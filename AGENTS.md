@@ -349,7 +349,22 @@ Documentation for Quest VR headset management tools is located in the `tools/` d
 
 - **[QUEST_WAKEUP.md](tools/QUEST_WAKEUP.md)** - How to wake up the Quest display remotely via ADB (useful for screenshots and remote debugging)
 
-## 13. Remote Debugging System (Quest/AI-Assisted Testing)
+## 13. Quest Device Safety Rules
+
+### APK Installation/Uninstallation
+**CRITICAL:** Never uninstall the APK from the Quest device unless given explicit permission by the user. The user may have game data, settings, or be in the middle of testing that would be lost.
+
+- ✅ **OK**: `adb install -r` (reinstall/update existing APK)
+- ❌ **NOT OK**: `adb uninstall com.tempovr.game` (removes app and data)
+
+If signature mismatch errors occur during install, **ask the user first** before uninstalling:
+```
+"The APK has a different signature than the installed version. 
+May I uninstall the existing app to install the new one? 
+This will remove any saved data on the device."
+```
+
+## 14. Remote Debugging System (Quest/AI-Assisted Testing)
 
 The project includes a remote debugging system that allows AI assistants to test the game on Quest without human interaction.
 
