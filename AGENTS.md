@@ -349,7 +349,23 @@ Documentation for Quest VR headset management tools is located in the `tools/` d
 
 - **[QUEST_WAKEUP.md](tools/QUEST_WAKEUP.md)** - How to wake up the Quest display remotely via ADB (useful for screenshots and remote debugging)
 
-## 13. Quest Device Safety Rules
+## 13. GitHub Safety Rules
+
+### Pull Requests
+**CRITICAL:** Follow these rules for GitHub pull requests:
+
+- ❌ **NEVER merge PRs** - Always leave merging to the user
+- ❌ **NEVER create PRs** unless explicitly told to do so by the user
+- ✅ **OK**: Push branches, commit changes
+- ✅ **OK**: Create PRs **only when the user explicitly requests it**
+
+### Why This Matters
+- PRs may need human review before merging
+- The user may want to add additional commits before creating a PR
+- Merging without approval can break the main branch
+- The user controls the release/merge workflow
+
+## 14. Quest Device Safety Rules
 
 ### APK Installation/Uninstallation
 **CRITICAL:** Never uninstall the APK from the Quest device unless given explicit permission by the user. The user may have game data, settings, or be in the middle of testing that would be lost.
@@ -364,7 +380,7 @@ May I uninstall the existing app to install the new one?
 This will remove any saved data on the device."
 ```
 
-## 14. Remote Debugging System (Quest/AI-Assisted Testing)
+## 15. Remote Debugging System (Quest/AI-Assisted Testing)
 
 The project includes a remote debugging system that allows AI assistants to test the game on Quest without human interaction.
 
