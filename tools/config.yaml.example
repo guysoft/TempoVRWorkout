@@ -1,0 +1,11 @@
+# Copy this file to config.yaml and customize for your system
+# DO NOT commit config.yaml - it contains user-specific paths
+
+# Path to Godot 4 executable
+# Examples:
+#   Linux (Steam): /home/user/.local/share/Steam/steamapps/common/Godot Engine/godot.x11.opt.tools.64
+#   Linux (manual): /usr/local/bin/godot4
+#   macOS: /Applications/Godot.app/Contents/MacOS/Godot
+#   Windows: C:\Program Files\Godot\Godot_v4.x.exe
+godot_cmd: "/path/to/godot"
+
