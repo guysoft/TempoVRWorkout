@@ -7,16 +7,16 @@ name: Build TempoVR
 # Trigger rules
 on:
   push:
-    branches: [main, develop, ci-workflow]
+    branches: [main, develop, ci-workflow, workout]
     tags: ['v*']
   pull_request:
-    branches: [main]
+    branches: [main, workout]
   workflow_dispatch:
 
 # Environment variables
 env:
   # Configure Godot version (must match project.godot config/features)
-  GODOT_VERSION: 4.4.1
+  GODOT_VERSION: 4.5.0
 
 # CI jobs
 jobs:
@@ -54,7 +54,6 @@ jobs:
             platform: android
             export-preset: Android Quest CI
             export-type: debug
-            export-args: --install-android-build-template
             export-folder: build/android-quest
             archive: Android-Quest
 
@@ -96,6 +95,29 @@ jobs:
           use-dotnet: false
           include-templates: true
 
+      # Configure Android environment for Godot
+      - name: Configure Android Environment
+        if: matrix.platform == 'android'
+        run: |
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.2.8568313" >> $GITHUB_ENV
+
+      # Configure Godot editor settings for Android
+      - name: Configure Editor Settings
+        if: matrix.platform == 'android'
+        run: |
+          mkdir -p ~/.config/godot
+          cat > ~/.config/godot/editor_settings-4.tres << EOF
+          [gd_resource type="EditorSettings" format=3]
+          
+          [resource]
+          export/android/android_sdk_path = "$ANDROID_HOME"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = ""
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EOF
+
       # Import Godot Project
       - name: Initial Godot Import
         shell: bash
@@ -103,12 +125,20 @@ jobs:
           cd src
           godot --headless --import || exit 0
 
+      # Install Android build template
+      - name: Install Android Build Template
+        if: matrix.platform == 'android'
+        shell: bash
+        run: |
+          cd src
+          godot --headless --export-android-install-build-template || exit 0
+
       # Export project
       - name: Export Godot Project
         shell: bash
         run: |
           cd src
-          godot --headless ${{ matrix.export-args }} --export-${{ matrix.export-type }} "${{ matrix.export-preset }}"
+          godot --headless --export-${{ matrix.export-type }} "${{ matrix.export-preset }}"
 
       # Upload artifacts
       - name: Upload Artifacts
@@ -140,4 +170,3 @@ jobs:
           omitNameDuringUpdate: true
           omitBodyDuringUpdate: true
           token: ${{ secrets.GITHUB_TOKEN }}
-
