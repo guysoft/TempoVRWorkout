@@ -16,7 +16,8 @@ on:
 # Environment variables
 env:
   # Configure Godot version (must match project.godot config/features)
-  GODOT_VERSION: 4.5
+  # Note: Using 4.5.1 as setup-godot requires minor version
+  GODOT_VERSION: 4.5.1
 
 # CI jobs
 jobs:
