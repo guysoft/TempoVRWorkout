@@ -4,23 +4,15 @@
 [ext_resource type="Theme" uid="uid://dhxx6nyx60wmn" path="res://ui_theme.tres" id="2"]
 [ext_resource type="Script" uid="uid://dtbp8rwbn2jte" path="res://scenes/MainMenuLeft.gd" id="3"]
 
-[node name="MainMenuLeft" type="Control"]
-modulate = Color(0.360784, 0.360784, 0.360784, 1)
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-pivot_offset = Vector2(-238, -153)
+[node name="MainMenuLeft" type="VBoxContainer"]
+custom_minimum_size = Vector2(996, 568)
 theme = ExtResource("2")
 script = ExtResource("3")
 
 [node name="TabContainer" type="TabContainer" parent="."]
-top_level = true
-layout_mode = 0
-offset_right = 996.0
-offset_bottom = 568.0
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_font_sizes/font_size = 41
 current_tab = 0
 
