@@ -20,7 +20,6 @@ const MIN_COMBO_FOR_MULTIPLIER = 5  # Need 5+ combo for score multiplier
 enum HitLevel { TOOLOW, MINIMUMIMPACT, FULLIMPACT }
 
 const BOMB_SCORE_VALUE = 100 
-const BOMB_ENERGY_VALUE = 25
 const MAX_COMBO = 99  # Increased max combo for PowerBeatsVR style
 
 # Floating score text scene
@@ -46,37 +45,12 @@ const GRAVITY = 0 #0.098
 var forward_velocity = 0
 var Walk_Speed = 0.1
 
-enum {FASTER, NEUTRAL, SLOWER}
-const MAX_ACCELERATION = 1
-const MIN_ACCELERATION = 0
-var time_direction = NEUTRAL
-var song_acceleration = 0.00:
-	set(value):
-		song_acceleration = value
-		if song_acceleration > MAX_ACCELERATION:
-			song_acceleration = MAX_ACCELERATION
-		if song_acceleration <= MIN_ACCELERATION:
-			song_acceleration = MIN_ACCELERATION
-var song_deceleration = 1.0 #rate at which we return to zero
-var acceleration_rate = 0.25
-
-# Legacy timing ranges (kept for reference, no longer used)
-#var hit_range = Vector2(-0.25, 0.25)
-#var accuracy_range = Vector2(0.0, 3.0)
-
 var score = 0:
 	set(value):
 		score = value
 		if score < 0:
 			score = 0
 		Events.emit_signal("current_score_updated", score)
-var energy = 0:
-	set(value):
-		energy = value
-		if energy > 100: energy = 100
-		if energy < 0: energy = 0
-		if energy == 0: disable_energy_use(1.0)
-		Events.emit_signal("current_energy_updated", energy)
 var combo = 0:
 	set(value):
 		combo = value
@@ -84,21 +58,13 @@ var combo = 0:
 			combo = MAX_COMBO
 		Events.emit_signal("current_combo_updated", combo)
 
-var can_use_energy = true
-
-var energy_decay_rate = 7
-
 #REFS
 @onready var _camera = $XROrigin3D/XRCamera3D
 
 
 func reset_player():
 	self.score = 0
-	self.energy = 0
 	self.combo = 0
-	self.can_use_energy=true
-	self.song_acceleration = 0.0
-	self.time_direction = NEUTRAL
 	
 	if not _beat_player:
 		_beat_player = Global.manager()._beatplayer
@@ -115,44 +81,9 @@ func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
 	if not GameVariables.ENABLE_VR:
-		
 		forward_velocity = Walk_Speed
-		set_process(true)
-	
 
-func _process(delta):
-	
-	if in_game and game_node:
-		#increase energy passively
-		self.energy += (1.5*delta*Engine.time_scale)
-	
-		process_controller_input("left", delta)
-		process_controller_input("right", delta)
-	
-		if can_use_energy:
-			if time_direction == FASTER:
-				#print ("Faster:", get_parent().song_speed)
-				game_node.set_song_speed(game_node.song_speed + song_acceleration*delta)
-			elif time_direction == SLOWER:
-				#print ("Slower:", get_parent().song_speed)
-				game_node.set_song_speed(game_node.song_speed - song_acceleration*delta)
-			elif time_direction == NEUTRAL:
-				#print ("Neutral:", get_parent().song_speed)
-				if not is_equal_approx(game_node.song_speed,1.0):
-					if game_node.song_speed > 1.0:
-						game_node.set_song_speed(game_node.song_speed-song_deceleration * delta)
-					elif game_node.song_speed <1.0:
-						game_node.set_song_speed(game_node.song_speed+song_deceleration * delta)
-				else:
-						game_node.song_speed = 1.0
-	
-	# Handle non-vr exit on ESCAPE
-#	if not GameVariables.ENABLE_VR:
-#		if Exit_On_Escape:
-#				if Input.is_key_pressed(KEY_ESCAPE):
-#						get_tree().quit()
-	
-	
+
 func _physics_process(delta):
 	
 	if not GameVariables.ENABLE_VR and in_game and not get_tree().paused:
@@ -250,7 +181,6 @@ func handle_hit(body, hand):
 		if body._type == 3:
 			$BombSound.play()
 			self.score -= BOMB_SCORE_VALUE
-			self.energy -= BOMB_ENERGY_VALUE
 			self.combo = 0
 			if body.has_method("on_hit"):
 				body.on_hit(0, 0, HitLevel.TOOLOW)
@@ -273,7 +203,6 @@ func handle_hit(body, hand):
 			if hit_level == HitLevel.TOOLOW:
 				# Too weak - miss
 				self.combo = 0
-				self.energy -= 1
 				if body.has_method("on_hit"):
 					body.on_hit(velocity, linear_velocity, hit_level)
 				else:
@@ -298,12 +227,6 @@ func handle_hit(body, hand):
 				
 				# Spawn floating score text at hit location
 				_spawn_floating_score(body.global_position, score_value, hit_level)
-				
-				# Energy gain based on hit level
-				if hit_level == HitLevel.FULLIMPACT:
-					self.energy += 2
-				else:
-					self.energy += 1
 
 				if body.has_method("on_hit"):
 					body.on_hit(velocity, linear_velocity, hit_level)
@@ -405,7 +328,6 @@ func pause_game():
 	var is_playlist_mode = PlaylistManager.is_playlist_mode()
 	
 	if get_tree().paused:
-		set_process(false)
 		if _beat_player:
 			_beat_player.stream_paused = true
 		
@@ -427,7 +349,6 @@ func pause_game():
 			skip_btn.visible = is_playlist_mode
 			skip_btn.disabled = not is_playlist_mode
 	else:
-		set_process(true)
 		if _beat_player:
 			_beat_player.stream_paused = false
 		pause_menu.get_node("PauseSound").play()
@@ -438,61 +359,6 @@ func pause_game():
 		if skip_btn:
 			skip_btn.disabled = true
 	
-
-func process_controller_input(hand, delta):
-	var hand_object = null
-	if hand=="left":
-		hand_object = Global.manager()._left_hand
-	elif hand=="right":
-		hand_object = Global.manager()._right_hand
-
-	if not hand_object:
-		#print ("not a hand")
-		return
-	
-	
-	if in_game:
-		time_direction = NEUTRAL
-		
-		var trigger
-		var grip
-		if Global.manager().webxr_interface:
-			trigger = 4
-			grip = 5
-		else:
-			trigger = "trigger_click"
-			grip = "grip_click"
-			
-		if GameVariables.ENABLE_VR:
-			# Pause button is now handled in _physics_process so it works when paused
-			#if hand_object._buttons_pressed[JOY_OPENVR_MENU]:
-			
-			# NOTE: Removed the BombSound.play() here - it was playing every frame
-			# when trigger was pressed and energy was low, causing repeated beep sounds
-			# The original intent was likely a one-time feedback, but this needs proper
-			# "just pressed" detection to work correctly
-			
-			if hand_object.is_button_pressed(trigger):
-				if energy>energy_decay_rate*delta and can_use_energy:
-					#print ("joy button pressed")
-					#self.get_parent().toggle_speed(1.5, 0.1, 5.0, 0.01)
-					self.song_acceleration+=acceleration_rate * delta
-					time_direction = FASTER
-					self.energy -= energy_decay_rate * delta
-			
-			if hand_object.is_button_pressed(grip):
-				if energy>energy_decay_rate*delta and can_use_energy:
-					#print ("joy grip pressed")
-					#self.get_parent().toggle_speed(0.5, 0.1, 5.0, 0.01)
-					self.song_acceleration+=acceleration_rate * delta
-					time_direction = SLOWER
-					self.energy -= energy_decay_rate * delta
-			
-
-
-
-
-			
 
 func button_pressed(button, hand):
 	pass
@@ -528,14 +394,6 @@ func _on_HeadArea_area_entered(area):
 		$BombSound.play()
 		self.combo = 0
 		self.score -= 500
-		self.energy -= 25
-		game_node.toggle_speed(0.5, 0.1, 1.0, 0.01)
-		disable_energy_use(1.5)
-
-func disable_energy_use(seconds):
-	can_use_energy = false
-	await get_tree().create_timer(seconds).timeout
-	can_use_energy = true
 
 
 func _on_ResumeBtn_pressed():

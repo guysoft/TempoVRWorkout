@@ -5,7 +5,6 @@ const SAVE_PATH = "user://settings.ini"
 var _config_file = ConfigFile.new()
 var _settings = {
 	"game": {
-		"disable_time_warp": false,
 		"only_power_balls": false
 		},
 	"vr": {

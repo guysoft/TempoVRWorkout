@@ -37,15 +37,11 @@ offset_top = 32.0
 offset_right = 24.0
 offset_bottom = -4.0
 theme_override_font_sizes/normal_font_size = 33
-text = "Hit notes on time to collect energy and increase your combo. Missing resets your combo so try not to. Use energy to modify your speed.
+text = "Hit notes on time to increase your combo. Missing resets your combo so try not to.
 
 Avoid walls and bombs which will remove your combo and slow you down!
 
-Score bonus points based on your clear time.
-
-Controls
-trigger -> speed up time
-grip -> slow down time"
+Score bonus points based on your clear time."
 tab_size = 10
 
 [node name="Settings" type="ReferenceRect" parent="TabContainer"]
@@ -59,20 +55,11 @@ anchor_bottom = 1.0
 offset_right = -8.0
 offset_bottom = -36.0
 
-[node name="DisableTimeWarp" type="CheckButton" parent="TabContainer/Settings"]
+[node name="OnlyPowerBalls" type="CheckButton" parent="TabContainer/Settings"]
 layout_mode = 0
 offset_right = 600.0
 offset_bottom = 80.0
 theme_override_font_sizes/font_size = 47
-text = "Disable time warp"
-
-[node name="OnlyPowerBalls" type="CheckButton" parent="TabContainer/Settings"]
-layout_mode = 0
-offset_top = 90.0
-offset_right = 600.0
-offset_bottom = 170.0
-theme_override_font_sizes/font_size = 47
 text = "Only power balls"
 
-[connection signal="toggled" from="TabContainer/Settings/DisableTimeWarp" to="." method="_on_DisableTimeWarp_toggled"]
 [connection signal="toggled" from="TabContainer/Settings/OnlyPowerBalls" to="." method="_on_OnlyPowerBalls_toggled"]

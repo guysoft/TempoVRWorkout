@@ -243,7 +243,6 @@ func despawn(type):
 		var manager = Global.manager()
 		if manager and manager._player:
 			manager._player.combo = 0
-			manager._player.energy -= 1
 		
 	await _animation_player.animation_finished
 	deactivate()

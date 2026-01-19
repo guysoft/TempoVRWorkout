@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://7ayj7cglk12m"]
+[gd_scene load_steps=26 format=3 uid="uid://7ayj7cglk12m"]
 
 [ext_resource type="Script" uid="uid://dkxv61amt5qsg" path="res://scripts/Game.gd" id="1"]
 [ext_resource type="Environment" uid="uid://bmargeaaawkls" path="res://effects/Dark_environment.tres" id="2"]
@@ -16,7 +16,6 @@
 [ext_resource type="Material" uid="uid://bhuo1ttshnp37" path="res://effects/wall_material.tres" id="14"]
 [ext_resource type="Material" uid="uid://fm84yumfchuq" path="res://effects/note_3_material.tres" id="15"]
 [ext_resource type="PackedScene" uid="uid://bqmjf2xl6vp1h" path="res://scenes/ui_score.tscn" id="16"]
-[ext_resource type="PackedScene" uid="uid://c4hmskf6kfhyq" path="res://scenes/ui_energy_bar.tscn" id="17"]
 [ext_resource type="Material" uid="uid://dr8t6pa5tb8a4" path="res://effects/note_1_material.tres" id="18"]
 [ext_resource type="Material" uid="uid://0l3q4ycp43lc" path="res://effects/note_0_material.tres" id="19"]
 [ext_resource type="PackedScene" uid="uid://dp6qkljlk5y1r" path="res://scenes/ui_time_left.tscn" id="20"]
@@ -234,10 +233,6 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("21")
 theme_override_font_sizes/font_size = 60
 text = "X4"
-
-[node name="EnergyBar" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer" instance=ExtResource("17")]
-custom_minimum_size = Vector2(800, 100)
-layout_mode = 2
 
 [node name="PlaylistTimeLabel" type="Label" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer"]
 visible = false

@@ -53,23 +53,20 @@ subdivide_depth = 16
 [node name="Ground" type="StaticBody3D"]
 collision_layer = 8
 script = ExtResource("2")
-ground_size = 8.0
-subdivisions = 128
-grid_scale = 2.0
 
 [node name="GroundShapeA" type="MeshInstance3D" parent="."]
 transform = Transform3D(8, 0, 0, 0, 0.5, 0, 0, 0, 8, 0.053482056, 0.036834717, -0.04353995)
+extra_cull_margin = 50.0
 mesh = SubResource("27")
 skeleton = NodePath("../CollisionShape3D")
 surface_material_override/0 = ExtResource("1")
-extra_cull_margin = 50.0
 
 [node name="GroundShapeB" type="MeshInstance3D" parent="."]
-transform = Transform3D(8, 0, 0, 0, 0.5, 0, 0, 0, 8, 0.053482056, 0.036834717, -64.04353995)
+transform = Transform3D(8, 0, 0, 0, 0.5, 0, 0, 0, 8, 0.053482056, 0.036834717, -64.04354)
+extra_cull_margin = 50.0
 mesh = SubResource("27")
 skeleton = NodePath("../CollisionShape3D")
 surface_material_override/0 = ExtResource("1")
-extra_cull_margin = 50.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.038, 3.688)

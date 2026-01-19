@@ -132,4 +132,3 @@ func _back_action():
 	print("DebugController: Back/Escape pressed")
 	# This is handled by individual scenes
 	# Just log it for debugging purposes
-

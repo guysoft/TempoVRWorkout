@@ -283,7 +283,6 @@ func test_all_menu_scenes() -> bool:
 		"res://scenes/UICanvasInteract.tscn",
 		"res://scenes/UITransition.tscn",
 		"res://scenes/ui_combo.tscn",
-		"res://scenes/ui_energy_bar.tscn",
 		"res://scenes/ui_score.tscn",
 		"res://scenes/ui_song_list.tscn",
 		"res://scenes/ui_time_left.tscn",

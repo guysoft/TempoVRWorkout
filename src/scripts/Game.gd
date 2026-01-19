@@ -23,12 +23,8 @@ var obstaclescene = preload("res://scenes/Obstacle.tscn")
 # This is set from the map's get_ball_flight_duration() method
 var notes_delay = 4
 
-const MIN_SONG_SPEED = 0.5
-const MAX_SONG_SPEED = 1.5
 var _song_length
-var song_speed = 1
 var _song_offset
-var toggle_speed_lock = false
 
 var _bounce_time = 0
 var _bounce_freq = 0
@@ -207,8 +203,6 @@ func setup_song(map):
 	#print ("time delay:", time_delay)
 	_song_offset = map.get_offset()
 	_beat_player.offset = _song_offset + float(_time_delay)
-	
-	set_song_speed(song_speed)
 
 #setup the visual elements
 func setup_environment(map):
@@ -386,49 +380,6 @@ func setup_map(path:String, difficulty:String):
 		print("Game.setup_map: MapFactory.create_map returned null!")
 	return map
 
-
-#function for changing the song speed and adjusting the
-#beatplayer pitch, engine speed and environment satuation control
-#simultaneously
-func set_song_speed(newval, do_lerp = false, lerp_step = 0.05, lerp_delay= 0.05):
-	if Settings.get_setting("game", "disable_time_warp"):
-		return
-	song_speed = newval
-	if song_speed <= MIN_SONG_SPEED: 
-		song_speed = MIN_SONG_SPEED
-	if song_speed >= MAX_SONG_SPEED:
-		song_speed = MAX_SONG_SPEED
-	
-	#print ("adjusting song_speed: ", song_speed)
-	
-	if do_lerp:
-		if is_equal_approx(Engine.time_scale,song_speed):
-			return
-		else:
-			while (not is_equal_approx(Engine.time_scale, song_speed)):
-				_beat_player.pitch_scale = lerp(_beat_player.pitch_scale, song_speed, lerp_step)
-				_environment_manager.environment.adjustment_saturation = Utility.remap_value(song_speed,Vector2(0.5,1.5),Vector2(0.0,2.0))
-				Engine.time_scale = lerp(Engine.time_scale, song_speed, lerp_step)
-				await get_tree().create_timer(lerp_delay).timeout
-	
-	_environment_manager.environment.adjustment_saturation = Utility.remap_value(song_speed,Vector2(0.5,1.5),Vector2(0.0,2.0))
-	_beat_player.pitch_scale = song_speed
-	Engine.time_scale = song_speed
-
-#Smoothly interpolate speed to target speed for x amount of time and
-#then interpolate back
-func toggle_speed(target_speed, step, duration_stay, step_delay):
-	if toggle_speed_lock:
-		return
-	toggle_speed_lock = true
-
-	set_song_speed(target_speed,true,step,step_delay)
-
-	await get_tree().create_timer(duration_stay).timeout
-
-	set_song_speed(1.0,true,step,step_delay)
-	
-	toggle_speed_lock = false
 
 #signal callback for beatplayer when music ends
 #propogates a global event song_end to the event bus
