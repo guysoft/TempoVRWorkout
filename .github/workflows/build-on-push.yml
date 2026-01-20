@@ -147,13 +147,22 @@ jobs:
           cd src
           godot --headless ${{ matrix.export-args }} --export-${{ matrix.export-type }} "${{ matrix.export-preset }}"
 
+      # Copy pre-shipped levels to build output (external filesystem access)
+      - name: Copy Pre-shipped Levels to Build
+        if: matrix.platform != 'android'
+        shell: bash
+        run: |
+          cp -r src/Levels src/${{ matrix.export-folder }}/Levels
+          echo "Copied Levels folder to build output:"
+          ls -la src/${{ matrix.export-folder }}/Levels/
+
       # Upload artifacts
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.archive }}-Artifacts
           path: |
-            src/${{ matrix.export-folder }}/*.*
+            src/${{ matrix.export-folder }}
             !**/.gitignore
 
       # Compress project (if building release tag)
@@ -163,7 +172,7 @@ jobs:
           github.ref_type == 'tag'
         run: |
           cd src/${{ matrix.export-folder }}
-          7z a -tzip ${{ matrix.archive }}.zip *.* -x'!.gitignore'
+          7z a -tzip ${{ matrix.archive }}.zip . -x'!.gitignore'
 
       # Publish release (if building release tag)
       - name: Publish Release

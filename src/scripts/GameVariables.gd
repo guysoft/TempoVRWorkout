@@ -21,6 +21,8 @@ var difficulty = null
 # Defalt location of songs
 var internal_songs_path:String = ""
 var custom_songs_path:String = ""
+# Bundled levels (pre-shipped in res://Levels/ for export builds)
+var bundled_songs_path:String = "res://Levels"
 var song_selected
 
 var custom_levels_foldername = "Levels"

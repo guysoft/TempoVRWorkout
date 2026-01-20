@@ -17,8 +17,18 @@ static func detect_format(path: String) -> MapFormat:
 	print("MapFactory.detect_format: path=", path)
 	
 	# Check for Beat Saber format (folder with info.dat)
-	if DirAccess.dir_exists_absolute(path):
-		if FileAccess.file_exists(path + "/info.dat") or FileAccess.file_exists(path + "/Info.dat"):
+	# Handle both res:// paths (bundled) and absolute paths (filesystem)
+	var dir_exists = false
+	if path.begins_with("res://"):
+		# For res:// paths, try to open the directory
+		var dir = DirAccess.open(path)
+		dir_exists = dir != null
+	else:
+		dir_exists = DirAccess.dir_exists_absolute(path)
+	
+	if dir_exists:
+		var info_exists = FileAccess.file_exists(path + "/info.dat") or FileAccess.file_exists(path + "/Info.dat")
+		if info_exists:
 			print("MapFactory.detect_format: BEAT_SABER (folder with info.dat)")
 			return MapFormat.BEAT_SABER
 	

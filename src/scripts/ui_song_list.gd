@@ -56,8 +56,11 @@ func populate_list():
 	
 	if tab == "Original":
 		# Populate Item List with internal levels (Beat Saber format)
+		# First check external path (for copied levels next to executable)
 		path = GameVariables.internal_songs_path
 		_add_beatsaber_songs(path)
+		# Also check bundled levels (res://Levels/ - pre-shipped in PCK)
+		_add_beatsaber_songs_bundled(GameVariables.bundled_songs_path)
 		_populate_beatsaber_ui()
 	elif tab == "Custom":
 		# Custom tab uses PowerBeatsVR music folder browser
@@ -260,7 +263,7 @@ func _finalize_list_ui():
 
 
 func _add_beatsaber_songs(search_path: String):
-	"""Add Beat Saber format songs (folders with info.dat)"""
+	"""Add Beat Saber format songs (folders with info.dat) from filesystem"""
 	if search_path == "":
 		return
 	
@@ -271,10 +274,46 @@ func _add_beatsaber_songs(search_path: String):
 			# Check if it's a Beat Saber level (folder with info.dat)
 			if DirAccess.dir_exists_absolute(item_path):
 				if FileAccess.file_exists(item_path + "/info.dat") or FileAccess.file_exists(item_path + "/Info.dat"):
+					# Skip if already added (avoid duplicates from bundled check)
+					if item_path in songs_paths:
+						continue
 					songs_list.append(item)
 					songs_paths.append(item_path)
 					item_types.append(ItemType.BEATSABER_SONG)
 					disabled_items.append(false)
+
+
+func _add_beatsaber_songs_bundled(search_path: String):
+	"""Add Beat Saber format songs bundled in res:// (for export builds)"""
+	if search_path == "":
+		return
+	
+	# Use DirAccess for res:// paths (works with bundled resources)
+	var dir = DirAccess.open(search_path)
+	if not dir:
+		return
+	
+	dir.list_dir_begin()
+	var item = dir.get_next()
+	while item != "":
+		if not item.begins_with("."):
+			var item_path = search_path + "/" + item
+			# Check if it's a directory with info.dat
+			if dir.current_is_dir():
+				var info_path = item_path + "/info.dat"
+				var Info_path = item_path + "/Info.dat"
+				if ResourceLoader.exists(info_path) or ResourceLoader.exists(Info_path) or FileAccess.file_exists(info_path) or FileAccess.file_exists(Info_path):
+					# Skip if already added from filesystem path
+					var absolute_path = ProjectSettings.globalize_path(item_path)
+					if absolute_path in songs_paths or item_path in songs_paths:
+						item = dir.get_next()
+						continue
+					songs_list.append(item)
+					songs_paths.append(item_path)  # Keep res:// path for bundled resources
+					item_types.append(ItemType.BEATSABER_SONG)
+					disabled_items.append(false)
+		item = dir.get_next()
+	dir.list_dir_end()
 
 
 func _is_music_file(filename: String) -> bool:
