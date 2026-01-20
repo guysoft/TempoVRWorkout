@@ -22,5 +22,22 @@ mv temp_vendors/addons/godotopenxrvendors src/addons/
 rm -rf temp_vendors godot_openxr_vendors.zip
 echo "Installed Godot OpenXR Vendors."
 
+echo "Downloading Pre-shipped Levels..."
+mkdir -p src/Levels/a908 src/Levels/a907
+
+# a908 - TheFatRat - Unity (ExpertPlus)
+curl -sL "https://r2cdn.beatsaver.com/296946437e2194823129d88e7c457202e4c7f281.zip" -o /tmp/a908.zip
+unzip -j /tmp/a908.zip ExpertPlusStandard.dat cover.jpg song.egg info.dat -d src/Levels/a908/
+mv src/Levels/a908/song.egg src/Levels/a908/song.ogg
+python3 scripts/patch_level_info.py src/Levels/a908/info.dat
+
+# a907 - TheFatRat - Monody (ExpertPlus)
+curl -sL "https://r2cdn.beatsaver.com/8e82872941abe8c99e9ac86d9c063fc5aee57d52.zip" -o /tmp/a907.zip
+unzip -j /tmp/a907.zip ExpertPlusStandard.dat cover.jpg song.egg info.dat -d src/Levels/a907/
+mv src/Levels/a907/song.egg src/Levels/a907/song.ogg
+python3 scripts/patch_level_info.py src/Levels/a907/info.dat
+
+echo "Pre-shipped levels installed (ExpertPlus only)."
+
 echo "Dependencies installed successfully!"
 
