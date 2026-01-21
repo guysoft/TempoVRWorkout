@@ -438,3 +438,28 @@ adb shell input keyevent KEYCODE_5   # Set difficulty: Expert
 - **debug_test_song is filename only** - Just `"Song.mp3"`, not the full path
 - **DebugController reads from GameManager** - No hardcoded values in DebugController.gd
 - See `docs/QUEST_MCP_DEBUGGING.md` for detailed debugging procedures
+
+## 16. Critical Settings - Never Commit Wrong Values
+
+**CRITICAL:** The following settings must ALWAYS be verified before committing:
+
+| File | Setting | Required Value | What Happens If Wrong |
+|------|---------|----------------|----------------------|
+| `src/scripts/GameVariables.gd` | `ENABLE_VR` | `true` | Black screen on Quest - VR doesn't render |
+| `src/scenes/GameManager.tscn` | `debug_start_scene` | `"Menu"` | Game skips menu, confuses users |
+| `src/scenes/GameManager.tscn` | `debug_test_song` | `""` (empty) | Game tries to load non-existent test song |
+
+### Pre-Commit Checklist
+
+Before committing ANY changes, verify:
+```bash
+# Check ENABLE_VR is true
+grep "ENABLE_VR" src/scripts/GameVariables.gd
+# Expected: var ENABLE_VR = true
+```
+
+### Why This Matters
+
+- **ENABLE_VR = false** causes Quest builds to show a black screen because no XR viewport is rendered
+- These settings are often changed during desktop testing and forgotten before deploy
+- CI builds will inherit whatever value is committed, breaking releases
