@@ -93,6 +93,20 @@ func get_available_difficulties() -> Array:
 						difficulties.append(difficulty_map["_difficulty"])
 	return difficulties
 
+
+func _get_difficulty_filename(difficulty: String) -> String:
+	"""Look up the actual beatmap filename for a difficulty from info.dat"""
+	if self.bs_info_data == null or not "_difficultyBeatmapSets" in self.bs_info_data:
+		return ""
+	
+	for beatmap_set in self.bs_info_data["_difficultyBeatmapSets"]:
+		if "_difficultyBeatmaps" in beatmap_set:
+			for difficulty_map in beatmap_set["_difficultyBeatmaps"]:
+				if "_difficulty" in difficulty_map and difficulty_map["_difficulty"] == difficulty:
+					if "_beatmapFilename" in difficulty_map:
+						return difficulty_map["_beatmapFilename"]
+	return ""
+
 func _on_beat_detected(difficulty, beat:int):
 	# assert(typeof(beat) == TYPE_INT)
 	
@@ -115,10 +129,26 @@ func _on_beat_detected(difficulty, beat:int):
 	return [return_value_notes, return_value_obstacles, return_value_events]
 
 func get_level(difficulty):
-	var difficulty_path = self.path + "/" + difficulty + ".dat"
+	# Look up the actual filename from info.dat's _beatmapFilename
+	var difficulty_filename = _get_difficulty_filename(difficulty)
+	if difficulty_filename == "":
+		# Fallback to old behavior for compatibility
+		difficulty_filename = difficulty + ".dat"
+	
+	var difficulty_path = self.path + "/" + difficulty_filename
 	var file = FileAccess.open(difficulty_path, FileAccess.READ)
+	if not file:
+		push_error("MapLoader: Could not open difficulty file: " + difficulty_path)
+		return
+	
 	var json = JSON.new()
-	json.parse(file.get_as_text())
+	var error = json.parse(file.get_as_text())
+	file.close()
+	
+	if error != OK:
+		push_error("MapLoader: JSON parse error in " + difficulty_path + ": " + json.get_error_message())
+		return
+	
 	var level = json.data
 	self.bs_level_data[difficulty] = level
 	
