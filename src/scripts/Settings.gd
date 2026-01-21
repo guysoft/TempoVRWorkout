@@ -10,6 +10,9 @@ var _settings = {
 	"vr": {
 		"recenter_offset_position": Vector3.ZERO,
 		"recenter_offset_rotation": 0.0  # Y-axis rotation in radians
+		},
+	"ui": {
+		"song_list_tab": 0  # Default to Original tab (index 0)
 		}
 	}
 

@@ -41,7 +41,32 @@ const DISABLED_COLOR = Color(0.5, 0.5, 0.5)
 
 
 func _ready():
+	# Set up tab persistence (only do this once from the Original tab)
+	if tab == "Original":
+		_setup_tab_persistence()
+	
 	populate_list()
+
+
+func _setup_tab_persistence():
+	"""Set up tab persistence - load saved tab and connect to tab_changed signal"""
+	var tab_container = get_parent()
+	if not tab_container or not tab_container is TabContainer:
+		return
+	
+	# Load the saved tab index
+	var saved_tab = Settings.get_setting("ui", "song_list_tab", 0)
+	if saved_tab is int and saved_tab >= 0 and saved_tab < tab_container.get_tab_count():
+		tab_container.current_tab = saved_tab
+	
+	# Connect to tab_changed to save when user switches tabs
+	if not tab_container.tab_changed.is_connected(_on_tab_container_tab_changed):
+		tab_container.tab_changed.connect(_on_tab_container_tab_changed)
+
+
+func _on_tab_container_tab_changed(tab_index: int):
+	"""Save the selected tab when user changes it"""
+	Settings.set_setting("ui", "song_list_tab", tab_index)
 
 
 func populate_list():
