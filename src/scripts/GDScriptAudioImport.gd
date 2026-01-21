@@ -50,6 +50,23 @@ func report_errors(err, filepath):
 		print("Unknown error with file ", filepath, " error code: ", err)
 
 func loadfile(filepath, loop = false, type_override=null):
+	# For res:// paths (bundled resources), use ResourceLoader
+	# This handles Godot's imported/processed audio properly on Android/Quest
+	if filepath.begins_with("res://"):
+		var resource = ResourceLoader.load(filepath)
+		if resource is AudioStream:
+			if resource is AudioStreamOggVorbis:
+				resource.loop = loop
+			elif resource is AudioStreamMP3:
+				resource.loop = loop
+			elif resource is AudioStreamWAV:
+				resource.loop_mode = 1 if loop else 0
+			return resource
+		else:
+			push_warning("AudioLoader: Failed to load bundled audio: " + filepath)
+			return null
+	
+	# For filesystem paths, continue with raw file loading
 	var file = FileAccess.open(filepath, FileAccess.READ)
 	if file == null:
 		report_errors(FileAccess.get_open_error(), filepath)
