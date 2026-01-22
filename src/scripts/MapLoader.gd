@@ -18,8 +18,8 @@ const BPM_HIGH_THRESHOLD = 145
 const LEVEL_WIDTH = 0.8
 # Lowest point in the game map - matches PowerBeatsVR converted levels (Wellerman lowest = -0.5 + 1.3 = 0.8)
 const LEVEL_LOW = 0.8
-# Highest point in the map - adjusted for proper vertical range
-const LEVEL_HIGH = 1.35
+# Highest point in the map - LEVEL_HIGH * 2 = max Y, so 0.9 * 2 = 1.8 (matches Wellerman highest)
+const LEVEL_HIGH = 0.9
 
 var path = null
 var bs_level_data = {}
