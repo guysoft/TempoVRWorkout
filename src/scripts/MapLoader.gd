@@ -11,12 +11,15 @@ const BS_LEVELS = ["Easy", "NormalStandard", "Normal", "HardStandard", "Hard", "
 const NOTE_TYPE = {"BOMB": 3}
 const OBSTACLE_TYPE = {"FULL_HEIGHT": 0, "CROUCH": 1}
 
+# BPM threshold for ball flight duration (from PowerBeatsVR)
+const BPM_HIGH_THRESHOLD = 145
+
 # The width from each side in the center (the total width is twice this number)
 const LEVEL_WIDTH = 0.8
-# Lowest point in the game map beneeth your center
-const LEVEL_LOW = 0.6
-# Highest point in the map
-const LEVEL_HIGH = 1.05
+# Lowest point in the game map - matches PowerBeatsVR converted levels (Wellerman lowest = -0.5 + 1.3 = 0.8)
+const LEVEL_LOW = 0.8
+# Highest point in the map - adjusted for proper vertical range
+const LEVEL_HIGH = 1.35
 
 var path = null
 var bs_level_data = {}
@@ -75,8 +78,14 @@ func get_note_count(difficulty):
 	return self.bs_level_data[difficulty]["_notes"].size()
 
 func get_ball_flight_duration() -> int:
-	# Beat Saber levels use the original 4-beat timing from EnergySource
-	return 4
+	# Ball flight duration in beats - matches PowerBeatsVR timing
+	# High BPM (>= 145): 3 beats for more reaction time
+	# Low/Mid BPM (< 145): 2 beats
+	var bpm = get_bpm()
+	if bpm >= BPM_HIGH_THRESHOLD:
+		return 3
+	else:
+		return 2
 
 func get_song():
 	if self.bs_info_data != null and "_songFilename" in self.bs_info_data:
