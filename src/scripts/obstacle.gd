@@ -146,9 +146,9 @@ func _setup_collision_for_pbvr_wall(wall_type: int, z_scale: float):
 		_extra_collision_shapes.append(collision_node)
 
 
-func _setup_beatsaber_obstacle(obstacle: Dictionary, _spd: float, bpm: float, distance: float):
+func _setup_beatsaber_obstacle(obstacle: Dictionary, obstacle_speed: float, bpm: float, distance: float):
 	"""Setup a Beat Saber style obstacle (grid-based positioning)."""
-	self.speed = speed
+	self.speed = obstacle_speed
 	if not obstacle:
 		return
 	
