@@ -158,34 +158,32 @@ func _setup_beatsaber_obstacle(obstacle: Dictionary, obstacle_speed: float, bpm:
 	var x = -90
 	var y = -90
 	
+	# Lane positions for wall placement (same for both wall types)
+	var index_to_position_x = {
+		0: -Map.LEVEL_WIDTH, 
+		1: -Map.LEVEL_WIDTH*0.5,
+		2: Map.LEVEL_WIDTH*0.5,
+		3: Map.LEVEL_WIDTH
+	}
+	# Width of a single lane (used for centering multi-lane walls)
+	var lane_width = Map.LEVEL_WIDTH * 0.5  # = 0.4
+	
 	if obstacle["type"] == "full_height":
-		var index_to_position_x = {
-			0: -Map.LEVEL_WIDTH, 
-			1: -Map.LEVEL_WIDTH*0.5,
-			2: Map.LEVEL_WIDTH*0.5,
-			3: Map.LEVEL_WIDTH
-		}
-		
-		#scale_x is double the width
-		scale_x = 2*Map.LEVEL_WIDTH/4 * obstacle["width"]
-		#scale_x = Map.LEVEL_WIDTH*0.25 * obstacle["width"]
+		# Wall width scales with number of lanes covered
+		scale_x = lane_width * obstacle["width"]
 		scale_y = Map.LEVEL_HIGH*2 - Map.LEVEL_LOW
-		#x = index_to_position_x[int(obstacle["_lineIndex"])] + 0.5 * scale_x
-		x = index_to_position_x[int(obstacle["_lineIndex"])]*obstacle["width"] + 0.5 * scale_x
+		# Center wall: start at lane position, add half the extra width beyond one lane
+		var base_x = index_to_position_x[int(obstacle["_lineIndex"])]
+		x = base_x + (scale_x - lane_width) / 2
 		y = (Map.LEVEL_HIGH*2 + Map.LEVEL_LOW)/2
 		
 	elif obstacle["type"] == "crouch":
-		var index_to_position_x = {
-			0: -Map.LEVEL_WIDTH,
-			1: -Map.LEVEL_WIDTH*0.5,
-			2: Map.LEVEL_WIDTH*0.5,
-			3: Map.LEVEL_WIDTH
-		}
-		scale_x = 2*Map.LEVEL_WIDTH/4 * obstacle["width"]
+		# Wall width scales with number of lanes covered
+		scale_x = lane_width * obstacle["width"]
 		scale_y = (Map.LEVEL_HIGH*2 - Map.LEVEL_LOW) / 2
-		x = index_to_position_x[int(obstacle["_lineIndex"])] + 0.5 * scale_x
-		#y = Map.LEVEL_LOW + (Map.LEVEL_HIGH - Map.LEVEL_LOW) * 0.75 + scale_y/2
-		#y = Map.LEVEL_LOW + (Map.LEVEL_HIGH - Map.LEVEL_LOW)
+		# Center wall: start at lane position, add half the extra width beyond one lane
+		var base_x = index_to_position_x[int(obstacle["_lineIndex"])]
+		x = base_x + (scale_x - lane_width) / 2
 		y = Map.LEVEL_HIGH*2
 		
 	print("got: " + obstacle["type"])
@@ -196,9 +194,10 @@ func _setup_beatsaber_obstacle(obstacle: Dictionary, obstacle_speed: float, bpm:
 	#self.scale_object_local(Vector3(scale_x, scale_y, z))
 	$MeshInstance3D.scale = (Vector3(scale_x, scale_y, z))
 	$CollisionShape3D.scale = (Vector3(scale_x, scale_y, z))
-	transform.origin = Vector3(x, y, -z)
+	# -0.25 offset aligns wall front face with note timing (matches Beat Saber behavior)
+	transform.origin = Vector3(x, y, -z - 0.25)
 	
-	despawn_z = distance+z
+	despawn_z = distance + z
 	
 	#if the note has an offset, set up the timer to match
 	if obstacle["offset"] > 0.0:
