@@ -55,11 +55,120 @@ anchor_bottom = 1.0
 offset_right = -8.0
 offset_bottom = -36.0
 
-[node name="OnlyPowerBalls" type="CheckButton" parent="TabContainer/Settings"]
+[node name="SettingsContent" type="VBoxContainer" parent="TabContainer/Settings"]
 layout_mode = 0
-offset_right = 600.0
-offset_bottom = 80.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 970.0
+offset_bottom = 480.0
+
+[node name="OnlyPowerBalls" type="CheckButton" parent="TabContainer/Settings/SettingsContent"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 47
 text = "Only power balls"
 
-[connection signal="toggled" from="TabContainer/Settings/OnlyPowerBalls" to="." method="_on_OnlyPowerBalls_toggled"]
+[node name="Orientation" type="ReferenceRect" parent="TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Panel" type="Panel" parent="TabContainer/Orientation"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -8.0
+offset_bottom = -36.0
+
+[node name="OrientationContent" type="VBoxContainer" parent="TabContainer/Orientation"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 970.0
+offset_bottom = 480.0
+
+[node name="PositionLabel" type="Label" parent="TabContainer/Orientation/OrientationContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "— Position —"
+horizontal_alignment = 1
+
+[node name="PositionButtons" type="HBoxContainer" parent="TabContainer/Orientation/OrientationContent"]
+layout_mode = 2
+alignment = 1
+
+[node name="LeftBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons"]
+custom_minimum_size = Vector2(140, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Left"
+
+[node name="RightBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons"]
+custom_minimum_size = Vector2(140, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Right"
+
+[node name="FwdBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons"]
+custom_minimum_size = Vector2(140, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Fwd"
+
+[node name="BackBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons"]
+custom_minimum_size = Vector2(140, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Back"
+
+[node name="Spacer1" type="Control" parent="TabContainer/Orientation/OrientationContent"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="RotationLabel" type="Label" parent="TabContainer/Orientation/OrientationContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "— Rotation —"
+horizontal_alignment = 1
+
+[node name="RotationButtons" type="HBoxContainer" parent="TabContainer/Orientation/OrientationContent"]
+layout_mode = 2
+alignment = 1
+
+[node name="RotateCCWBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/RotationButtons"]
+custom_minimum_size = Vector2(200, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "↺ CCW"
+
+[node name="RotateCWBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/RotationButtons"]
+custom_minimum_size = Vector2(200, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "CW ↻"
+
+[node name="Spacer2" type="Control" parent="TabContainer/Orientation/OrientationContent"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="ResetBtn" type="Button" parent="TabContainer/Orientation/OrientationContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Reset Position"
+
+[node name="Spacer3" type="Control" parent="TabContainer/Orientation/OrientationContent"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="RecenterBtn" type="Button" parent="TabContainer/Orientation/OrientationContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Recenter (like B+Y)"
+
+[connection signal="toggled" from="TabContainer/Settings/SettingsContent/OnlyPowerBalls" to="." method="_on_OnlyPowerBalls_toggled"]
+[connection signal="button_down" from="TabContainer/Orientation/OrientationContent/PositionButtons/LeftBtn" to="." method="_on_LeftBtn_pressed"]
+[connection signal="button_down" from="TabContainer/Orientation/OrientationContent/PositionButtons/RightBtn" to="." method="_on_RightBtn_pressed"]
+[connection signal="button_down" from="TabContainer/Orientation/OrientationContent/PositionButtons/FwdBtn" to="." method="_on_FwdBtn_pressed"]
+[connection signal="button_down" from="TabContainer/Orientation/OrientationContent/PositionButtons/BackBtn" to="." method="_on_BackBtn_pressed"]
+[connection signal="button_down" from="TabContainer/Orientation/OrientationContent/RotationButtons/RotateCCWBtn" to="." method="_on_RotateCCWBtn_pressed"]
+[connection signal="button_down" from="TabContainer/Orientation/OrientationContent/RotationButtons/RotateCWBtn" to="." method="_on_RotateCWBtn_pressed"]
+[connection signal="button_down" from="TabContainer/Orientation/OrientationContent/ResetBtn" to="." method="_on_ResetBtn_pressed"]
+[connection signal="button_down" from="TabContainer/Orientation/OrientationContent/RecenterBtn" to="." method="_on_RecenterBtn_pressed"]

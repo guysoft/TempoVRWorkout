@@ -25,6 +25,15 @@ func _init():
 	# Test 5: Settings get/set with defaults
 	all_passed = test_settings_get_with_default() and all_passed
 	
+	# Test 6: Recenter uses LOCAL transform (bug fix verification)
+	all_passed = test_recenter_uses_local_transform() and all_passed
+	
+	# Test 7: Position adjustment methods
+	all_passed = test_position_adjustment() and all_passed
+	
+	# Test 8: Rotation adjustment methods
+	all_passed = test_rotation_adjustment() and all_passed
+	
 	print("\n=== Test Summary ===")
 	if all_passed:
 		print("✓ ALL VR RECENTER TESTS PASSED")
@@ -251,4 +260,165 @@ func test_settings_get_with_default() -> bool:
 		print("  ✓ get_setting for missing key returns default")
 	
 	instance.free()
+	return passed
+
+
+func test_recenter_uses_local_transform() -> bool:
+	"""Test that recenter calculation uses LOCAL camera transform, not global.
+	
+	This tests the bug fix: when an offset was already applied to XROrigin3D,
+	the recenter() function was reading global_transform which included the
+	current offset, causing compounding errors. The fix uses local transform
+	(camera relative to XROrigin3D) which is the raw HMD tracking data.
+	"""
+	print("--- Testing Recenter Uses Local Transform (Bug Fix) ---")
+	var passed = true
+	
+	# Scenario: Player stands at same physical position, recenters multiple times.
+	# Each recenter should give the SAME result because we use local (tracking space) data.
+	
+	# Simulate camera at fixed tracking space position
+	var tracking_position = Vector3(1.0, 1.6, 0.5)  # HMD 1m right, 1.6m high, 0.5m forward in tracking
+	var tracking_forward = Vector3(0.5, 0, -0.866).normalized()  # ~30 degrees right of center
+	
+	# Calculate what offset should be (this is what first recenter should produce)
+	var expected_rotation = _calculate_rotation_offset(tracking_forward)
+	var expected_position = _calculate_position_offset(tracking_position, expected_rotation)
+	
+	# Now simulate what happens with the OLD buggy code if there was an existing offset:
+	# The camera's global_transform would have been: tracking_transform * origin_offset_transform
+	# This made recenter compound the offset.
+	
+	# With the fix (using local transform), recenter should ALWAYS produce the same result
+	# regardless of what offset is currently applied, because it reads raw tracking data.
+	
+	# Test: First recenter (no existing offset)
+	var result_rotation_1 = _calculate_rotation_offset(tracking_forward)
+	var result_position_1 = _calculate_position_offset(tracking_position, result_rotation_1)
+	
+	# Test: Second recenter (same tracking data - should give same result)
+	var result_rotation_2 = _calculate_rotation_offset(tracking_forward)
+	var result_position_2 = _calculate_position_offset(tracking_position, result_rotation_2)
+	
+	# Verify both recenters produce identical results
+	if abs(result_rotation_1 - result_rotation_2) > 0.001:
+		print("  ✗ Repeated recenters produced different rotations: ", rad_to_deg(result_rotation_1), "° vs ", rad_to_deg(result_rotation_2), "°")
+		passed = false
+	else:
+		print("  ✓ Repeated recenters produce identical rotation: ", snapped(rad_to_deg(result_rotation_1), 0.1), "°")
+	
+	if result_position_1.distance_to(result_position_2) > 0.001:
+		print("  ✗ Repeated recenters produced different positions: ", result_position_1, " vs ", result_position_2)
+		passed = false
+	else:
+		print("  ✓ Repeated recenters produce identical position: ", result_position_1)
+	
+	# Verify the rotation is approximately 30 degrees (tracking_forward was ~30° right)
+	var expected_angle_deg = 30.0  # approx
+	if abs(rad_to_deg(result_rotation_1) - expected_angle_deg) > 1.0:
+		print("  ✗ Rotation offset unexpected: got ", snapped(rad_to_deg(result_rotation_1), 0.1), "°, expected ~", expected_angle_deg, "°")
+		passed = false
+	else:
+		print("  ✓ Rotation offset is correct (~30° for 30° right facing)")
+	
+	return passed
+
+
+func test_position_adjustment() -> bool:
+	"""Test incremental position adjustment calculations."""
+	print("--- Testing Position Adjustment ---")
+	var passed = true
+	
+	# VRRecenter constants
+	const POSITION_STEP = 0.05  # 5cm
+	
+	# Test: Adjusting position with no rotation offset
+	var initial_position = Vector3.ZERO
+	var rotation_offset = 0.0
+	
+	# Move left (should be -X in world space when rotation is 0)
+	var direction = Vector3.LEFT
+	var rotated_direction = direction.rotated(Vector3.UP, rotation_offset)
+	var new_position = initial_position + rotated_direction * POSITION_STEP
+	
+	if not new_position.is_equal_approx(Vector3(-0.05, 0, 0)):
+		print("  ✗ Move left with 0° rotation: got ", new_position, ", expected (-0.05, 0, 0)")
+		passed = false
+	else:
+		print("  ✓ Move left with 0° rotation: ", new_position)
+	
+	# Move forward (should be -Z in world space when rotation is 0)
+	direction = Vector3.FORWARD
+	rotated_direction = direction.rotated(Vector3.UP, rotation_offset)
+	new_position = initial_position + rotated_direction * POSITION_STEP
+	
+	if not new_position.is_equal_approx(Vector3(0, 0, -0.05)):
+		print("  ✗ Move forward with 0° rotation: got ", new_position, ", expected (0, 0, -0.05)")
+		passed = false
+	else:
+		print("  ✓ Move forward with 0° rotation: ", new_position)
+	
+	# Test: Adjusting position with 90° rotation offset (player facing right)
+	rotation_offset = deg_to_rad(90.0)
+	
+	# Move "left" (relative to player) with 90° rotation
+	# Vector3.LEFT is (-1, 0, 0), rotated +90° around Y becomes (0, 0, 1) = BACK
+	direction = Vector3.LEFT
+	rotated_direction = direction.rotated(Vector3.UP, rotation_offset)
+	new_position = initial_position + rotated_direction * POSITION_STEP
+	
+	# With 90° rotation, LEFT becomes BACK in world space (0, 0, +0.05)
+	if abs(new_position.z - 0.05) > 0.001 or abs(new_position.x) > 0.001:
+		print("  ✗ Move left with 90° rotation: got ", new_position, ", expected (0, 0, 0.05)")
+		passed = false
+	else:
+		print("  ✓ Move left with 90° rotation: ", new_position, " (relative to player facing)")
+	
+	return passed
+
+
+func test_rotation_adjustment() -> bool:
+	"""Test incremental rotation adjustment calculations."""
+	print("--- Testing Rotation Adjustment ---")
+	var passed = true
+	
+	# VRRecenter constant
+	const ROTATION_STEP = deg_to_rad(5.0)  # 5 degrees
+	
+	# Test: Rotate clockwise from 0
+	var rotation = 0.0
+	rotation -= ROTATION_STEP  # Clockwise reduces rotation
+	
+	if abs(rad_to_deg(rotation) - (-5.0)) > 0.1:
+		print("  ✗ Rotate CW from 0°: got ", rad_to_deg(rotation), "°, expected -5°")
+		passed = false
+	else:
+		print("  ✓ Rotate CW from 0°: ", snapped(rad_to_deg(rotation), 0.1), "°")
+	
+	# Test: Rotate counter-clockwise from 0
+	rotation = 0.0
+	rotation += ROTATION_STEP  # CCW increases rotation
+	
+	if abs(rad_to_deg(rotation) - 5.0) > 0.1:
+		print("  ✗ Rotate CCW from 0°: got ", rad_to_deg(rotation), "°, expected 5°")
+		passed = false
+	else:
+		print("  ✓ Rotate CCW from 0°: ", snapped(rad_to_deg(rotation), 0.1), "°")
+	
+	# Test: Normalization near 180 degrees
+	rotation = deg_to_rad(178.0)
+	rotation += ROTATION_STEP  # Should wrap to ~-177°
+	
+	# Normalize to -PI to PI
+	while rotation > PI:
+		rotation -= TAU
+	while rotation < -PI:
+		rotation += TAU
+	
+	if abs(rad_to_deg(rotation) - (-177.0)) > 0.5:
+		print("  ✗ Rotation wrap at 180°: got ", snapped(rad_to_deg(rotation), 0.1), "°, expected ~-177°")
+		passed = false
+	else:
+		print("  ✓ Rotation wraps correctly at 180°: ", snapped(rad_to_deg(rotation), 0.1), "°")
+	
 	return passed

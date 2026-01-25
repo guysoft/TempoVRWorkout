@@ -55,31 +55,38 @@ func recenter():
 	
 	This calculates the offset needed to make the current HMD forward direction
 	become the 'forward' direction in the game world (negative Z).
+	
+	IMPORTANT: We use the camera's LOCAL transform (relative to XROrigin3D) to get
+	the raw HMD tracking data, not global_transform which includes the current offset.
 	"""
 	if _xr_origin == null or _xr_camera == null:
 		print("VRRecenter: Cannot recenter - XR nodes not set")
 		return
 	
-	# Get the current HMD (camera) transform
-	var camera_transform = _xr_camera.global_transform
+	# Use LOCAL transform to get raw HMD tracking data (not affected by current offset)
+	# The camera's transform relative to XROrigin3D is the pure tracking space position
+	var camera_local_transform = _xr_camera.transform
 	
 	# Get the forward direction of the camera (negative Z in camera space)
-	var camera_forward = -camera_transform.basis.z
+	var camera_forward = -camera_local_transform.basis.z
 	# Project onto XZ plane (ignore vertical component)
 	camera_forward.y = 0
+	if camera_forward.length_squared() < 0.001:
+		print("VRRecenter: Camera looking straight up/down, cannot determine forward")
+		return
 	camera_forward = camera_forward.normalized()
 	
 	# Calculate the angle between current forward and world forward (-Z)
 	var world_forward = Vector3(0, 0, -1)
 	var angle = camera_forward.signed_angle_to(world_forward, Vector3.UP)
 	
-	# The rotation offset is the negative of this angle
+	# The rotation offset is this angle
 	# (we rotate the origin so that the camera's forward becomes world forward)
 	_offset_rotation = angle
 	
-	# Calculate position offset to center on HMD position
-	# We want the HMD's XZ position to become the origin (0, 0, 0) in room space
-	var camera_pos = _xr_camera.global_position
+	# Calculate position offset to center on HMD position in tracking space
+	# We want the HMD's XZ position to become the origin (0, 0, 0) in game space
+	var camera_pos = camera_local_transform.origin
 	
 	# Apply the rotation to the position offset as well
 	var rotated_offset = Vector3(-camera_pos.x, 0, -camera_pos.z).rotated(Vector3.UP, angle)
@@ -98,6 +105,61 @@ func clear_offset():
 	apply_offset()
 	save_offset()
 	print("VRRecenter: Offset cleared")
+
+# Constants for manual adjustment
+const POSITION_STEP := 0.05  # 5cm per button press
+const ROTATION_STEP := deg_to_rad(5.0)  # 5 degrees per button press
+
+func adjust_position(direction: Vector3):
+	"""Adjust position offset by a step in the given direction.
+	
+	Direction should be normalized. The direction is in world space,
+	so Vector3.LEFT moves left, Vector3.FORWARD moves forward, etc.
+	The adjustment is applied relative to the current rotation offset.
+	"""
+	if _xr_origin == null:
+		print("VRRecenter: Cannot adjust position - XROrigin3D not set")
+		return
+	
+	# Rotate the direction by current offset rotation so movement is relative to player facing
+	var rotated_direction = direction.rotated(Vector3.UP, _offset_rotation)
+	_offset_position += rotated_direction * POSITION_STEP
+	
+	apply_offset()
+	save_offset()
+	print("VRRecenter: Position adjusted by ", direction, " - new offset: ", _offset_position)
+
+func adjust_rotation(clockwise: bool):
+	"""Adjust rotation offset by one step.
+	
+	clockwise=true rotates view clockwise (player rotates counter-clockwise)
+	clockwise=false rotates view counter-clockwise (player rotates clockwise)
+	"""
+	if _xr_origin == null:
+		print("VRRecenter: Cannot adjust rotation - XROrigin3D not set")
+		return
+	
+	if clockwise:
+		_offset_rotation -= ROTATION_STEP
+	else:
+		_offset_rotation += ROTATION_STEP
+	
+	# Normalize to -PI to PI range
+	while _offset_rotation > PI:
+		_offset_rotation -= TAU
+	while _offset_rotation < -PI:
+		_offset_rotation += TAU
+	
+	apply_offset()
+	save_offset()
+	print("VRRecenter: Rotation adjusted - new offset: ", rad_to_deg(_offset_rotation), " degrees")
+
+# Getters for UI display
+func get_position_offset() -> Vector3:
+	return _offset_position
+
+func get_rotation_offset_degrees() -> float:
+	return rad_to_deg(_offset_rotation)
 
 # Static helper functions for offset calculations (useful for testing)
 static func calculate_rotation_offset(camera_forward: Vector3) -> float:
