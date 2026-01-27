@@ -30,16 +30,43 @@ func load_offset():
 	_offset_rotation = Settings.get_setting("vr", "recenter_offset_rotation", 0.0)
 	print("VRRecenter: Loaded offset - position: ", _offset_position, ", rotation: ", _offset_rotation)
 
+var _save_pending := false  # Debounce flag for saving
+
 func save_offset():
-	"""Save the current offset to Settings."""
+	"""Save the current offset to Settings.
+	
+	Uses debouncing to avoid excessive file I/O during rapid adjustments.
+	"""
+	if _save_pending:
+		return
+	
+	_save_pending = true
+	call_deferred("_save_offset_deferred")
+
+func _save_offset_deferred():
+	"""Actually save the offset (called at end of frame via call_deferred)."""
+	_save_pending = false
 	Settings.set_setting("vr", "recenter_offset_position", _offset_position)
 	Settings.set_setting("vr", "recenter_offset_rotation", _offset_rotation)
 	print("VRRecenter: Saved offset - position: ", _offset_position, ", rotation: ", _offset_rotation)
 
 func apply_offset():
-	"""Apply the stored offset to the XROrigin3D node."""
+	"""Apply the stored offset to the XROrigin3D node.
+	
+	Uses call_deferred to avoid modifying transforms during active VR frame rendering,
+	which can cause Vulkan device loss on Quest when transforms change rapidly.
+	"""
 	if _xr_origin == null:
 		print("VRRecenter: Cannot apply offset - XROrigin3D not set")
+		return
+	
+	# Defer the actual transform modification to end of frame to avoid
+	# race conditions with Vulkan rendering (especially in VR with multiple viewports)
+	call_deferred("_apply_offset_deferred")
+
+func _apply_offset_deferred():
+	"""Actually apply the offset (called at end of frame via call_deferred)."""
+	if _xr_origin == null:
 		return
 	
 	# Apply rotation around Y axis
@@ -110,6 +137,8 @@ func clear_offset():
 const POSITION_STEP := 0.05  # 5cm per button press
 const ROTATION_STEP := deg_to_rad(5.0)  # 5 degrees per button press
 
+var _is_adjusting := false  # Reentrancy guard
+
 func adjust_position(direction: Vector3):
 	"""Adjust position offset by a step in the given direction.
 	
@@ -117,8 +146,13 @@ func adjust_position(direction: Vector3):
 	so Vector3.LEFT moves left, Vector3.FORWARD moves forward, etc.
 	The adjustment is applied relative to the current rotation offset.
 	"""
+	if _is_adjusting:
+		return
+	_is_adjusting = true
+	
 	if _xr_origin == null:
 		print("VRRecenter: Cannot adjust position - XROrigin3D not set")
+		_is_adjusting = false
 		return
 	
 	# Rotate the direction by current offset rotation so movement is relative to player facing
@@ -127,6 +161,8 @@ func adjust_position(direction: Vector3):
 	
 	apply_offset()
 	save_offset()
+	
+	_is_adjusting = false
 	print("VRRecenter: Position adjusted by ", direction, " - new offset: ", _offset_position)
 
 func adjust_rotation(clockwise: bool):

@@ -7,6 +7,7 @@
 [ext_resource type="FontFile" path="res://fonts/logo_font.tres" id="6"]
 
 [node name="MainMenuUI" type="MarginContainer"]
+custom_minimum_size = Vector2(800, 512)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

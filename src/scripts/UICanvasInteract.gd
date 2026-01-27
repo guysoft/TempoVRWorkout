@@ -54,12 +54,23 @@ func update_size():
 		ui_size.x = min_size.x
 	if ui_size.y < min_size.y:
 		ui_size.y = min_size.y
+	
+	# Cap viewport size to prevent excessive GPU memory usage
+	# Max 2048x2048 is sufficient for any VR UI panel
+	const MAX_VIEWPORT_SIZE = 2048.0
+	if ui_size.x > MAX_VIEWPORT_SIZE:
+		var scale = MAX_VIEWPORT_SIZE / ui_size.x
+		ui_size.x = MAX_VIEWPORT_SIZE
+		ui_size.y = ui_size.y * scale
+	if ui_size.y > MAX_VIEWPORT_SIZE:
+		var scale = MAX_VIEWPORT_SIZE / ui_size.y
+		ui_size.y = MAX_VIEWPORT_SIZE
+		ui_size.x = ui_size.x * scale
 
 	if (ui_area != null):
 		ui_area.scale.x = ui_size.x * UI_PIXELS_TO_METER;
 		ui_area.scale.y = ui_size.y * UI_PIXELS_TO_METER;
 	if (viewport != null):
-		print ("setting viewport size:", ui_size)
 		viewport.set_size(ui_size);
 
 	# Fix for Godot 4: Explicitly bind viewport texture to material
@@ -128,18 +139,19 @@ func _process(delta: float) -> void:
 				#if visible, disabled is false, if not visible, disabled is true
 				ui_collisionshape.disabled = not is_visible_in_tree()
 		
-		# Quest optimization: reduce viewport update frequency when not being interacted with
-		if quest_optimize_updates and QualitySettings.is_quest() and viewport:
-			_update_frame_counter += 1
-			if _is_being_looked_at:
-				# Full update rate when being looked at
-				viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-			else:
-				# Reduce update rate when not being looked at (every 3rd frame)
-				if _update_frame_counter % 3 == 0:
-					viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
-				else:
-					viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
+		# Quest optimization: DISABLED - rapid viewport mode toggling was causing Vulkan crashes
+		# The toggling every 3rd frame overwhelmed the GPU command queue, especially with
+		# multiple SubViewports (up to 4 in MainMenu). Keep viewports at UPDATE_ALWAYS for stability.
+		# TODO: Investigate reducing viewport sizes instead for performance gains
+		#if quest_optimize_updates and QualitySettings.is_quest() and viewport:
+		#	_update_frame_counter += 1
+		#	if _is_being_looked_at:
+		#		viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		#	else:
+		#		if _update_frame_counter % 3 == 0:
+		#			viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+		#		else:
+		#			viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
 		return
 	
 	#if we are in the editor
