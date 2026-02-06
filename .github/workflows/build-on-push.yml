@@ -16,7 +16,7 @@ on:
 # Environment variables
 env:
   # Configure Godot version (must match project.godot config/features)
-  GODOT_VERSION: 4.5.1
+  GODOT_VERSION: 4.6.0
   # OpenXR Vendors version (for VR builds)
   OPENXR_VENDORS_VERSION: 4.2.2-stable
 
