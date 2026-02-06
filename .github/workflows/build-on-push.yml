@@ -80,6 +80,9 @@ jobs:
           ls -la src/addons/godotopenxrvendors/
 
       # Download pre-shipped BeatSaver levels (ExpertPlus only)
+      # These levels will be:
+      # - Android: Bundled into APK (res://Levels/) - stays in src/Levels/ during export
+      # - Non-Android: Copied externally next to executable - moved out before export to avoid bundling
       - name: Download Pre-shipped Levels
         shell: bash
         run: |
@@ -140,6 +143,16 @@ jobs:
           cd src
           godot --headless --import || exit 0
 
+      # Move Levels folder out of project for non-Android builds to prevent bundling
+      # Android: Levels stay in src/Levels/ to get bundled into APK (res://Levels/)
+      # Non-Android: Levels moved out before export, then copied externally (avoids bundling into PCK)
+      - name: Move Levels Out of Project (Non-Android Only)
+        if: matrix.platform != 'android'
+        shell: bash
+        run: |
+          mv src/Levels /tmp/Levels
+          echo "Moved Levels folder to /tmp/Levels to prevent bundling into PCK"
+
       # Export project (with android build template if needed)
       - name: Export Godot Project
         shell: bash
@@ -147,7 +160,17 @@ jobs:
           cd src
           godot --headless ${{ matrix.export-args }} --export-${{ matrix.export-type }} "${{ matrix.export-preset }}"
 
+      # Restore Levels folder for non-Android builds so it can be copied externally
+      - name: Restore Levels Folder (Non-Android Only)
+        if: matrix.platform != 'android'
+        shell: bash
+        run: |
+          mv /tmp/Levels src/Levels
+          echo "Restored Levels folder from /tmp/Levels"
+
       # Copy pre-shipped levels to build output (external filesystem access)
+      # For non-Android: Copy Levels externally next to executable (not bundled in PCK)
+      # For Android: Levels are already bundled in APK (res://Levels/), no external copy needed
       - name: Copy Pre-shipped Levels to Build
         if: matrix.platform != 'android'
         shell: bash
