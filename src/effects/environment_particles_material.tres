@@ -1,4 +1,4 @@
-[gd_resource type="ParticleProcessMaterial" load_steps=5 format=3 uid="uid://dwk0jtenkcwdd"]
+[gd_resource type="ParticleProcessMaterial" format=3 uid="uid://dwk0jtenkcwdd"]
 
 [ext_resource type="Gradient" path="res://effects/bw_gradient.tres" id="1"]
 

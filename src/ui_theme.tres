@@ -1,10 +1,19 @@
-[gd_resource type="Theme" load_steps=8 format=3 uid="uid://dhxx6nyx60wmn"]
+[gd_resource type="Theme" format=3 uid="uid://dhxx6nyx60wmn"]
 
 [ext_resource type="FontFile" uid="uid://02edy2v61pii" path="res://fonts/anthony-master/fonts/Anthony.otf" id="1"]
 [ext_resource type="FontFile" uid="uid://c46eoi7k3obk3" path="res://fonts/millimetre-font-64.tres" id="2"]
 
 [sub_resource type="FontFile" id="19"]
 fallbacks = Array[Font]([ExtResource("1")])
+cache/0/variation_coordinates = {}
+cache/0/face_index = 0
+cache/0/embolden = 0.0
+cache/0/transform = Transform2D(1, 0, 0, 1, 0, 0)
+cache/0/spacing_top = 0
+cache/0/spacing_bottom = 0
+cache/0/spacing_space = 0
+cache/0/spacing_glyph = 0
+cache/0/baseline_offset = 0.0
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -15,6 +24,11 @@ cache/0/64/0/descent = 0.0
 cache/0/64/0/underline_position = 0.0
 cache/0/64/0/underline_thickness = 0.0
 cache/0/64/0/scale = 1.0
+cache/0/36/0/ascent = 0.0
+cache/0/36/0/descent = 0.0
+cache/0/36/0/underline_position = 0.0
+cache/0/36/0/underline_thickness = 0.0
+cache/0/36/0/scale = 1.0
 
 [sub_resource type="StyleBoxFlat" id="22"]
 bg_color = Color(0, 0, 0, 0.627451)
@@ -39,6 +53,15 @@ corner_radius_bottom_left = 32
 
 [sub_resource type="FontFile" id="24"]
 fallbacks = Array[Font]([ExtResource("1")])
+cache/0/variation_coordinates = {}
+cache/0/face_index = 0
+cache/0/embolden = 0.0
+cache/0/transform = Transform2D(1, 0, 0, 1, 0, 0)
+cache/0/spacing_top = 0
+cache/0/spacing_bottom = 0
+cache/0/spacing_space = 0
+cache/0/spacing_glyph = 0
+cache/0/baseline_offset = 0.0
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0

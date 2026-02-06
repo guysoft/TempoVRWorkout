@@ -8,13 +8,21 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="TempoVR"
 run/main_scene="res://scenes/GameManager.tscn"
-config/features=PackedStringArray("4.5")
+config/features=PackedStringArray("4.6")
 config/icon="res://icon.png"
 run/delta_sync_after_draw=true
+
+[audio]
+
+buses/default_bus_layout="uid://d053rwbpesd3y"
 
 [autoload]
 
@@ -27,8 +35,8 @@ Settings="*res://scripts/Settings.gd"
 VRRecenter="*res://scripts/VRRecenter.gd"
 SaveManager="*res://scripts/SaveManager.gd"
 PlaytimeTracker="*res://scripts/PlaytimeTracker.gd"
-XRToolsUserSettings="*res://addons/godot-xr-tools/user_settings/user_settings.gd"
-XRToolsRumbleManager="*res://addons/godot-xr-tools/rumble/rumble_manager.gd"
+XRToolsUserSettings="*uid://bqgb8i74tm0t"
+XRToolsRumbleManager="*uid://by853dk86g1qw"
 PlaylistManager="*res://scripts/PlaylistManager.gd"
 GDAIMCPRuntime="*res://addons/gdai-mcp-plugin-godot/gdai_mcp_runtime.gd"
 

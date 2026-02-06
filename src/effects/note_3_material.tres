@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://fm84yumfchuq"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://fm84yumfchuq"]
 
 [ext_resource type="Shader" path="res://effects/note_displace_shader.tres" id="1"]
 

@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=15 format=3 uid="uid://d1fbglwrn3v44"]
+[gd_resource type="Theme" format=3 uid="uid://d1fbglwrn3v44"]
 
 [ext_resource type="FontFile" uid="uid://c46eoi7k3obk3" path="res://fonts/millimetre-font-64.tres" id="1"]
 [ext_resource type="FontFile" uid="uid://3pf1bwauqjqe" path="res://fonts/millimetre-font-24.tres" id="2"]
