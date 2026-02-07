@@ -39,6 +39,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="VersionLabel" type="Label" parent="UICanvas/ReferenceRect/Panel"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 13.0
+offset_right = 200.0
+offset_bottom = 37.0
+theme = ExtResource("6_5faoh")
+text = "v0.0.0"
+
 [node name="RichTextLabel" type="RichTextLabel" parent="UICanvas/ReferenceRect/Panel"]
 layout_mode = 1
 anchors_preset = 15

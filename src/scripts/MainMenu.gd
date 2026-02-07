@@ -42,6 +42,7 @@ func _ready():
 	_player.game_node=null
 	
 	_update_playtime_display()
+	_update_version_display()
 
 func _update_playtime_display():
 	# UICanvas moves the Control into SubViewport at runtime
@@ -49,6 +50,12 @@ func _update_playtime_display():
 	if playtime_label:
 		var seconds = PlaytimeTracker.get_playtime_today()
 		playtime_label.text = PlaytimeTracker.format_playtime(seconds)
+
+
+func _update_version_display():
+	var version_label = $UICanvas/SubViewport/ReferenceRect/Panel/VersionLabel
+	if version_label:
+		version_label.text = Version.get_version()
 
 func _process(delta):
 	_check_recenter_input(delta)
