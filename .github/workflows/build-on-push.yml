@@ -61,9 +61,18 @@ jobs:
             archive: Android-Quest
 
     steps:
-      # Check out the repository
+      # Check out the repository (full history for git describe)
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Inject version from git tag (used in MainMenu credits panel)
+      - name: Inject Version
+        run: |
+          VERSION=$(git describe --tags --always)
+          echo "$VERSION" > src/version.txt
+          echo "Version: $VERSION"
 
       # Install the OpenXR Vendors Plugin (required for VR builds)
       - name: Install OpenXR Vendors Plugin
@@ -179,7 +188,16 @@ jobs:
           echo "Copied Levels folder to build output:"
           ls -la src/${{ matrix.export-folder }}/Levels/
 
-      # Upload artifacts
+      # Compress project for release (must run before upload so zip is in artifact)
+      - name: Compress Project
+        if: >
+          github.event_name == 'push' &&
+          github.ref_type == 'tag'
+        run: |
+          cd src/${{ matrix.export-folder }}
+          7z a -tzip ${{ matrix.archive }}.zip . -x'!.gitignore'
+
+      # Upload artifacts (includes zip for Windows/Linux when building release tag)
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -188,24 +206,28 @@ jobs:
             src/${{ matrix.export-folder }}
             !**/.gitignore
 
-      # Compress project (if building release tag)
-      - name: Compress Project
-        if: >
-          github.event_name == 'push' && 
-          github.ref_type == 'tag'
-        run: |
-          cd src/${{ matrix.export-folder }}
-          7z a -tzip ${{ matrix.archive }}.zip . -x'!.gitignore'
+  # Publish release with all platform artifacts (runs only on tag push)
+  release:
+    needs: build
+    if: >
+      github.event_name == 'push' &&
+      github.ref_type == 'tag'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*-Artifacts'
 
-      # Publish release (if building release tag)
       - name: Publish Release
         uses: ncipollo/release-action@v1
-        if: >
-          github.event_name == 'push' && 
-          github.ref_type == 'tag'
         with:
+          tag: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
           allowUpdates: true
-          artifacts: 'src/${{ matrix.export-folder }}/${{ matrix.archive }}.zip'
           omitNameDuringUpdate: true
           omitBodyDuringUpdate: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: 'Windows-Artifacts/Windows.zip,Linux-Artifacts/Linux.zip,Android-Quest-Artifacts/TempoVR-CI.apk'
