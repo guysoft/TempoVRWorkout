@@ -1,17 +1,38 @@
-# TempoVR
+# TempoVRWorkout
 
-A VR rhythm game built with Godot Engine using OpenXR. Originally a game jam entry for Go Godot 2, now being developed into a full game.
+A VR rhythm workout game built with Godot Engine using OpenXR. Play Beat Saber and PowerBeatsVR maps on Quest, SteamVR, and other OpenXR runtimes.
 
-Features:
-- VR gameplay using OpenXR (works with Quest, SteamVR, and other OpenXR runtimes)
-- WebXR support for browser-based VR
-- Unique time-slowdown mechanic during gameplay
-- Compatible with Beat Saber custom maps from [BeatSaver](https://beatsaver.com)
+## Features
+
+- **VR gameplay** using OpenXR (Quest native, SteamVR, and other runtimes)
+- **Workout** This game is intended to make you workouy, mechanics based on PowerBeatsVR ones. You hit balls, and not slash them like in beatsaber.
+- **Beat Saber compatibility** - plays custom maps from [BeatSaver](https://beatsaver.com)
+- **PowerBeatsVR map format** - converts and plays PowerBeatsVR levels
+- **Offline-first** - no internet required after install
+- **Pre-shipped songs** - Unity and Monody included in official builds
+- **Loads PowerBeatsVR playlists** - Supports loading of a playlist in the format used in PowerBeatsVR.
 
 ## Download
 
-- **Nightly builds**: [GitHub Releases](https://github.com/guysoft/EnergySource/releases)
-- **Stable version**: [itch.io](https://guysoft.itch.io/tempovr)
+Official builds are published to [GitHub Releases](https://github.com/guysoft/TempoVRWorkout/releases).
+
+### Windows
+
+1. Download `Windows.zip` from the latest release
+2. Extract to a folder
+3. Run `TempoVR.exe`
+
+### Linux
+
+1. Download `Linux.zip` from the latest release
+2. Extract and run the executable
+3. **Note**: Copy `libopenxr_loader.so.1` from your distribution to the game folder if needed
+
+### Meta Quest
+
+1. Download `Android-Quest.zip` from the latest release
+2. Extract the APK
+3. Sideload via ADB: `adb install -r TempoVR.apk` (or use Quest's file manager)
 
 ## Pre-shipped Songs
 
@@ -22,7 +43,18 @@ Official builds include the following songs (ExpertPlus difficulty):
 | Unity | TheFatRat | Timeweaver | [a908](https://beatsaver.com/maps/a908) |
 | Monody (ft. Laura Brehm) | TheFatRat | Timeweaver | [a907](https://beatsaver.com/maps/a907) |
 
-You can add more songs by downloading maps from [BeatSaver](https://beatsaver.com) and placing them in the `Levels` folder.
+You can add more songs by downloading maps from [BeatSaver](https://beatsaver.com) and placing them in the `Levels` folder next to the executable.
+
+## Creating a Release
+
+To publish a new version:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+CI will build for all platforms and attach the artifacts to the GitHub Release.
 
 ## Community
 
@@ -34,7 +66,7 @@ Join our [Discord](https://discord.gg/xkbAszgKcd) for support and discussion.
 
 ### Prerequisites
 
-- [Godot 4.5+](https://godotengine.org/download) (standard version, not .NET)
+- [Godot 4.6+](https://godotengine.org/download) (standard version, not .NET)
 - Python 3 (for level patching script)
 - curl, unzip (for dependency download)
 
@@ -42,8 +74,8 @@ Join our [Discord](https://discord.gg/xkbAszgKcd) for support and discussion.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/guysoft/EnergySource.git
-   cd EnergySource
+   git clone https://github.com/guysoft/TempoVRWorkout.git
+   cd TempoVRWorkout
    ```
 
 2. Download dependencies and pre-shipped levels:
@@ -79,7 +111,7 @@ The project uses GitHub Actions to automatically build for:
 Builds are triggered on:
 - Push to `main`, `develop`, `ci-workflow`, or `workout` branches
 - Pull requests to `main` or `workout`
-- Git tags starting with `v` (creates a GitHub Release)
+- Git tags starting with `v` (creates a GitHub Release with all platform artifacts)
 
 See [`.github/workflows/build-on-push.yml`](.github/workflows/build-on-push.yml) for details.
 
@@ -111,6 +143,4 @@ For Linux builds, copy `libopenxr_loader.so.1` from your distribution to the gam
 
 **Pre-shipped Music:**
 - TheFatRat - Unity, Monody (mapped by Timeweaver)
-
-**Test Level:**
 - jennissary (joey): [BeatSaver #19614](https://beatsaver.com/maps/19614)
