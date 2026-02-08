@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bb0mf0mn8t4u6"]
+[gd_scene format=3 uid="uid://bb0mf0mn8t4u6"]
 
 [ext_resource type="Material" uid="uid://dj3f4hk8m2qxp" path="res://effects/GroundCurved.tres" id="1"]
 [ext_resource type="Script" uid="uid://74mnkxd1v74u" path="res://scripts/GroundMicroConveyor.gd" id="2"]
@@ -8,17 +8,17 @@ size = Vector2(100, 100)
 subdivide_width = 128
 subdivide_depth = 128
 
-[node name="GroundCurveTest" type="Node3D"]
+[node name="GroundCurveTest" type="Node3D" unique_id=1946642562]
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="Camera3D" type="Camera3D" parent="." unique_id=667475430]
 transform = Transform3D(1, 0, 0, 0, 0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0, 2, 5)
 current = true
 
-[node name="Ground" type="MeshInstance3D" parent="."]
+[node name="Ground" type="MeshInstance3D" parent="." unique_id=536711476]
 extra_cull_margin = 50.0
 mesh = SubResource("plane")
 surface_material_override/0 = ExtResource("1")
 script = ExtResource("2")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=167964860]
 transform = Transform3D(0.8660254, 0.35355338, -0.35355338, 0, 0.70710677, 0.70710677, 0.5, -0.6123724, 0.6123724, 0, 0, 0)

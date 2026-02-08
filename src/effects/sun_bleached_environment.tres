@@ -1,4 +1,4 @@
-[gd_resource type="Environment" load_steps=3 format=3 uid="uid://cy2hjra5n8p2s"]
+[gd_resource type="Environment" format=3 uid="uid://cy2hjra5n8p2s"]
 
 [sub_resource type="ProceduralSkyMaterial" id="1"]
 sky_top_color = Color(0.945098, 0.835294, 0.647059, 1)
@@ -21,15 +21,12 @@ glow_enabled = true
 glow_levels/1 = 1.0
 glow_levels/2 = 1.0
 glow_levels/3 = 0.0
-glow_levels/5 = 0.0
 glow_intensity = 0.25
 glow_bloom = 0.5
 glow_blend_mode = 0
 fog_enabled = true
 fog_light_color = Color(0.568627, 0.407843, 0.25098, 1)
-fog_density = 0.01
 fog_aerial_perspective = 0.5
-fog_sky_affect = 1.0
 fog_height = 3.0
 fog_height_density = 1.0
 adjustment_contrast = 2.29

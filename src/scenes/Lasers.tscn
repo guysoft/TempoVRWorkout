@@ -1,10 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dxkql2n7h4lqo"]
+[gd_scene format=3 uid="uid://dxkql2n7h4lqo"]
 
 [ext_resource type="Material" path="res://effects/left_laser_material.tres" id="1"]
 [ext_resource type="Material" path="res://effects/right_laser_material.tres" id="2"]
 [ext_resource type="Material" path="res://effects/ring_material.tres" id="3"]
 [ext_resource type="Material" path="res://effects/back_laser_material.tres" id="4"]
-[ext_resource type="Material" path="res://effects/center_lights_material.tres" id="5"]
+[ext_resource type="Material" uid="uid://bhfkvv4jo8ynk" path="res://effects/center_lights_material.tres" id="5"]
 
 [sub_resource type="QuadMesh" id="1"]
 size = Vector2(2, 500)
@@ -15,106 +15,106 @@ size = Vector2(250, 250)
 [sub_resource type="QuadMesh" id="5"]
 size = Vector2(0.25, 500)
 
-[node name="Lasers" type="Node3D"]
+[node name="Lasers" type="Node3D" unique_id=512688800]
 
-[node name="BackLaser" type="Node3D" parent="."]
+[node name="BackLaser" type="Node3D" parent="." unique_id=1645495134]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -111.068)
 visible = false
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="BackLaser"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="BackLaser" unique_id=2123050036]
 transform = Transform3D(0.452138, -0.398067, 0.798194, 0.660801, 0.750561, 0, -0.599093, 0.527448, 0.6024, 0, 13.5015, 15.4832)
 mesh = SubResource("1")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("4")
 
-[node name="MeshInstance2" type="MeshInstance3D" parent="BackLaser"]
+[node name="MeshInstance2" type="MeshInstance3D" parent="BackLaser" unique_id=1871209551]
 transform = Transform3D(0.452138, 0.398067, -0.798194, -0.660801, 0.750561, 0, 0.599093, 0.527448, 0.6024, 0, 13.5015, 15.4832)
 mesh = SubResource("1")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("4")
 
-[node name="RingLights" type="Node3D" parent="."]
+[node name="RingLights" type="Node3D" parent="." unique_id=478504771]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 9.38921)
 visible = false
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RingLights"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RingLights" unique_id=837518245]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.5015, -133.146)
 mesh = SubResource("3")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("3")
 
-[node name="MeshInstance2" type="MeshInstance3D" parent="RingLights"]
+[node name="MeshInstance2" type="MeshInstance3D" parent="RingLights" unique_id=71863204]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.5015, -99.5131)
 mesh = SubResource("3")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("3")
 
-[node name="MeshInstance3" type="MeshInstance3D" parent="RingLights"]
+[node name="MeshInstance3" type="MeshInstance3D" parent="RingLights" unique_id=1721093883]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.5015, -74.6628)
 mesh = SubResource("3")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("3")
 
-[node name="MeshInstance4" type="MeshInstance3D" parent="RingLights"]
+[node name="MeshInstance4" type="MeshInstance3D" parent="RingLights" unique_id=1659584165]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.5015, -49.111)
 mesh = SubResource("3")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("3")
 
-[node name="MeshInstance5" type="MeshInstance3D" parent="RingLights"]
+[node name="MeshInstance5" type="MeshInstance3D" parent="RingLights" unique_id=1541745866]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.5015, -15.4778)
 mesh = SubResource("3")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("3")
 
-[node name="MeshInstance6" type="MeshInstance3D" parent="RingLights"]
+[node name="MeshInstance6" type="MeshInstance3D" parent="RingLights" unique_id=1676625662]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13.5015, 9.37244)
 mesh = SubResource("3")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("3")
 
-[node name="LeftLasers" type="Node3D" parent="."]
+[node name="LeftLasers" type="Node3D" parent="." unique_id=1139014325]
 transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -100, 0, -100)
 visible = false
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="LeftLasers"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LeftLasers" unique_id=1415936218]
 transform = Transform3D(0.452138, -0.398067, 0.798194, 0.660801, 0.750561, 0, -0.599093, 0.527448, 0.6024, 0, 13.5015, 15.4832)
 mesh = SubResource("1")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("1")
 
-[node name="MeshInstance2" type="MeshInstance3D" parent="LeftLasers"]
+[node name="MeshInstance2" type="MeshInstance3D" parent="LeftLasers" unique_id=1349976428]
 transform = Transform3D(0.452138, 0.398067, -0.798194, -0.660801, 0.750561, 0, 0.599093, 0.527448, 0.6024, 0, 13.5015, 15.4832)
 mesh = SubResource("1")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("1")
 
-[node name="RightLasers" type="Node3D" parent="."]
+[node name="RightLasers" type="Node3D" parent="." unique_id=107620339]
 transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 100, 0, -100)
 visible = false
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RightLasers"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RightLasers" unique_id=1795576450]
 transform = Transform3D(0.452138, -0.398067, 0.798194, 0.660801, 0.750561, 0, -0.599093, 0.527448, 0.6024, 0, 13.5015, 15.4832)
 mesh = SubResource("1")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("2")
 
-[node name="MeshInstance2" type="MeshInstance3D" parent="RightLasers"]
+[node name="MeshInstance2" type="MeshInstance3D" parent="RightLasers" unique_id=535110902]
 transform = Transform3D(0.452138, 0.398067, -0.798194, -0.660801, 0.750561, 0, 0.599093, 0.527448, 0.6024, 0, 13.5015, 15.4832)
 mesh = SubResource("1")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("2")
 
-[node name="CenterLights" type="Node3D" parent="."]
+[node name="CenterLights" type="Node3D" parent="." unique_id=599172483]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
-[node name="LeftLight" type="MeshInstance3D" parent="CenterLights"]
+[node name="LeftLight" type="MeshInstance3D" parent="CenterLights" unique_id=1502997462]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, -1.5, 0, 0)
 mesh = SubResource("5")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("5")
 
-[node name="RightLight" type="MeshInstance3D" parent="CenterLights"]
+[node name="RightLight" type="MeshInstance3D" parent="CenterLights" unique_id=944979563]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 1.5, 0, 0)
 mesh = SubResource("5")
 skeleton = NodePath("../..")

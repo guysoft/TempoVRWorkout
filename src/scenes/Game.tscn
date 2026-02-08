@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://7ayj7cglk12m"]
+[gd_scene format=3 uid="uid://7ayj7cglk12m"]
 
 [ext_resource type="Script" uid="uid://dkxv61amt5qsg" path="res://scripts/Game.gd" id="1"]
 [ext_resource type="Environment" uid="uid://bmargeaaawkls" path="res://effects/Dark_environment.tres" id="2"]
@@ -31,21 +31,21 @@ size = Vector2(0.25, 500)
 color = Color(1, 1, 1, 0.501961)
 thickness = 3
 
-[node name="Game" type="Node3D"]
+[node name="Game" type="Node3D" unique_id=2091432166]
 script = ExtResource("1")
 environment = ExtResource("2")
 
-[node name="Ground" parent="." instance=ExtResource("7")]
+[node name="Ground" parent="." unique_id=1663295857 instance=ExtResource("7")]
 
-[node name="EnvironmentParticles" parent="." instance=ExtResource("6")]
+[node name="EnvironmentParticles" parent="." unique_id=801145276 instance=ExtResource("6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.45584, -8.76391)
 lifetime = 5.0
 script = ExtResource("10")
 
-[node name="SpawnLocation" type="Node3D" parent="."]
+[node name="SpawnLocation" type="Node3D" parent="." unique_id=744432405]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)
 
-[node name="BeatResponder" type="Node" parent="."]
+[node name="BeatResponder" type="Node" parent="." unique_id=119369707]
 script = ExtResource("5")
 materials = [ExtResource("19"), ExtResource("18"), ExtResource("15"), ExtResource("14")]
 params = {
@@ -54,7 +54,7 @@ params = {
 lerp_value = 10.0
 set_value = 0.0
 
-[node name="GroundBeatResponse" type="Node" parent="."]
+[node name="GroundBeatResponse" type="Node" parent="." unique_id=357442867]
 script = ExtResource("5")
 materials = [ExtResource("22")]
 params = {
@@ -64,25 +64,25 @@ lerp_value = 1.0
 disabled = true
 response_frequency = 2.0
 
-[node name="HitMarker" type="Marker3D" parent="."]
+[node name="HitMarker" type="Marker3D" parent="." unique_id=123173996]
 transform = Transform3D(1, -3.63798e-12, 1.45519e-11, 3.63798e-12, 1, 2.98024e-08, -1.45519e-11, -2.98024e-08, 1, 0, 0, 0.0753192)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="HitMarker"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="HitMarker" unique_id=259405132]
 transform = Transform3D(-2.62268e-08, 0.015, -4.37114e-08, 0, -6.55671e-10, -1, -0.6, -6.55671e-10, 3.55271e-15, 0, 0.5, 0.12)
 mesh = SubResource("5")
 skeleton = NodePath("../..")
 
-[node name="BigScore" parent="." instance=ExtResource("8")]
+[node name="BigScore" parent="." unique_id=1173553461 instance=ExtResource("8")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 2, 0, 1.5, -2.97768)
 visible = false
 transparent = true
 
-[node name="ReferenceRect" type="Panel" parent="BigScore"]
+[node name="ReferenceRect" type="Panel" parent="BigScore" unique_id=1571739894]
 offset_right = 1216.0
 offset_bottom = 1230.0
 theme = ExtResource("4")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="BigScore/ReferenceRect"]
+[node name="VBoxContainer" type="VBoxContainer" parent="BigScore/ReferenceRect" unique_id=285384338]
 layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
@@ -94,7 +94,7 @@ offset_right = 533.5
 offset_bottom = 551.0
 alignment = 1
 
-[node name="Finished" type="RichTextLabel" parent="BigScore/ReferenceRect/VBoxContainer"]
+[node name="Finished" type="RichTextLabel" parent="BigScore/ReferenceRect/VBoxContainer" unique_id=2066573937]
 clip_contents = false
 custom_minimum_size = Vector2(1067, 256)
 layout_mode = 2
@@ -105,11 +105,11 @@ bbcode_enabled = true
 text = "SONG FINISHED"
 scroll_active = false
 
-[node name="HSeparator2" type="HSeparator" parent="BigScore/ReferenceRect/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="BigScore/ReferenceRect/VBoxContainer" unique_id=1804252053]
 layout_mode = 2
 theme_override_styles/separator = SubResource("6")
 
-[node name="TimeBonusLabel" type="Label" parent="BigScore/ReferenceRect/VBoxContainer"]
+[node name="TimeBonusLabel" type="Label" parent="BigScore/ReferenceRect/VBoxContainer" unique_id=691546077]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("12")
 theme_override_font_sizes/font_size = 64
@@ -117,17 +117,17 @@ text = "time bonus"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TimeBonus" type="Label" parent="BigScore/ReferenceRect/VBoxContainer"]
+[node name="TimeBonus" type="Label" parent="BigScore/ReferenceRect/VBoxContainer" unique_id=94549141]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HSeparator3" type="HSeparator" parent="BigScore/ReferenceRect/VBoxContainer"]
+[node name="HSeparator3" type="HSeparator" parent="BigScore/ReferenceRect/VBoxContainer" unique_id=640994217]
 layout_mode = 2
 theme_override_styles/separator = SubResource("6")
 
-[node name="ScoreCardLabel" type="Label" parent="BigScore/ReferenceRect/VBoxContainer"]
+[node name="ScoreCardLabel" type="Label" parent="BigScore/ReferenceRect/VBoxContainer" unique_id=1125964605]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.25098, 0.478431, 0.239216, 1)
 theme_override_font_sizes/font_size = 64
@@ -135,21 +135,21 @@ text = "final score"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="UIScore" parent="BigScore/ReferenceRect/VBoxContainer" instance=ExtResource("16")]
+[node name="UIScore" parent="BigScore/ReferenceRect/VBoxContainer" unique_id=780064888 instance=ExtResource("16")]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.25098, 0.478431, 0.239216, 1)
 text = "0"
 
-[node name="HSeparator" type="HSeparator" parent="BigScore/ReferenceRect/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="BigScore/ReferenceRect/VBoxContainer" unique_id=1066269704]
 layout_mode = 2
 theme_override_styles/separator = SubResource("6")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="BigScore/ReferenceRect/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="BigScore/ReferenceRect/VBoxContainer" unique_id=1077214903]
 layout_mode = 2
 theme_override_constants/separation = 256
 alignment = 1
 
-[node name="RestartButton" type="Button" parent="BigScore/ReferenceRect/VBoxContainer/HBoxContainer"]
+[node name="RestartButton" type="Button" parent="BigScore/ReferenceRect/VBoxContainer/HBoxContainer" unique_id=177654101]
 layout_mode = 2
 theme = ExtResource("4")
 theme_override_fonts/font = ExtResource("12")
@@ -157,7 +157,7 @@ theme_override_font_sizes/font_size = 64
 action_mode = 0
 text = "restart"
 
-[node name="MenuButton" type="Button" parent="BigScore/ReferenceRect/VBoxContainer/HBoxContainer"]
+[node name="MenuButton" type="Button" parent="BigScore/ReferenceRect/VBoxContainer/HBoxContainer" unique_id=1694945737]
 layout_mode = 2
 theme = ExtResource("4")
 theme_override_fonts/font = ExtResource("12")
@@ -165,7 +165,7 @@ theme_override_font_sizes/font_size = 64
 action_mode = 0
 text = "menu"
 
-[node name="NextButton" type="Button" parent="BigScore/ReferenceRect/VBoxContainer/HBoxContainer"]
+[node name="NextButton" type="Button" parent="BigScore/ReferenceRect/VBoxContainer/HBoxContainer" unique_id=138538941]
 visible = false
 layout_mode = 2
 theme = ExtResource("4")
@@ -174,16 +174,16 @@ theme_override_font_sizes/font_size = 64
 action_mode = 0
 text = "next"
 
-[node name="SongFinished" type="AudioStreamPlayer" parent="BigScore"]
+[node name="SongFinished" type="AudioStreamPlayer" parent="BigScore" unique_id=1594202419]
 stream = ExtResource("3")
 
-[node name="AcceptSound" type="AudioStreamPlayer" parent="BigScore"]
+[node name="AcceptSound" type="AudioStreamPlayer" parent="BigScore" unique_id=1710072744]
 stream = ExtResource("9")
 
-[node name="ScoreCanvas" parent="." instance=ExtResource("11")]
+[node name="ScoreCanvas" parent="." unique_id=995302675 instance=ExtResource("11")]
 transform = Transform3D(1.22873, 0.363606, 0.0779755, 0, 1.35946, -0.0633927, -0.860365, 0.519283, 0.111361, -2.56726, 2.41427, -6.60775)
 
-[node name="ReferenceRect" type="Panel" parent="ScoreCanvas"]
+[node name="ReferenceRect" type="Panel" parent="ScoreCanvas" unique_id=1009951031]
 custom_minimum_size = Vector2(1024, 800)
 anchors_preset = 8
 anchor_left = 0.5
@@ -196,7 +196,7 @@ offset_right = 512.0
 offset_bottom = 400.0
 theme = ExtResource("4")
 
-[node name="CenterContainer" type="Container" parent="ScoreCanvas/ReferenceRect"]
+[node name="CenterContainer" type="Container" parent="ScoreCanvas/ReferenceRect" unique_id=1605952766]
 custom_minimum_size = Vector2(900, 0)
 layout_mode = 0
 anchor_left = 0.5
@@ -208,33 +208,33 @@ offset_top = -374.0
 offset_right = 450.0
 offset_bottom = 374.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ScoreCanvas/ReferenceRect/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ScoreCanvas/ReferenceRect/CenterContainer" unique_id=1016211296]
 custom_minimum_size = Vector2(900, 748)
 layout_mode = 2
 theme_override_constants/separation = 0
 alignment = 1
 
-[node name="UITimeLeft" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer" instance=ExtResource("20")]
+[node name="UITimeLeft" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer" unique_id=702132313 instance=ExtResource("20")]
 layout_mode = 2
 theme = null
 theme_override_fonts/font = ExtResource("12")
 text = "00:00:00"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer" unique_id=209735970]
 layout_mode = 2
 
-[node name="UIScore" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer/HBoxContainer" instance=ExtResource("16")]
+[node name="UIScore" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer/HBoxContainer" unique_id=345242835 instance=ExtResource("16")]
 custom_minimum_size = Vector2(600, 190)
 layout_mode = 2
 text = "000000"
 
-[node name="UICombo" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer/HBoxContainer" instance=ExtResource("13")]
+[node name="UICombo" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer/HBoxContainer" unique_id=1172335924 instance=ExtResource("13")]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("21")
 theme_override_font_sizes/font_size = 60
 text = "X4"
 
-[node name="PlaylistTimeLabel" type="Label" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer"]
+[node name="PlaylistTimeLabel" type="Label" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer" unique_id=962849470]
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 1, 1)
@@ -244,21 +244,21 @@ text = "Playlist: 00:00"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Lasers" parent="." instance=ExtResource("23")]
+[node name="Lasers" parent="." unique_id=823318134 instance=ExtResource("23")]
 
-[node name="StartTimer" type="Timer" parent="."]
+[node name="StartTimer" type="Timer" parent="." unique_id=939268846]
 wait_time = 2.0
 one_shot = true
 
-[node name="EndTimer" type="Timer" parent="."]
+[node name="EndTimer" type="Timer" parent="." unique_id=758303606]
 one_shot = true
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1953308850]
 transform = Transform3D(-0.57185084, 0.6294633, -0.52608234, 0.27022094, 0.75002825, 0.6036873, 0.7745757, 0.20306051, -0.59899837, 0.12419295, 14.558197, -9.005886)
 light_color = Color(0.945098, 0.835294, 0.647059, 1)
 light_energy = 1.5
 
-[node name="PauseMenu" parent="." instance=ExtResource("24_jbgew")]
+[node name="PauseMenu" parent="." unique_id=882452195 instance=ExtResource("24_jbgew")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3676617, -3.7702389)
 visible = false
 disable_collision = true

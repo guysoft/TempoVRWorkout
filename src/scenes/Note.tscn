@@ -1,184 +1,182 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene format=3 uid="uid://b13wmmms5n2gg"]
 
-[ext_resource path="res://scripts/note.gd" type="Script" id=1]
-[ext_resource path="res://sfx/beep_01.wav" type="AudioStream" id=2]
-[ext_resource path="res://models/note/note.obj" type="ArrayMesh" id=3]
-[ext_resource path="res://effects/note_1_material.tres" type="Material" id=4]
-[ext_resource path="res://effects/note_0_material.tres" type="Material" id=5]
-[ext_resource path="res://effects/note_3_material.tres" type="Material" id=6]
-[ext_resource path="res://scenes/NoteExplosion.tscn" type="PackedScene" id=7]
-[ext_resource path="res://scenes/NoteFeedback.tscn" type="PackedScene" id=8]
+[ext_resource type="Script" uid="uid://k6disfe0h3yj" path="res://scripts/note.gd" id="1"]
+[ext_resource type="AudioStream" uid="uid://bhq1oe6e46uko" path="res://sfx/beep_01.wav" id="2"]
+[ext_resource type="ArrayMesh" uid="uid://dmheln26n36se" path="res://models/note/note.obj" id="3"]
+[ext_resource type="Material" uid="uid://dr8t6pa5tb8a4" path="res://effects/note_1_material.tres" id="4"]
+[ext_resource type="Material" uid="uid://0l3q4ycp43lc" path="res://effects/note_0_material.tres" id="5"]
+[ext_resource type="Material" uid="uid://fm84yumfchuq" path="res://effects/note_3_material.tres" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/NoteExplosion.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/NoteFeedback.tscn" id="8"]
 
-[sub_resource type="SphereShape3D" id=7]
+[sub_resource type="SphereShape3D" id="7"]
 margin = 0.01
 radius = 0.225
 
-[sub_resource type="Animation" id=4]
+[sub_resource type="Animation" id="4"]
 length = 0.001
 tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
 tracks/0/path = NodePath("MeshInstance3D:rotation_degrees")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
 tracks/0/keys = {
-"times": PackedFloat32Array( 0 ),
-"transitions": PackedFloat32Array( 1 ),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [ Vector3( 45, 45, 45 ) ]
+"values": [Vector3(45, 45, 45)]
 }
 tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
 tracks/1/path = NodePath("MeshInstance3D:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
 tracks/1/keys = {
-"times": PackedFloat32Array( 0 ),
-"transitions": PackedFloat32Array( 1 ),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [ Vector3( 0, 3.08304, 0 ) ]
+"values": [Vector3(0, 3.08304, 0)]
 }
 tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
 tracks/2/path = NodePath("MeshInstance3D:scale")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
-tracks/2/imported = false
-tracks/2/enabled = true
 tracks/2/keys = {
-"times": PackedFloat32Array( 0 ),
-"transitions": PackedFloat32Array( 1 ),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [ Vector3( 0, 0, 0 ) ]
+"values": [Vector3(0, 0, 0)]
 }
 tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
 tracks/3/path = NodePath(".:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
 tracks/3/keys = {
-"times": PackedFloat32Array( 0 ),
-"transitions": PackedFloat32Array( 1 ),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [ false ]
+"values": [false]
 }
 
-[sub_resource type="Animation" id=6]
+[sub_resource type="Animation" id="6"]
 resource_name = "despawn"
 length = 0.5
 tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
 tracks/0/path = NodePath("MeshInstance3D:scale")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
 tracks/0/keys = {
-"times": PackedFloat32Array( 0, 0.2 ),
-"transitions": PackedFloat32Array( 1, 1 ),
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [ Vector3( 1, 1, 1 ), Vector3( 0, 0, 0 ) ]
+"values": [Vector3(1, 1, 1), Vector3(0, 0, 0)]
 }
 tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
 tracks/1/path = NodePath(".:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
 tracks/1/keys = {
-"times": PackedFloat32Array( 0, 0.5 ),
-"transitions": PackedFloat32Array( 1, 1 ),
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [ true, false ]
+"values": [true, false]
 }
 
-[sub_resource type="Animation" id=5]
+[sub_resource type="Animation" id="5"]
 resource_name = "spawn"
 length = 0.3
 step = 0.05
 tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
 tracks/0/path = NodePath("MeshInstance3D:rotation_degrees")
 tracks/0/interp = 2
 tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
 tracks/0/keys = {
-"times": PackedFloat32Array( 0.05, 0.3 ),
-"transitions": PackedFloat32Array( 1, 1 ),
+"times": PackedFloat32Array(0.05, 0.3),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [ Vector3( 150, 150, 150 ), Vector3( 0, 0, 0 ) ]
+"values": [Vector3(150, 150, 150), Vector3(0, 0, 0)]
 }
 tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
 tracks/1/path = NodePath("MeshInstance3D:position")
 tracks/1/interp = 2
 tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
 tracks/1/keys = {
-"times": PackedFloat32Array( 0.05, 0.3 ),
-"transitions": PackedFloat32Array( 0.203063, 1 ),
+"times": PackedFloat32Array(0.05, 0.3),
+"transitions": PackedFloat32Array(0.203063, 1),
 "update": 0,
-"values": [ Vector3( 0, 0, -25 ), Vector3( 0, 0, 0 ) ]
+"values": [Vector3(0, 0, -25), Vector3(0, 0, 0)]
 }
 tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
 tracks/2/path = NodePath("MeshInstance3D:scale")
 tracks/2/interp = 2
 tracks/2/loop_wrap = true
-tracks/2/imported = false
-tracks/2/enabled = true
 tracks/2/keys = {
-"times": PackedFloat32Array( 0.05, 0.3 ),
-"transitions": PackedFloat32Array( 1, 1 ),
+"times": PackedFloat32Array(0.05, 0.3),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [ Vector3( 0, 0, 0 ), Vector3( 1, 1, 1 ) ]
+"values": [Vector3(0, 0, 0), Vector3(1, 1, 1)]
 }
 tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
 tracks/3/path = NodePath(".:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
 tracks/3/keys = {
-"times": PackedFloat32Array( 0 ),
-"transitions": PackedFloat32Array( 1 ),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ true ]
+"values": [true]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_note"]
 _data = {
-"RESET": SubResource( 4 ),
-"despawn": SubResource( 6 ),
-"spawn": SubResource( 5 )
+&"RESET": SubResource("4"),
+&"despawn": SubResource("6"),
+&"spawn": SubResource("5")
 }
 
-[node name="Note" type="Area3D" groups=["note"]]
+[node name="Note" type="Area3D" unique_id=1519165758 groups=["note"]]
 visible = false
 collision_layer = 4
 collision_mask = 2
 monitoring = false
-script = ExtResource( 1 )
-materials = [ ExtResource( 5 ), ExtResource( 4 ), ExtResource( 6 ) ]
-hit_effect = ExtResource( 7 )
-feedback_effect = ExtResource( 8 )
+script = ExtResource("1")
+materials = [ExtResource("5"), ExtResource("4"), ExtResource("6")]
+hit_effect = ExtResource("7")
+feedback_effect = ExtResource("8")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.08304, 0 )
-material_override = ExtResource( 4 )
-mesh = ExtResource( 3 )
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=909831677]
+transform = Transform3D(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3.08304, 0)
+material_override = ExtResource("4")
+mesh = ExtResource("3")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource( 7 )
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=142004213]
+shape = SubResource("7")
 
-[node name="Timer" type="Timer" parent="."]
+[node name="Timer" type="Timer" parent="." unique_id=1559910215]
 wait_time = 0.001
 one_shot = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-autoplay = "RESET"
-libraries = {
-"": SubResource("AnimationLibrary_note")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1782447633]
+libraries/ = SubResource("AnimationLibrary_note")
+autoplay = &"RESET"
 
-[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]
-stream = ExtResource( 2 )
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=484578540]
+stream = ExtResource("2")

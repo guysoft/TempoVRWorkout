@@ -1,25 +1,24 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://b7rtjp3q2w0el"]
 
 [ext_resource type="Theme" uid="uid://d1fbglwrn3v44" path="res://effects/menu_theme.tres" id="1"]
-[ext_resource type="Script" path="res://scripts/ui_playlist.gd" id="2"]
+[ext_resource type="Script" uid="uid://cgjy6j1h13fy2" path="res://scripts/ui_playlist.gd" id="2"]
 
-[node name="UI_Playlist" type="VBoxContainer"]
+[node name="UI_Playlist" type="VBoxContainer" unique_id=1853599555]
 custom_minimum_size = Vector2(1468, 768)
 theme = ExtResource("1")
 script = ExtResource("2")
 
-[node name="HeaderContainer" type="HBoxContainer" parent="."]
+[node name="HeaderContainer" type="HBoxContainer" parent="." unique_id=1178189360]
 layout_mode = 2
 
-[node name="BackButton" type="Button" parent="HeaderContainer"]
+[node name="BackButton" type="Button" parent="HeaderContainer" unique_id=1555447089]
 visible = false
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
-mouse_filter = 0
 theme_override_font_sizes/font_size = 64
 text = "<"
 
-[node name="PlaylistLabel" type="Label" parent="HeaderContainer"]
+[node name="PlaylistLabel" type="Label" parent="HeaderContainer" unique_id=800801499]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 64
@@ -27,17 +26,16 @@ text = "PLAYLISTS"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ListContainer" type="VBoxContainer" parent="."]
+[node name="ListContainer" type="VBoxContainer" parent="." unique_id=332419395]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ScrollUpBtn" type="Button" parent="ListContainer"]
+[node name="ScrollUpBtn" type="Button" parent="ListContainer" unique_id=200276897]
 layout_mode = 2
-mouse_filter = 0
 theme_override_font_sizes/font_size = 64
 text = "^"
 
-[node name="PlaylistItems" type="ItemList" parent="ListContainer"]
+[node name="PlaylistItems" type="ItemList" parent="ListContainer" unique_id=1069784602]
 custom_minimum_size = Vector2(1436, 636)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -46,16 +44,13 @@ mouse_filter = 1
 theme_override_font_sizes/font_size = 64
 allow_reselect = true
 
-[node name="ScrollDownBtn" type="Button" parent="ListContainer"]
+[node name="ScrollDownBtn" type="Button" parent="ListContainer" unique_id=694060530]
 layout_mode = 2
-mouse_filter = 0
 theme_override_font_sizes/font_size = 64
 text = "v"
 
-[node name="PlayButton" type="Button" parent="."]
+[node name="PlayButton" type="Button" parent="." unique_id=455979087]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-mouse_filter = 0
 theme_override_font_sizes/font_size = 64
 text = "Select Playlist"
-

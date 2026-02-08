@@ -1,6 +1,6 @@
 [gd_resource type="ParticleProcessMaterial" format=3 uid="uid://dwk0jtenkcwdd"]
 
-[ext_resource type="Gradient" path="res://effects/bw_gradient.tres" id="1"]
+[ext_resource type="Gradient" uid="uid://dgj0k7k3wd7bm" path="res://effects/bw_gradient.tres" id="1"]
 
 [sub_resource type="GradientTexture2D" id="24"]
 gradient = ExtResource("1")

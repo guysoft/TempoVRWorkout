@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dfvrt1g74wo5l"]
+[gd_scene format=3 uid="uid://dfvrt1g74wo5l"]
 
 [ext_resource type="Script" uid="uid://dtu41n7u2cbs4" path="res://scripts/GameManager.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b3mrx5kj7l8vc" path="res://scenes/Player.tscn" id="2"]
@@ -9,13 +9,13 @@
 [ext_resource type="PackedScene" uid="uid://ctltchlf2j2r4" path="res://addons/xr-simulator/XRSimulator.tscn" id="9"]
 [ext_resource type="Script" uid="uid://cnmde0srm4xk6" path="res://scripts/DebugController.gd" id="10"]
 
-[node name="GameManager" type="Node"]
+[node name="GameManager" type="Node" unique_id=297511804]
 script = ExtResource("1")
 debug_start_scene = "Menu"
 
-[node name="Player" parent="." instance=ExtResource("2")]
+[node name="Player" parent="." unique_id=126411633 instance=ExtResource("2")]
 
-[node name="FPSOverlay" parent="Player/XROrigin3D/XRCamera3D" index="3" instance=ExtResource("3_2uts2")]
+[node name="FPSOverlay" parent="Player/XROrigin3D/XRCamera3D" index="3" unique_id=1548264350 instance=ExtResource("3_2uts2")]
 
 [node name="LeftHand" parent="Player/XROrigin3D/LeftHand" index="0"]
 script = null
@@ -48,34 +48,34 @@ visible = false
 [node name="PlayerCenter" parent="Player" index="3"]
 visible = false
 
-[node name="BeatPlayer" type="AudioStreamPlayer" parent="."]
+[node name="BeatPlayer" type="AudioStreamPlayer" parent="." unique_id=1403003101]
 script = ExtResource("3")
 bpm = 109.0
 beat_subdivisions = 1.0
 
-[node name="EnvironmentManager" type="WorldEnvironment" parent="."]
+[node name="EnvironmentManager" type="WorldEnvironment" parent="." unique_id=345705884]
 environment = ExtResource("7")
 script = ExtResource("8")
 
-[node name="MaterialCache" type="Node3D" parent="."]
+[node name="MaterialCache" type="Node3D" parent="." unique_id=833452459]
 
-[node name="PlayerStats" type="Node" parent="."]
+[node name="PlayerStats" type="Node" parent="." unique_id=797667227]
 
-[node name="Button" type="Button" parent="."]
+[node name="Button" type="Button" parent="." unique_id=1646935794]
 offset_left = 23.0
 offset_top = 17.0
 offset_right = 88.0
 offset_bottom = 37.0
 text = "Enter VR"
 
-[node name="XRSimulator" parent="." instance=ExtResource("9")]
+[node name="XRSimulator" parent="." unique_id=1645824655 instance=ExtResource("9")]
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1219469615]
 transform = Transform3D(0.8660254, 0.12940952, -0.4829629, 0, 0.9659258, 0.25881904, 0.5, -0.22414386, 0.83651626, 0, 0, 0)
 light_color = Color(0.945098, 0.835294, 0.647059, 1)
 light_energy = 1.5
 
-[node name="DebugController" type="Node" parent="."]
+[node name="DebugController" type="Node" parent="." unique_id=1477711557]
 script = ExtResource("10")
 
 [editable path="Player"]

@@ -1,9 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://bhiqsmkfyhdkp"]
+[gd_scene format=3 uid="uid://bhiqsmkfyhdkp"]
 
-[ext_resource type="Texture2D" path="res://models/ball/ChristmasTreeOrnament003_2K_Color.jpg" id="1"]
-[ext_resource type="Texture2D" path="res://models/ball/ChristmasTreeOrnament003_2K_Metalness.jpg" id="2"]
-[ext_resource type="Texture2D" path="res://models/ball/ChristmasTreeOrnament003_2K_Roughness.jpg" id="3"]
-[ext_resource type="Script" path="res://scripts/ball.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://vkfumq76ohms" path="res://models/ball/ChristmasTreeOrnament003_2K_Color.jpg" id="1"]
+[ext_resource type="Texture2D" uid="uid://dbukobheimjd0" path="res://models/ball/ChristmasTreeOrnament003_2K_Metalness.jpg" id="2"]
+[ext_resource type="Texture2D" uid="uid://d2uap7e6w61pc" path="res://models/ball/ChristmasTreeOrnament003_2K_Roughness.jpg" id="3"]
+[ext_resource type="Script" uid="uid://t3lq4237wx6g" path="res://scripts/ball.gd" id="4"]
 
 [sub_resource type="SphereShape3D" id="4"]
 
@@ -16,17 +16,17 @@ albedo_texture = ExtResource("1")
 metallic_texture = ExtResource("2")
 roughness_texture = ExtResource("3")
 
-[node name="Ball" type="Node3D"]
+[node name="Ball" type="Node3D" unique_id=819411954]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 script = ExtResource("4")
 
-[node name="Ball" type="StaticBody3D" parent="."]
+[node name="Ball" type="StaticBody3D" parent="." unique_id=212212707]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball" unique_id=322646898]
 transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)
 shape = SubResource("4")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ball"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ball" unique_id=381058075]
 transform = Transform3D(0.254268, 0, 0, 0, 0.254268, 0, 0, 0, 0.254268, 0, 0, 0)
 mesh = SubResource("1")
 skin = SubResource("2")

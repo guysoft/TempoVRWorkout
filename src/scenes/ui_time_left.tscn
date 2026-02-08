@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://dp6qkljlk5y1r"]
+[gd_scene format=3 uid="uid://dp6qkljlk5y1r"]
 
 [ext_resource type="Script" uid="uid://c4145y30f6350" path="res://scripts/UITimeLeft.gd" id="1"]
 [ext_resource type="Theme" uid="uid://dhxx6nyx60wmn" path="res://ui_theme.tres" id="2"]
 
-[node name="UITimeLeft" type="Label"]
+[node name="UITimeLeft" type="Label" unique_id=180272090]
 offset_right = 635.0
 offset_bottom = 181.0
 theme = ExtResource("2")

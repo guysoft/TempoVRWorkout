@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dqxk5h4r3kxcp"]
+[gd_scene format=3 uid="uid://dqxk5h4r3kxcp"]
 
 [ext_resource type="Script" uid="uid://c1fo1i8d1xvtn" path="res://scripts/GameOffSplash.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://cn8f17tpfui6m" path="res://Images/ggj2-splash.png" id="2"]
@@ -75,22 +75,20 @@ _data = {
 &"fade": SubResource("4")
 }
 
-[node name="GameOffSplash" type="Node3D"]
+[node name="GameOffSplash" type="Node3D" unique_id=1849435065]
 script = ExtResource("1")
 length = 5.0
 environment = ExtResource("3")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=617217177]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.97004)
 mesh = SubResource("1")
 surface_material_override/0 = SubResource("2")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("5")
-}
-autoplay = "RESET"
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1794157010]
+libraries/ = SubResource("5")
+autoplay = &"RESET"
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=832818198]
 stream = ExtResource("4")
 pitch_scale = 2.0

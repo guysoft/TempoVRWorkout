@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://bq1j7l2u3xp6c"]
+[gd_scene format=3 uid="uid://bq1j7l2u3xp6c"]
 
-[ext_resource type="PackedScene" path="res://scenes/ball.tscn" id="1"]
-[ext_resource type="Script" path="res://scripts/spawner.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://bhiqsmkfyhdkp" path="res://scenes/ball.tscn" id="1"]
+[ext_resource type="Script" uid="uid://bwn1a22ns0iw8" path="res://scripts/spawner.gd" id="2"]
 
-[node name="Spawner" type="Node3D"]
+[node name="Spawner" type="Node3D" unique_id=1257058850]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
 script = ExtResource("2")
 active = true
@@ -11,7 +11,7 @@ spawn_time = 0.5
 spawn_object = ExtResource("1")
 bounding_box = AABB(-1, 0, 0, 1, 1.5, 0)
 
-[node name="Timer" type="Timer" parent="."]
+[node name="Timer" type="Timer" parent="." unique_id=1650740097]
 autostart = true
 
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

@@ -1,11 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://ueybijl2o3qc"]
+[gd_scene format=3 uid="uid://ueybijl2o3qc"]
 
 [ext_resource type="Script" uid="uid://dio6sx6psyknr" path="res://scripts/FPSOverlay.gd" id="1_c213b"]
 
-[node name="FPSOverlay" type="Node3D"]
+[node name="FPSOverlay" type="Node3D" unique_id=542610175]
 script = ExtResource("1_c213b")
 
-[node name="Label3D" type="Label3D" parent="."]
+[node name="Label3D" type="Label3D" parent="." unique_id=1857262809]
 pixel_size = 0.001
 no_depth_test = true
 fixed_size = true

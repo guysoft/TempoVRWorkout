@@ -1,34 +1,34 @@
-[gd_scene load_steps=4 format=3 uid="uid://joq00fxkwv8o"]
+[gd_scene format=3 uid="uid://joq00fxkwv8o"]
 
 [ext_resource type="Theme" uid="uid://d1fbglwrn3v44" path="res://effects/menu_theme.tres" id="1"]
 [ext_resource type="Theme" uid="uid://dhxx6nyx60wmn" path="res://ui_theme.tres" id="2"]
 [ext_resource type="Script" uid="uid://dtbp8rwbn2jte" path="res://scenes/MainMenuLeft.gd" id="3"]
 
-[node name="MainMenuLeft" type="VBoxContainer"]
+[node name="MainMenuLeft" type="VBoxContainer" unique_id=201553181]
 custom_minimum_size = Vector2(996, 568)
 theme = ExtResource("2")
 script = ExtResource("3")
 
-[node name="TabContainer" type="TabContainer" parent="."]
+[node name="TabContainer" type="TabContainer" parent="." unique_id=1420609975]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 41
 current_tab = 0
 
-[node name="Instructions" type="ReferenceRect" parent="TabContainer"]
+[node name="Instructions" type="ReferenceRect" parent="TabContainer" unique_id=747841253]
 layout_mode = 2
 theme = ExtResource("1")
 metadata/_tab_index = 0
 
-[node name="Panel" type="Panel" parent="TabContainer/Instructions"]
+[node name="Panel" type="Panel" parent="TabContainer/Instructions" unique_id=1332609013]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -8.0
 offset_bottom = -36.0
 
-[node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/Instructions/Panel"]
+[node name="RichTextLabel" type="RichTextLabel" parent="TabContainer/Instructions/Panel" unique_id=1390564255]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -44,121 +44,123 @@ Avoid walls and bombs which will remove your combo and slow you down!
 Score bonus points based on your clear time."
 tab_size = 10
 
-[node name="Settings" type="ReferenceRect" parent="TabContainer"]
+[node name="Settings" type="ReferenceRect" parent="TabContainer" unique_id=1143889993]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
-[node name="Panel" type="Panel" parent="TabContainer/Settings"]
+[node name="Panel" type="Panel" parent="TabContainer/Settings" unique_id=1991633254]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -8.0
 offset_bottom = -36.0
 
-[node name="SettingsContent" type="VBoxContainer" parent="TabContainer/Settings"]
+[node name="SettingsContent" type="VBoxContainer" parent="TabContainer/Settings" unique_id=1700338189]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 970.0
 offset_bottom = 480.0
 
-[node name="OnlyPowerBalls" type="CheckButton" parent="TabContainer/Settings/SettingsContent"]
+[node name="OnlyPowerBalls" type="CheckButton" parent="TabContainer/Settings/SettingsContent" unique_id=800751069]
 layout_mode = 2
 theme_override_font_sizes/font_size = 47
 text = "Only power balls"
 
-[node name="Orientation" type="ReferenceRect" parent="TabContainer"]
+[node name="Orientation" type="ReferenceRect" parent="TabContainer" unique_id=2008908738]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="Panel" type="Panel" parent="TabContainer/Orientation"]
+[node name="Panel" type="Panel" parent="TabContainer/Orientation" unique_id=2103701528]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_right = -8.0
 offset_bottom = -36.0
 
-[node name="OrientationContent" type="VBoxContainer" parent="TabContainer/Orientation"]
+[node name="OrientationContent" type="VBoxContainer" parent="TabContainer/Orientation" unique_id=71282541]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 970.0
 offset_bottom = 480.0
 
-[node name="PositionLabel" type="Label" parent="TabContainer/Orientation/OrientationContent"]
+[node name="PositionLabel" type="Label" parent="TabContainer/Orientation/OrientationContent" unique_id=1520729959]
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "— Position —"
 horizontal_alignment = 1
 
-[node name="PositionButtons" type="HBoxContainer" parent="TabContainer/Orientation/OrientationContent"]
+[node name="PositionButtons" type="HBoxContainer" parent="TabContainer/Orientation/OrientationContent" unique_id=1274199984]
 layout_mode = 2
 alignment = 1
 
-[node name="LeftBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons"]
+[node name="LeftBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons" unique_id=140720571]
 custom_minimum_size = Vector2(140, 70)
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Left"
 
-[node name="RightBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons"]
+[node name="RightBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons" unique_id=864966101]
 custom_minimum_size = Vector2(140, 70)
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Right"
 
-[node name="FwdBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons"]
+[node name="FwdBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons" unique_id=1622939934]
 custom_minimum_size = Vector2(140, 70)
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Fwd"
 
-[node name="BackBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons"]
+[node name="BackBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/PositionButtons" unique_id=1833050552]
 custom_minimum_size = Vector2(140, 70)
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Back"
 
-[node name="Spacer1" type="Control" parent="TabContainer/Orientation/OrientationContent"]
+[node name="Spacer1" type="Control" parent="TabContainer/Orientation/OrientationContent" unique_id=1960971902]
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
-[node name="RotationLabel" type="Label" parent="TabContainer/Orientation/OrientationContent"]
+[node name="RotationLabel" type="Label" parent="TabContainer/Orientation/OrientationContent" unique_id=983328297]
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "— Rotation —"
 horizontal_alignment = 1
 
-[node name="RotationButtons" type="HBoxContainer" parent="TabContainer/Orientation/OrientationContent"]
+[node name="RotationButtons" type="HBoxContainer" parent="TabContainer/Orientation/OrientationContent" unique_id=1469420634]
 layout_mode = 2
 alignment = 1
 
-[node name="RotateCCWBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/RotationButtons"]
+[node name="RotateCCWBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/RotationButtons" unique_id=1895205540]
 custom_minimum_size = Vector2(200, 70)
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "↺ CCW"
 
-[node name="RotateCWBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/RotationButtons"]
+[node name="RotateCWBtn" type="Button" parent="TabContainer/Orientation/OrientationContent/RotationButtons" unique_id=1210976015]
 custom_minimum_size = Vector2(200, 70)
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "CW ↻"
 
-[node name="Spacer2" type="Control" parent="TabContainer/Orientation/OrientationContent"]
+[node name="Spacer2" type="Control" parent="TabContainer/Orientation/OrientationContent" unique_id=1545783451]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="ResetBtn" type="Button" parent="TabContainer/Orientation/OrientationContent"]
+[node name="ResetBtn" type="Button" parent="TabContainer/Orientation/OrientationContent" unique_id=317873401]
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Reset Position"
 
-[node name="Spacer3" type="Control" parent="TabContainer/Orientation/OrientationContent"]
+[node name="Spacer3" type="Control" parent="TabContainer/Orientation/OrientationContent" unique_id=1944968272]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="RecenterBtn" type="Button" parent="TabContainer/Orientation/OrientationContent"]
+[node name="RecenterBtn" type="Button" parent="TabContainer/Orientation/OrientationContent" unique_id=2120430812]
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Recenter (like B+Y)"

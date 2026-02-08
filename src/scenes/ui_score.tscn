@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://bqmjf2xl6vp1h"]
+[gd_scene format=3 uid="uid://bqmjf2xl6vp1h"]
 
 [ext_resource type="Script" uid="uid://b0x1aw2lnboh8" path="res://scripts/ui_score.gd" id="1"]
 
-[node name="UIScore" type="Label"]
+[node name="UIScore" type="Label" unique_id=188900565]
 offset_right = 659.0
 offset_bottom = 215.0
 theme_override_colors/font_color = Color(0.25, 0.48, 0.24, 1)

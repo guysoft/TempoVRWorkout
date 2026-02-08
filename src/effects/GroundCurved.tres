@@ -1,4 +1,4 @@
-[gd_resource type="ShaderMaterial" load_steps=7 format=3 uid="uid://dj3f4hk8m2qxp"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dj3f4hk8m2qxp"]
 
 [ext_resource type="Texture2D" uid="uid://bveewmtsbjo0i" path="res://textures/grid.png" id="1"]
 [ext_resource type="Texture2D" uid="uid://drgu3mqyglde3" path="res://models/ground/Tiles074_2K_NormalDX.png" id="2"]

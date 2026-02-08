@@ -1,18 +1,18 @@
-[gd_scene load_steps=6 format=3 uid="uid://drlk24o5gw78t"]
+[gd_scene format=3 uid="uid://drlk24o5gw78t"]
 
-[ext_resource type="Texture2D" path="res://effects/circle_05.png" id="1"]
-[ext_resource type="Material" path="res://effects/environment_particles_material.tres" id="2"]
+[ext_resource type="Texture2D" uid="uid://c3e6qkkdppgje" path="res://effects/circle_05.png" id="1"]
+[ext_resource type="Material" uid="uid://dwk0jtenkcwdd" path="res://effects/environment_particles_material.tres" id="2"]
 
 [sub_resource type="StandardMaterial3D" id="18"]
 transparency = 1
+blend_mode = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-blend_mode = 1
+albedo_texture = ExtResource("1")
 billboard_mode = 3
 particles_anim_h_frames = 1
 particles_anim_v_frames = 1
 particles_anim_loop = false
-albedo_texture = ExtResource("1")
 
 [sub_resource type="QuadMesh" id="19"]
 material = SubResource("18")
@@ -22,7 +22,7 @@ radius = 20.0
 height = 20.0
 is_hemisphere = true
 
-[node name="EnvironmentParticles" type="GPUParticles3D"]
+[node name="EnvironmentParticles" type="GPUParticles3D" unique_id=1633271567]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.56195, 0)
 amount = 50
 lifetime = 3.0
@@ -30,7 +30,7 @@ visibility_aabb = AABB(-12.6138, -4, -12.4749, 25.2276, 8, 24.9499)
 process_material = ExtResource("2")
 draw_pass_1 = SubResource("19")
 
-[node name="ParticleEmissionMesh" type="MeshInstance3D" parent="."]
+[node name="ParticleEmissionMesh" type="MeshInstance3D" parent="." unique_id=840408100]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.37489, 0)
 visible = false
 mesh = SubResource("20")

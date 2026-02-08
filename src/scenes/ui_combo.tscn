@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://dm6ln1wr7hmcs"]
+[gd_scene format=3 uid="uid://dm6ln1wr7hmcs"]
 
 [ext_resource type="Script" uid="uid://v8n4ftdgyg4m" path="res://scripts/ui_combo.gd" id="1"]
 
-[node name="UICombo" type="Label"]
+[node name="UICombo" type="Label" unique_id=786899709]
 offset_top = 219.0
 offset_right = 659.0
 offset_bottom = 434.0
