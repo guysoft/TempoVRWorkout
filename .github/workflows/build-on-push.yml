@@ -7,7 +7,7 @@ name: Build TempoVR
 # Trigger rules
 on:
   push:
-    branches: [main, develop, ci-workflow, workout]
+    branches: [main, develop, ci-workflow, workout, mac-ci]
     tags: ['v*']
   pull_request:
     branches: [main, workout]
@@ -49,6 +49,15 @@ jobs:
             export-type: release
             export-folder: build/linux
             archive: Linux
+
+          # Export for macOS
+          - name: macOS
+            os: ubuntu-22.04
+            platform: macos
+            export-preset: macOS
+            export-type: release
+            export-folder: build/macos
+            archive: macOS
 
           # Export for Android Quest
           - name: Android-Quest
@@ -162,12 +171,29 @@ jobs:
           mv src/Levels /tmp/Levels
           echo "Moved Levels folder to /tmp/Levels to prevent bundling into PCK"
 
+      # Ensure export output directory exists
+      - name: Create Export Directory
+        shell: bash
+        run: mkdir -p src/${{ matrix.export-folder }}
+
       # Export project (with android build template if needed)
       - name: Export Godot Project
         shell: bash
         run: |
           cd src
           godot --headless ${{ matrix.export-args }} --export-${{ matrix.export-type }} "${{ matrix.export-preset }}"
+
+      # macOS: Godot exports a .zip containing the .app bundle. Unzip it so the
+      # artifact isn't double-zipped and we can place Levels inside the .app.
+      - name: Unzip macOS App Bundle
+        if: matrix.platform == 'macos'
+        shell: bash
+        run: |
+          cd src/${{ matrix.export-folder }}
+          unzip -o TempoVR.zip
+          rm TempoVR.zip
+          echo "Extracted TempoVR.app:"
+          ls -la
 
       # Restore Levels folder for non-Android builds so it can be copied externally
       - name: Restore Levels Folder (Non-Android Only)
@@ -180,13 +206,20 @@ jobs:
       # Copy pre-shipped levels to build output (external filesystem access)
       # For non-Android: Copy Levels externally next to executable (not bundled in PCK)
       # For Android: Levels are already bundled in APK (res://Levels/), no external copy needed
+      # For macOS: Levels go inside TempoVR.app/Contents/MacOS/Levels/ (next to the binary)
       - name: Copy Pre-shipped Levels to Build
         if: matrix.platform != 'android'
         shell: bash
         run: |
-          cp -r src/Levels src/${{ matrix.export-folder }}/Levels
-          echo "Copied Levels folder to build output:"
-          ls -la src/${{ matrix.export-folder }}/Levels/
+          if [ "${{ matrix.platform }}" = "macos" ]; then
+            cp -r src/Levels src/${{ matrix.export-folder }}/TempoVR.app/Contents/MacOS/Levels
+            echo "Copied Levels into TempoVR.app/Contents/MacOS/:"
+            ls -la src/${{ matrix.export-folder }}/TempoVR.app/Contents/MacOS/Levels/
+          else
+            cp -r src/Levels src/${{ matrix.export-folder }}/Levels
+            echo "Copied Levels folder to build output:"
+            ls -la src/${{ matrix.export-folder }}/Levels/
+          fi
 
       # Compress project for release (must run before upload so zip is in artifact)
       - name: Compress Project
@@ -230,4 +263,4 @@ jobs:
           omitNameDuringUpdate: true
           omitBodyDuringUpdate: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: 'Windows-Artifacts/Windows.zip,Linux-Artifacts/Linux.zip,Android-Quest-Artifacts/TempoVR-CI.apk'
+          artifacts: 'Windows-Artifacts/Windows.zip,Linux-Artifacts/Linux.zip,macOS-Artifacts/macOS.zip,Android-Quest-Artifacts/TempoVR-CI.apk'
