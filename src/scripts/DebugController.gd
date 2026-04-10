@@ -9,6 +9,7 @@ extends Node
 ##   F2  - Return to main menu
 ##   F3  - Print current game state
 ##   F4  - Toggle debug overlay
+##   F5  - Run pause menu E2E test (auto-pauses and validates)
 ##   1-5 - Quick select difficulty (1=Beginner, 5=Expert)
 ##   ENTER - Confirm/Start
 ##   ESCAPE - Back/Menu
@@ -23,7 +24,7 @@ var enabled: bool = true
 
 func _ready():
 	print("DebugController: Initialized - keyboard debug controls enabled")
-	print("DebugController: F1=test level, F2=menu, F3=state, ENTER=start")
+	print("DebugController: F1=test level, F2=menu, F3=state, F5=pause test, ENTER=start")
 
 func _input(event):
 	if not enabled:
@@ -44,6 +45,8 @@ func _handle_key(keycode: int):
 			_print_game_state()
 		KEY_F4:
 			_toggle_debug_overlay()
+		KEY_F5:
+			_run_pause_menu_test()
 		KEY_1:
 			_set_difficulty("Beginner")
 		KEY_2:
@@ -132,3 +135,14 @@ func _back_action():
 	print("DebugController: Back/Escape pressed")
 	# This is handled by individual scenes
 	# Just log it for debugging purposes
+
+func _run_pause_menu_test():
+	print("DebugController: Running pause menu E2E test...")
+	var test_script = load("res://tests/test_pause_menu_e2e.gd")
+	if not test_script:
+		print("DebugController: ERROR - Could not load test_pause_menu_e2e.gd")
+		return
+	var test_node = Node.new()
+	test_node.name = "PauseMenuE2ETest"
+	test_node.set_script(test_script)
+	Global.manager().add_child(test_node)

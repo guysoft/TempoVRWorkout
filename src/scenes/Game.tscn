@@ -272,8 +272,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3676617, -3.7702389)
 visible = false
 disable_collision = true
 
-[connection signal="pressed" from="BigScore/ReferenceRect/VBoxContainer/HBoxContainer/RestartButton" to="." method="_on_RestartButton_pressed"]
-[connection signal="pressed" from="BigScore/ReferenceRect/VBoxContainer/HBoxContainer/MenuButton" to="." method="_on_MenuButton_pressed"]
-[connection signal="pressed" from="BigScore/ReferenceRect/VBoxContainer/HBoxContainer/NextButton" to="." method="_on_NextButton_pressed"]
 [connection signal="timeout" from="StartTimer" to="." method="_on_StartTimer_timeout"]
 [connection signal="timeout" from="EndTimer" to="." method="_on_EndTimer_timeout"]

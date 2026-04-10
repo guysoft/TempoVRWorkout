@@ -99,6 +99,7 @@ func _get_button_name_from_index(index: int) -> String:
 		14: return "grip_click"
 		13: return "menu_button"
 		7: return "ax_button"
+		2: return "primary_click"
 		1: return "by_button"
 	return ""
 
@@ -108,6 +109,7 @@ func _get_index_from_button_name(name: String) -> int:
 		"grip_click": return 14
 		"menu_button": return 13
 		"ax_button": return 7
+		"primary_click": return 2
 		"by_button": return 1
 	return -1
 

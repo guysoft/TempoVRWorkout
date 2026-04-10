@@ -63,9 +63,26 @@ func _physics_process(_dt):
 		return;
 	if (!visible): 
 		return;
+	# Skip physics raycast when paused — _process handles it instead.
+	# Running both causes flicker because the physics server may return stale
+	# results while _process gets correct ones, toggling visibility each frame.
+	if get_tree() and get_tree().paused:
+		return;
 	if Global.manager().webxr_interface:
 		webxr = Global.manager().webxr_interface
 	_update_raycasts();
+
+# Also run in _process so raycasts work during pause.
+# _physics_process runs fine with PROCESS_MODE_ALWAYS, but in Godot 4 the
+# physics server may not fully step paused Area3D collision objects.
+# Running _update_raycasts() from _process as well gives us a fallback.
+func _process(_dt):
+	if get_tree() and get_tree().paused:
+		if (!active):
+			return;
+		if (!visible):
+			return;
+		_update_raycasts();
 
 
 func _update_raycasts():

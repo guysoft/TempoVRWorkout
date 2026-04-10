@@ -13,7 +13,6 @@
 [ext_resource type="Environment" uid="uid://d31wwr54a7auv" path="res://effects/MenuScreen_environment.tres" id="10"]
 [ext_resource type="PackedScene" uid="uid://dijimv3ogdn25" path="res://scenes/ui_song_list.tscn" id="11"]
 [ext_resource type="PackedScene" uid="uid://joq00fxkwv8o" path="res://scenes/MainMenuLeft.tscn" id="12"]
-[ext_resource type="PackedScene" uid="uid://ctltchlf2j2r4" path="res://addons/xr-simulator/XRSimulator.tscn" id="13"]
 [ext_resource type="PackedScene" uid="uid://b7rtjp3q2w0el" path="res://scenes/ui_playlist.tscn" id="16_8vx4p"]
 
 [node name="MainMenu" type="Node3D" unique_id=90771456]
@@ -118,8 +117,6 @@ params = {
 "min_displace": 1.0
 }
 set_value = 0.564
-
-[node name="XRSimulator" parent="." unique_id=1368449411 instance=ExtResource("13")]
 
 [node name="UICanvasInteract4" parent="." unique_id=1330396903 instance=ExtResource("4")]
 transform = Transform3D(0.7936082, 0, -0.60842913, 0, 1, 0, 0.60842913, 0, 0.7936082, 1.6205256, 1.0641348, -1.1447158)

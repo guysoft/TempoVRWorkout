@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://dc3r58yab5s55" path="res://models/contoller/hammer_low_poly_right.glb" id="7_right"]
 [ext_resource type="PackedScene" uid="uid://cxmhj7l4qkn5p" path="res://scenes/player_center.tscn" id="11"]
 [ext_resource type="PackedScene" uid="uid://diyc4ru8c1n75" path="res://scenes/UITransition.tscn" id="12"]
+[ext_resource type="Script" path="res://scripts/UIMenuNavigator.gd" id="13_nav"]
 
 [sub_resource type="SphereShape3D" id="22"]
 margin = 0.02
@@ -190,6 +191,10 @@ shape = SubResource("15")
 stream = ExtResource("6")
 
 [node name="PlayerCenter" parent="." unique_id=2105820544 instance=ExtResource("11")]
+
+[node name="UIMenuNavigator" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("13_nav")
 
 [connection signal="area_entered" from="XROrigin3D/XRCamera3D/HeadArea" to="." method="_on_HeadArea_area_entered"]
 [connection signal="area_entered" from="XROrigin3D/LeftHand/Position3D2/Marker3D/Area3D" to="." method="_on_Area_area_entered_left"]

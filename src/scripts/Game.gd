@@ -50,6 +50,9 @@ func _exit_tree():
 	# Disconnect beat signal when scene is freed to prevent stale connections
 	if _beat_player and _beat_player.is_connected("beat", Callable(self, "_on_beat_detected")):
 		_beat_player.disconnect("beat", Callable(self, "_on_beat_detected"))
+	# Deactivate navigator to prevent stale button references after scene free
+	if _player and _player._navigator:
+		_player._navigator.deactivate()
 
 func _ready():
 	
@@ -63,6 +66,9 @@ func _ready():
 	
 	# Connect pause menu button signals to player
 	_connect_pause_menu_signals()
+	
+	# Connect BigScore button signals (scene connections are broken by UICanvasInteract reparenting)
+	_connect_bigscore_signals()
 	
 	var difficulty = GameVariables.difficulty
 	var path = GameVariables.path
@@ -168,7 +174,42 @@ func _connect_pause_menu_signals():
 
 func _on_SkipBtn_pressed():
 	skip_to_next_song()
+
+func _connect_bigscore_signals():
+	# BigScore buttons: UICanvasInteract reparents Controls into SubViewport at runtime,
+	# which breaks the scene-file [connection] entries. Connect here with runtime paths.
+	# Use button_down (not pressed) for VR raycast compatibility.
+	var restart_btn = $BigScore.get_node_or_null("SubViewport/ReferenceRect/VBoxContainer/HBoxContainer/RestartButton")
+	var menu_btn = $BigScore.get_node_or_null("SubViewport/ReferenceRect/VBoxContainer/HBoxContainer/MenuButton")
+	var next_btn = $BigScore.get_node_or_null("SubViewport/ReferenceRect/VBoxContainer/HBoxContainer/NextButton")
 	
+	if restart_btn and not restart_btn.button_down.is_connected(_on_RestartButton_pressed):
+		restart_btn.button_down.connect(_on_RestartButton_pressed)
+	if menu_btn and not menu_btn.button_down.is_connected(_on_MenuButton_pressed):
+		menu_btn.button_down.connect(_on_MenuButton_pressed)
+	if next_btn and not next_btn.button_down.is_connected(_on_NextButton_pressed):
+		next_btn.button_down.connect(_on_NextButton_pressed)
+
+func _activate_bigscore_navigator():
+	# Activate joystick/keyboard navigation on the visible BigScore buttons
+	var nav = _player._navigator if _player else null
+	if not nav:
+		return
+	
+	var buttons: Array = []
+	var restart_btn = $BigScore.get_node_or_null("SubViewport/ReferenceRect/VBoxContainer/HBoxContainer/RestartButton")
+	var menu_btn = $BigScore.get_node_or_null("SubViewport/ReferenceRect/VBoxContainer/HBoxContainer/MenuButton")
+	
+	if restart_btn and restart_btn.visible and not restart_btn.disabled:
+		buttons.append(restart_btn)
+	if menu_btn and menu_btn.visible and not menu_btn.disabled:
+		buttons.append(menu_btn)
+	if _next_button and _next_button.visible and not _next_button.disabled:
+		buttons.append(_next_button)
+	
+	var vp = $BigScore.get_node_or_null("SubViewport")
+	nav.activate(buttons, vp)
+
 
 func setup_song(map):
 	# map can be Map (Beat Saber) or PowerBeatsVRMap
@@ -449,6 +490,9 @@ func _on_EndTimer_timeout():
 		if _next_button:
 			_next_button.visible = true
 			_next_button.disabled = false
+	
+	# Activate joystick/keyboard navigation on BigScore buttons
+	_activate_bigscore_navigator()
 	
 	#log_score("gravebud", _player.score)
 	#$Leaderboard.visible = true

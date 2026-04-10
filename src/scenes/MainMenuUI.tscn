@@ -56,6 +56,3 @@ stream = ExtResource("5")
 
 [node name="BackSound" type="AudioStreamPlayer" parent="." unique_id=336531058]
 stream = ExtResource("4")
-
-[connection signal="pressed" from="VBoxContainer2/VBoxContainer/Start" to="." method="_on_start_button_pressed"]
-[connection signal="pressed" from="VBoxContainer2/VBoxContainer/Quit" to="." method="_on_quit_button_pressed"]

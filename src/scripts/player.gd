@@ -60,6 +60,7 @@ var combo = 0:
 
 #REFS
 @onready var _camera = $XROrigin3D/XRCamera3D
+@onready var _navigator = $UIMenuNavigator
 
 
 func reset_player():
@@ -82,6 +83,7 @@ func _ready():
 	
 	if not GameVariables.ENABLE_VR:
 		forward_velocity = Walk_Speed
+		_create_crosshair()
 
 
 func _physics_process(delta):
@@ -274,6 +276,23 @@ func _spawn_floating_score(hit_position: Vector3, score_value: int, hit_level: i
 	get_tree().root.add_child(floating)
 	floating.show_score(hit_position, score_value, hit_level == HitLevel.FULLIMPACT)
 
+# Non-VR crosshair: small dot at center of screen so player knows where camera ray points
+func _create_crosshair():
+	var canvas = CanvasLayer.new()
+	canvas.layer = 100  # on top of everything
+	canvas.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(canvas)
+	
+	var dot = ColorRect.new()
+	dot.color = Color(1, 1, 1, 0.7)
+	dot.size = Vector2(6, 6)
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	canvas.add_child(dot)
+	
+	# Center the dot on screen (updated each frame via anchor)
+	dot.set_anchors_preset(Control.PRESET_CENTER)
+	dot.position = Vector2(-3, -3)  # offset by half size to truly center
+
 #SIGNAL CALLBACKS
 
 func _on_left_hand_body_entered(body):
@@ -314,7 +333,7 @@ func _on_RightHand_button_release(button):
 
 
 var last_position
-const PAUSE_MENU_DISTANCE = 2.0  # Distance in meters in front of camera
+const PAUSE_MENU_DISTANCE = 3.0  # Distance in meters in front of camera
 
 func pause_game():
 	if not game_node or not is_instance_valid(game_node):
@@ -335,23 +354,49 @@ func pause_game():
 		if _beat_player:
 			_beat_player.stream_paused = true
 		
-		# Position pause menu 2m in front of camera, facing the player
-		# var camera_transform = _camera.global_transform
-		# var menu_position = camera_transform.origin - camera_transform.basis.z * PAUSE_MENU_DISTANCE
-		# pause_menu.global_transform.origin = menu_position
-		
-		# Make the menu face the camera
-		# pause_menu.look_at(camera_transform.origin, Vector3.UP)
+		# Position pause menu in front of camera so it's always reachable by raycast.
+		# Without this, the menu is at a fixed world position and may be out of
+		# range if the player has physically moved in the play space.
+		var camera_transform = _camera.global_transform
+		var menu_position = camera_transform.origin - camera_transform.basis.z * PAUSE_MENU_DISTANCE
+		# Make the menu face the camera keeping it upright.
+		# QuadMesh faces +Z. Camera looks along its -Z. We want the menu's +Z
+		# to point back at the camera, i.e. the menu's -Z should equal the
+		# camera's -Z (both point "into the screen"). But we only take the
+		# camera's Y rotation so the menu stays upright regardless of pitch.
+		var original_scale = pause_menu.scale
+		var cam_y = _camera.global_rotation.y
+		pause_menu.global_transform = Transform3D(Basis(), menu_position)
+		pause_menu.global_rotation = Vector3(0, cam_y, 0)
+		pause_menu.scale = original_scale
 		
 		pause_menu.get_node("UnpauseSound").play()
 		pause_menu.visible = true
 		pause_menu.disable_collision = false
+		# Explicitly enable collision and flush the new transform to the physics
+		# server. During pause the physics step doesn't run, so the Area3D's
+		# position would never get synced — raycast queries would miss it.
+		var ui_area = pause_menu.get_node_or_null("UIArea")
+		if ui_area:
+			var col_shape = ui_area.get_node_or_null("UICollisionShape")
+			if col_shape:
+				col_shape.disabled = false
+			ui_area.force_update_transform()
 		for btn in pause_btns:
 			btn.disabled = false
 		# Skip button is separate from PauseBtns - only visible in playlist mode
 		if skip_btn:
 			skip_btn.visible = is_playlist_mode
 			skip_btn.disabled = not is_playlist_mode
+		
+		# Activate joystick/keyboard navigation on pause menu buttons
+		if _navigator:
+			var nav_buttons: Array = []
+			nav_buttons.append_array(pause_btns)
+			if skip_btn and skip_btn.visible and not skip_btn.disabled:
+				nav_buttons.append(skip_btn)
+			var vp = pause_menu.get_node_or_null("SubViewport")
+			_navigator.activate(nav_buttons, vp)
 	else:
 		if _beat_player:
 			_beat_player.stream_paused = false
@@ -362,6 +407,10 @@ func pause_game():
 			btn.disabled = true
 		if skip_btn:
 			skip_btn.disabled = true
+		
+		# Deactivate joystick/keyboard navigation
+		if _navigator:
+			_navigator.deactivate()
 	
 
 func button_pressed(button, hand):
