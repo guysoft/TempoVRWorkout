@@ -2,6 +2,9 @@ extends Node
 
 const UI_PIXELS_TO_METER = 1.0 / 512
 
+# When true, gameplay print() statements and the GameplayLogger are active.
+# Keep false for normal play to avoid frame drops on Quest (Space Warp budget).
+var DEBUG_LOGGING = false
 
 # Don't edit
 @export var vr_enabled = false

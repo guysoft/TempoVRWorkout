@@ -289,11 +289,11 @@ func unload_scene(unique_id : String):
 # Web XR functions
 func _webxr_on_select(controller_id: int) -> void:
 	if GameVariables.ENABLE_VR:
-		print("Select: " + str(controller_id))
-	 
 		var controller: XRPositionalTracker = webxr_interface.get_controller(controller_id)
-		print (controller.get_orientation())
-		print (controller.get_position())
+		if GameVariables.DEBUG_LOGGING:
+			print("Select: " + str(controller_id))
+			print(controller.get_orientation())
+			print(controller.get_position())
  
 func _webxr_on_select_start(controller_id: int) -> void:
 	if GameVariables.ENABLE_VR:
@@ -306,11 +306,13 @@ func _webxr_on_select_start(controller_id: int) -> void:
 		var controller = webxr_interface.get_controller(controller_id) as XRController3D
 		
 		# controller.check_button(JOY_VR_TRIGGER,1)
-		print("Select Start: " + str(controller_id))
+		if GameVariables.DEBUG_LOGGING:
+			print("Select Start: " + str(controller_id))
  
 func _webxr_on_select_end(controller_id: int) -> void:
 	if GameVariables.ENABLE_VR:
-		print("Select End: " + str(controller_id))
+		if GameVariables.DEBUG_LOGGING:
+			print("Select End: " + str(controller_id))
 		var controller
 		if controller_id==1:
 			controller = _left_hand
@@ -320,11 +322,13 @@ func _webxr_on_select_end(controller_id: int) -> void:
 		
 func _webxr_on_squeeze(controller_id: int) -> void:
 	if GameVariables.ENABLE_VR:
-		print("Squeeze: " + str(controller_id))
+		if GameVariables.DEBUG_LOGGING:
+			print("Squeeze: " + str(controller_id))
  
 func _webxr_on_squeeze_start(controller_id: int) -> void:
 	if GameVariables.ENABLE_VR:
-		print("Squeeze Start: " + str(controller_id))
+		if GameVariables.DEBUG_LOGGING:
+			print("Squeeze Start: " + str(controller_id))
 		var controller
 		if controller_id==1:
 			controller = _left_hand
@@ -334,7 +338,8 @@ func _webxr_on_squeeze_start(controller_id: int) -> void:
 		
 func _webxr_on_squeeze_end(controller_id: int) -> void:
 	if GameVariables.ENABLE_VR:
-		print("Squeeze End: " + str(controller_id))
+		if GameVariables.DEBUG_LOGGING:
+			print("Squeeze End: " + str(controller_id))
 		var controller
 		if controller_id==1:
 			controller = _left_hand

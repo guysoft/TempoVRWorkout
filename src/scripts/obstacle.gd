@@ -186,9 +186,10 @@ func _setup_beatsaber_obstacle(obstacle: Dictionary, obstacle_speed: float, bpm:
 		x = base_x + (scale_x - lane_width) / 2
 		y = Map.LEVEL_HIGH*2
 		
-	print("got: " + obstacle["type"])
-	print("width: " + str(obstacle["width"]))
-	print("index: " + str(obstacle["_lineIndex"]))
+	if GameVariables.DEBUG_LOGGING:
+		print("got: " + obstacle["type"])
+		print("width: " + str(obstacle["width"]))
+		print("index: " + str(obstacle["_lineIndex"]))
 		
 	var z = obstacle["duration"] * bpm / 60 * (1/size_z) / 2
 	#self.scale_object_local(Vector3(scale_x, scale_y, z))

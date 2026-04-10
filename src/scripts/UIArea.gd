@@ -32,8 +32,9 @@ func ui_raycast_hit_event(position, click, release):
 		e.position = pos2d;
 		e.global_position = pos2d;
 		
-		if (click): print("Click");
-		if (release): print("Release");
+		if GameVariables.DEBUG_LOGGING:
+			if (click): print("Click")
+			if (release): print("Release")
 
 		# Use call_deferred to prevent stack overflow from synchronous input processing
 		_processing_input = true

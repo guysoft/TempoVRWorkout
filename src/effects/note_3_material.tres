@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://fm84yumfchuq"]
 
-[ext_resource type="Shader" path="res://effects/note_displace_shader.tres" id="1"]
+[ext_resource type="Shader" uid="uid://by5ql4rxxr46u" path="res://effects/note_displace_shader.tres" id="1"]
 
 [sub_resource type="FastNoiseLite" id="13"]
 

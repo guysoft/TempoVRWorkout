@@ -34,6 +34,7 @@ PlaytimeTracker="*res://scripts/PlaytimeTracker.gd"
 XRToolsUserSettings="*uid://bqgb8i74tm0t"
 XRToolsRumbleManager="*uid://by853dk86g1qw"
 PlaylistManager="*res://scripts/PlaylistManager.gd"
+GameplayLogger="*res://scripts/GameplayLogger.gd"
 GDAIMCPRuntime="*res://addons/gdai-mcp-plugin-godot/gdai_mcp_runtime.gd"
 Version="*res://scripts/Version.gd"
 

@@ -121,7 +121,8 @@ func _on_button_released(name: String):
 #	if webxr_btn==1:
 #		btn=JOY_VR_GRIP
 #	check_button(0, btn)
-	print ("release signal: ", name)
+	if GameVariables.DEBUG_LOGGING:
+		print("release signal: ", name)
 	_simulation_buttons_pressed[button]=0
 	#check_button(button,0)
 	
@@ -129,7 +130,8 @@ func _on_button_pressed(name: String):
 	var button = _get_index_from_button_name(name)
 	if button == -1: return
 
-	print ("pressed signal: ", name)
+	if GameVariables.DEBUG_LOGGING:
+		print("pressed signal: ", name)
 	_simulation_buttons_pressed[button]=1
 	#check_button(button,1)
 #	var btn

@@ -234,12 +234,12 @@ func despawn(type):
 	_collision.set_deferred("disabled", true)
 	
 	if type==HIT:
-		print ("hit")
+		if GameVariables.DEBUG_LOGGING:
+			print("hit")
 		
 	elif type==MISS and not been_hit and _type!=3:
-		#print ("miss")
-		spawn_feedback(-speed*0.25, HIT_LEVEL_TOOLOW) # TOOLOW = miss
-		#bad reference, replace with signal
+		GameplayLogger.log_miss(global_position, speed)
+		spawn_feedback(-speed*0.25, HIT_LEVEL_TOOLOW)
 		var manager = Global.manager()
 		if manager and manager._player:
 			manager._player.combo = 0

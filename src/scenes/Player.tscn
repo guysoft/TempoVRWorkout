@@ -194,7 +194,5 @@ stream = ExtResource("6")
 [connection signal="area_entered" from="XROrigin3D/XRCamera3D/HeadArea" to="." method="_on_HeadArea_area_entered"]
 [connection signal="area_entered" from="XROrigin3D/LeftHand/Position3D2/Marker3D/Area3D" to="." method="_on_Area_area_entered_left"]
 [connection signal="body_entered" from="XROrigin3D/LeftHand/Position3D2/Marker3D/Area3D" to="." method="_on_left_hand_body_entered"]
-[connection signal="body_exited" from="XROrigin3D/LeftHand/Position3D2/Marker3D/Area3D" to="." method="_on_Area_body_exited_left"]
 [connection signal="area_entered" from="XROrigin3D/RightHand/Marker3D/Marker3D/Area3D" to="." method="_on_Area_area_entered_right"]
 [connection signal="body_entered" from="XROrigin3D/RightHand/Marker3D/Marker3D/Area3D" to="." method="_on_right_hand_body_entered"]
-[connection signal="body_exited" from="XROrigin3D/RightHand/Marker3D/Marker3D/Area3D" to="." method="_on_Area_body_exited_right"]

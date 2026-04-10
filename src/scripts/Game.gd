@@ -71,6 +71,8 @@ func _ready():
 	_map = setup_map(path, difficulty)
 	print("Game: Map loaded: ", _map != null)
 	
+	GameplayLogger.start_session()
+	
 	# Handle null map (missing layout or failed to load)
 	if not _map:
 		push_error("Game: Failed to load map at: " + path)
@@ -116,10 +118,9 @@ func _setup_playlist_mode_ui():
 
 func _process(delta):
 	# FPS logging for shader warmup validation (first 10 seconds)
-	if _fps_log_enabled:
+	if _fps_log_enabled and GameVariables.DEBUG_LOGGING:
 		_fps_log_timer += delta
 		if _fps_log_timer <= 10.0:
-			# Log at intervals to reduce spam
 			if fmod(_fps_log_timer, _fps_log_interval) < delta:
 				print("Game FPS @ %.1fs: %.1f" % [_fps_log_timer, Engine.get_frames_per_second()])
 		else:
@@ -384,6 +385,7 @@ func setup_map(path:String, difficulty:String):
 #signal callback for beatplayer when music ends
 #propogates a global event song_end to the event bus
 func _on_music_finished():
+	GameplayLogger.end_session()
 	Events.emit_signal("song_end")
 	$ScoreCanvas.visible = false
 	$EndTimer.start()

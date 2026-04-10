@@ -42,7 +42,8 @@ func _process(delta):
 
 func _on_beat_detected(beat):
 	var mag = _bus.get_magnitude_for_frequency_range(0,20000,1).length()
-	print (mag)
+	if GameVariables.DEBUG_LOGGING:
+		print(mag)
 	if not disabled and mag>min_average_freq:
 		if beat>=last_beat + response_frequency:
 			for material in materials:

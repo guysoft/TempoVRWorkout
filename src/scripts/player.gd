@@ -109,9 +109,20 @@ func _physics_process(delta):
 		if left_hand and left_hand.is_button_just_pressed("ax_button"):
 			_pause_button_cooldown = true
 			pause_game()
-			# Wait a bit before allowing another pause toggle
 			await get_tree().create_timer(0.3, true, false, true).timeout
 			_pause_button_cooldown = false
+	
+	# B-button user mark for debug logging (right hand by_button)
+	if GameVariables.ENABLE_VR and in_game and GameVariables.DEBUG_LOGGING:
+		var right_hand = Global.manager()._right_hand
+		if right_hand and right_hand.is_button_just_pressed("by_button"):
+			var lh = Global.manager()._left_hand
+			var rh = right_hand
+			GameplayLogger.log_user_mark(
+				lh.global_position if lh else Vector3.ZERO,
+				rh.global_position,
+				lh.velocity if lh else Vector3.ZERO,
+				rh.velocity)
 	
 	if GameVariables.NON_VR_MOVEMENT:
 		_handle_non_vr_move_and_slide()
@@ -190,42 +201,35 @@ func handle_hit(body, hand):
 			velocity = controller.get("velocity")
 			var linear_velocity = velocity.length()
 			
-			# Calculate velocity squared for hit detection (PowerBeatsVR style)
 			var velocity_squared = linear_velocity * linear_velocity
 			
-			# Determine hit level based on velocity squared and ball type
-			# PowerBalls require 4x velocity (checked per-ball, not globally)
 			var is_power_ball = body._is_power_ball if "_is_power_ball" in body else false
 			var hit_level = _calculate_hit_level(velocity_squared, is_power_ball)
 			
-			#print ("Controller velocity: ", linear_velocity, " squared: ", velocity_squared, " hit_level: ", hit_level, " power_ball: ", is_power_ball)
+			GameplayLogger.log_hit(hand, body.global_position,
+				velocity, velocity_squared, hit_level)
 			
 			if hit_level == HitLevel.TOOLOW:
-				# Too weak - miss
 				self.combo = 0
 				if body.has_method("on_hit"):
 					body.on_hit(velocity, linear_velocity, hit_level)
 				else:
 					body.queue_free()
 			else:
-				# Valid hit - calculate score
 				self.combo += 1
 				
-				# Haptic feedback on successful hit
 				if controller:
-					controller.simple_rumble(0.5, 0.15)  # Intensity 0.5, duration 0.15s
+					controller.simple_rumble(0.5, 0.15)
 				
 				var base_score = SCORE_SEMI if hit_level == HitLevel.MINIMUMIMPACT else SCORE_COMPLETE
 				var score_value = base_score
 				
-				# Combo multiplier only applies after MIN_COMBO_FOR_MULTIPLIER hits
 				if combo >= MIN_COMBO_FOR_MULTIPLIER:
-					var multiplier = combo - MIN_COMBO_FOR_MULTIPLIER + 2  # x2 at combo 5, x3 at 6, etc.
+					var multiplier = combo - MIN_COMBO_FOR_MULTIPLIER + 2
 					score_value = base_score * multiplier
 				
 				self.score += score_value
 				
-				# Spawn floating score text at hit location
 				_spawn_floating_score(body.global_position, score_value, hit_level)
 
 				if body.has_method("on_hit"):
