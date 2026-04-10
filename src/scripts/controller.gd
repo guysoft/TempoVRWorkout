@@ -224,26 +224,21 @@ func _update_rumble(dt):
 		trigger_haptic_pulse("haptic", 100.0, 0.0, 0.1, 0)
 
 func calc_velocity(delta):
-	velocity = Vector3(0, 0, 0)
-
-	if points.size() > 0:
-		for vel in points:
-			velocity += vel
-
-		# Get the average velocity, instead of just adding them together.
-		velocity = velocity / points.size()
-
 	var tracker_node = get_node(velocity_track_point)
 	if not tracker_node:
 		return
 
-	points.append((tracker_node.global_transform.origin - prior_controller_position) / delta)
-
-	velocity += (tracker_node.global_transform.origin - prior_controller_position) / delta
+	var current_vel = (tracker_node.global_transform.origin - prior_controller_position) / delta
 	prior_controller_position = tracker_node.global_transform.origin
 
+	points.append(current_vel)
 	if points.size() > TRACK_LENGTH:
 		points.remove_at(0)
+
+	velocity = Vector3.ZERO
+	for vel in points:
+		velocity += vel
+	velocity = velocity / points.size()
 
 
 func calc_velocity_old():
