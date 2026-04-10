@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://uwsjdlnmjhe6"]
+
+[ext_resource type="Script" uid="uid://bfujee76arr6m" path="res://scripts/GroundScrubberTest.gd" id="1_oskyj"]
+[ext_resource type="PackedScene" uid="uid://detft1vbxyxsd" path="res://scenes/Ground.tscn" id="2_f8ace"]
+
+[node name="GroundScrubberTest" type="Node3D" unique_id=1463808250]
+script = ExtResource("1_oskyj")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1534777798]
+transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.7071068, 0, 14, 14)
+current = true
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=575822219]
+transform = Transform3D(0.866, 0.354, -0.354, 0, 0.707, 0.707, 0.5, -0.612, 0.612, 0, 10, 0)
+
+[node name="Ground" parent="." unique_id=1115396397 instance=ExtResource("2_f8ace")]

@@ -21,6 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://dp6qkljlk5y1r" path="res://scenes/ui_time_left.tscn" id="20"]
 [ext_resource type="FontFile" uid="uid://dyway4ixu5nvl" path="res://fonts/millimetre-font-256.tres" id="21"]
 [ext_resource type="Material" uid="uid://ceh5k72kyhean" path="res://effects/Ground.tres" id="22"]
+[ext_resource type="Script" uid="uid://ct24bbq0v11e" path="res://scripts/DebugTeleportOverlay.gd" id="22_ocgqw"]
 [ext_resource type="PackedScene" uid="uid://dxkql2n7h4lqo" path="res://scenes/Lasers.tscn" id="23"]
 [ext_resource type="PackedScene" uid="uid://rpgkb5jyych7" path="res://scenes/PauseMenu.tscn" id="24_jbgew"]
 
@@ -243,6 +244,14 @@ theme_override_font_sizes/font_size = 48
 text = "Playlist: 00:00"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="DebugOverlay" type="Label" parent="ScoreCanvas/ReferenceRect/CenterContainer/VBoxContainer" unique_id=1421922615]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("22_ocgqw")
 
 [node name="Lasers" parent="." unique_id=823318134 instance=ExtResource("23")]
 
