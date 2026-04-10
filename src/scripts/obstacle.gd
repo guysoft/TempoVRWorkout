@@ -19,7 +19,10 @@ var _custom_data = {}
 
 var alive = false
 
-# TODO get this from mesh size
+# Object pool reference (set by Game.gd when using pooling)
+var _pool: ObjectPool = null
+
+# TODO get this need from mesh size
 var size_x = 1.0
 var size_y = 1.0
 var size_z = 1.0
@@ -36,6 +39,38 @@ var _extra_collision_shapes: Array = []
 
 func _ready():
 	deactivate(false)
+
+## Reset all state for pool reuse.
+func reset_for_pool():
+	alive = false
+	speed = 2
+	_velocity = Vector3.ZERO
+	_spawn_timer.stop()
+	_spawn_timer.wait_time = 0.001
+	_collision.set_deferred("disabled", true)
+	set_physics_process(false)
+	# Clear extra collision shapes from PBVR walls
+	for shape_node in _extra_collision_shapes:
+		shape_node.queue_free()
+	_extra_collision_shapes.clear()
+	# Reset mesh scale
+	_mesh.scale = Vector3.ONE
+	_collision.scale = Vector3.ONE
+	transform.origin = Vector3.ZERO
+	if _animation_player.is_playing():
+		_animation_player.stop()
+	visible = true
+
+## Release back to pool instead of queue_free
+func _release_to_pool():
+	visible = false
+	set_physics_process(false)
+	set_process(false)
+	_collision.set_deferred("disabled", true)
+	if _pool:
+		_pool.release(self)
+	else:
+		queue_free()
 
 func setup_obstacle(obstacle, obstacle_speed, bpm, distance):
 	# Check for PBVR wall type first
@@ -245,7 +280,7 @@ func deactivate(delete:bool = true, delete_delay:float=1.0):
 	_collision.set_deferred("disabled", true)
 	if delete:
 		await get_tree().create_timer(delete_delay).timeout
-		queue_free()
+		_release_to_pool()
 
 #TODO: Take into account the controller position of the hit?
 func on_hit():

@@ -6,6 +6,10 @@ extends Node3D
 
 @onready var _label: Label3D = $Label3D
 
+# Object pool reference (set by Game.gd when using pooling)
+var _pool: ObjectPool = null
+var _tween: Tween = null
+
 # Animation constants (matching PowerBeatsVR)
 const ANIMATION_DURATION = 1.0  # seconds
 const DRIFT_UP = 0.5  # Y drift (slightly up for visibility)
@@ -17,10 +21,24 @@ const SCALE_END = Vector3.ZERO
 const COLOR_PERFECT = Color.GREEN
 const COLOR_PARTIAL = Color.WHITE
 
+## Reset all state for pool reuse.
+func reset_for_pool():
+	visible = false
+	if _tween and _tween.is_valid():
+		_tween.kill()
+		_tween = null
+	if _label:
+		_label.position = Vector3.ZERO
+		_label.scale = SCALE_START
+		_label.modulate.a = 1.0
 
 func show_score(position: Vector3, score: int, is_perfect: bool):
 	# Position at hit location
 	global_position = position
+	visible = true
+	
+	# Reset label position for reuse
+	_label.position = Vector3.ZERO
 	
 	# Set text and color
 	_label.text = str(score)
@@ -36,20 +54,32 @@ func show_score(position: Vector3, score: int, is_perfect: bool):
 		DRIFT_BACKWARD
 	)
 	
+	# Kill any existing tween from previous use
+	if _tween and _tween.is_valid():
+		_tween.kill()
+	
 	# Create animation tween
-	var tween = create_tween().set_parallel(true)
+	_tween = create_tween().set_parallel(true)
 	
 	# Scale up quickly, then down
-	tween.tween_property(_label, "scale", Vector3.ONE, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_tween.tween_property(_label, "scale", Vector3.ONE, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	
 	# Position drift
-	tween.tween_property(_label, "position", end_pos, ANIMATION_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_tween.tween_property(_label, "position", end_pos, ANIMATION_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	
 	# Fade out alpha
-	tween.tween_property(_label, "modulate:a", 0.0, ANIMATION_DURATION)
+	_tween.tween_property(_label, "modulate:a", 0.0, ANIMATION_DURATION)
 	
 	# Scale down after initial pop (delayed)
-	tween.tween_property(_label, "scale", SCALE_END, 0.5).set_delay(ANIMATION_DURATION - 0.5)
+	_tween.tween_property(_label, "scale", SCALE_END, 0.5).set_delay(ANIMATION_DURATION - 0.5)
 	
-	# Clean up when done
-	tween.chain().tween_callback(queue_free)
+	# Release to pool when done
+	_tween.chain().tween_callback(_release_to_pool)
+
+## Release back to pool instead of queue_free
+func _release_to_pool():
+	visible = false
+	if _pool:
+		_pool.release(self)
+	else:
+		queue_free()

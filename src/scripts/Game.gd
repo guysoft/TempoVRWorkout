@@ -6,6 +6,22 @@ extends Node3D
 
 var notescene = preload("res://scenes/Note.tscn")
 var obstaclescene = preload("res://scenes/Obstacle.tscn")
+var _explosion_scene = preload("res://scenes/NoteExplosion.tscn")
+var _feedback_scene = preload("res://scenes/NoteFeedback.tscn")
+var _floating_score_scene = preload("res://scenes/FloatingScore.tscn")
+
+# Object pools (eliminate per-frame Vulkan pipeline compilations)
+const POOL_NOTES = 24
+const POOL_OBSTACLES = 8
+const POOL_EXPLOSIONS = 24
+const POOL_FEEDBACK = 24
+const POOL_FLOATING_SCORES = 12
+
+var _note_pool: ObjectPool
+var _obstacle_pool: ObjectPool
+var _explosion_pool: ObjectPool
+var _feedback_pool: ObjectPool
+var _floating_score_pool: ObjectPool
 
 # References
 @onready var _player = Global.manager()._player
@@ -53,6 +69,12 @@ func _exit_tree():
 	# Deactivate navigator to prevent stale button references after scene free
 	if _player and _player._navigator:
 		_player._navigator.deactivate()
+	# Clean up object pools (all pool children are under our tree, so queue_free is fine)
+	if _note_pool: _note_pool.destroy()
+	if _obstacle_pool: _obstacle_pool.destroy()
+	if _explosion_pool: _explosion_pool.destroy()
+	if _feedback_pool: _feedback_pool.destroy()
+	if _floating_score_pool: _floating_score_pool.destroy()
 
 func _ready():
 	
@@ -113,6 +135,10 @@ func _ready():
 	if QualitySettings.is_quest():
 		$StartTimer.wait_time = 4.0  # Extra time for shader warmup/settling
 		print("Game: Extended start timer to 4s for Quest")
+	
+	# Pre-allocate object pools to front-load all Vulkan pipeline compilations
+	_init_pools()
+	
 	$StartTimer.start()
 
 func _setup_playlist_mode_ui():
@@ -121,6 +147,67 @@ func _setup_playlist_mode_ui():
 		_playlist_time_label.visible = _is_playlist_mode
 	
 	# Next button visibility will be handled in _on_EndTimer_timeout
+
+func _init_pools():
+	"""Pre-allocate all gameplay object pools.
+	
+	Objects are instantiated hidden at y=-100, then made briefly visible for one frame
+	to force Vulkan pipeline compilation. After that they're hidden and parked in pools.
+	This front-loads ALL pipeline compilations to the 4-second start timer window.
+	"""
+	print("Game: Initializing object pools...")
+	
+	var pool_parent = $SpawnLocation  # Notes/obstacles parent
+	var effect_parent = self          # Effects parent (current_scene)
+	
+	# Create pools
+	_note_pool = ObjectPool.new(notescene, pool_parent, POOL_NOTES, "NotePool")
+	_obstacle_pool = ObjectPool.new(obstaclescene, pool_parent, POOL_OBSTACLES, "ObstaclePool")
+	_explosion_pool = ObjectPool.new(_explosion_scene, effect_parent, POOL_EXPLOSIONS, "ExplosionPool")
+	_feedback_pool = ObjectPool.new(_feedback_scene, effect_parent, POOL_FEEDBACK, "FeedbackPool")
+	_floating_score_pool = ObjectPool.new(_floating_score_scene, effect_parent, POOL_FLOATING_SCORES, "FloatingScorePool")
+	
+	# Set pool references on all pre-allocated instances so they know how to release
+	for i in range(_note_pool.available()):
+		var note = _note_pool.acquire()
+		note._pool = _note_pool
+		note._explosion_pool = _explosion_pool
+		note._feedback_pool = _feedback_pool
+		# Briefly show at offscreen position to trigger pipeline compilation
+		note.visible = true
+		note.position = Vector3(0, -100, 0)
+		_note_pool.release(note)
+	
+	for i in range(_obstacle_pool.available()):
+		var obs = _obstacle_pool.acquire()
+		obs._pool = _obstacle_pool
+		obs.visible = true
+		obs.position = Vector3(0, -100, 0)
+		_obstacle_pool.release(obs)
+	
+	for i in range(_explosion_pool.available()):
+		var exp = _explosion_pool.acquire()
+		exp._pool = _explosion_pool
+		exp.visible = true
+		exp.global_position = Vector3(0, -100, 0)
+		_explosion_pool.release(exp)
+	
+	for i in range(_feedback_pool.available()):
+		var fb = _feedback_pool.acquire()
+		fb._pool = _feedback_pool
+		fb.visible = true
+		fb.global_position = Vector3(0, -100, 0)
+		_feedback_pool.release(fb)
+	
+	for i in range(_floating_score_pool.available()):
+		var fs = _floating_score_pool.acquire()
+		fs._pool = _floating_score_pool
+		fs.visible = true
+		fs.global_position = Vector3(0, -100, 0)
+		_floating_score_pool.release(fs)
+	
+	print("Game: Pools initialized (notes=%d, obstacles=%d, explosions=%d, feedback=%d, scores=%d)" % [
+		POOL_NOTES, POOL_OBSTACLES, POOL_EXPLOSIONS, POOL_FEEDBACK, POOL_FLOATING_SCORES])
 
 func _process(delta):
 	# FPS logging for shader warmup validation (first 10 seconds)
@@ -343,9 +430,17 @@ func _on_beat_detected(beat):
 	var events = tmp[2]
 	
 	for note in notes:
-		# Spawn note
-		var note_instance = notescene.instantiate()
-		_spawn_location.add_child(note_instance)
+		# Acquire note from pool (or instantiate fallback)
+		var note_instance = _note_pool.acquire() if _note_pool else null
+		if note_instance:
+			note_instance.reset_for_pool()
+			# Ensure pool references are set (may be new overflow instance)
+			note_instance._pool = _note_pool
+			note_instance._explosion_pool = _explosion_pool
+			note_instance._feedback_pool = _feedback_pool
+		else:
+			note_instance = notescene.instantiate()
+			_spawn_location.add_child(note_instance)
 		
 		var note_speed = calc_object_speed()
 		#print(note_speed)
@@ -354,9 +449,14 @@ func _on_beat_detected(beat):
 		note_instance.activate()
 		
 	for obstacle in obstacles:
-		# Spawn obstacle
-		var obstacle_instance = obstaclescene.instantiate()
-		_spawn_location.add_child(obstacle_instance)
+		# Acquire obstacle from pool (or instantiate fallback)
+		var obstacle_instance = _obstacle_pool.acquire() if _obstacle_pool else null
+		if obstacle_instance:
+			obstacle_instance.reset_for_pool()
+			obstacle_instance._pool = _obstacle_pool
+		else:
+			obstacle_instance = obstaclescene.instantiate()
+			_spawn_location.add_child(obstacle_instance)
 		
 		var obstacle_speed = calc_object_speed()
 		#print(note_speed)

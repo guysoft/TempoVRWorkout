@@ -6,22 +6,32 @@ extends Node3D
 @export var late_texture: Texture2D    # Legacy, kept for compatibility
 @export var bomb_texture: Texture2D
 
+# Object pool reference (set by Game.gd when using pooling)
+var _pool: ObjectPool = null
+
 # HitLevel enum values (must match player.gd)
 const HIT_LEVEL_TOOLOW = 0
 const HIT_LEVEL_MINIMUMIMPACT = 1
 const HIT_LEVEL_FULLIMPACT = 2
 
+## Reset all state for pool reuse.
+func reset_for_pool():
+	visible = false
+	if $AnimationPlayer.is_playing():
+		$AnimationPlayer.stop()
+
 func show_feedback(position, hit_level):
 	
 	print ("hit_level: ", hit_level)
 	global_transform.origin = position
+	visible = true
 	
 	var mat = $MeshInstance3D.get_surface_override_material(0)
 	if mat == null:
 		mat = $MeshInstance3D.get_active_material(0)
 	if mat == null:
 		push_warning("NoteFeedback: No material found on MeshInstance3D")
-		queue_free()
+		_release_to_pool()
 		return
 	
 	# PowerBeatsVR style feedback based on hit level
@@ -42,4 +52,12 @@ func show_feedback(position, hit_level):
 	$AnimationPlayer.play("show")
 	
 	await $AnimationPlayer.animation_finished
-	queue_free()
+	_release_to_pool()
+
+## Release back to pool instead of queue_free
+func _release_to_pool():
+	visible = false
+	if _pool:
+		_pool.release(self)
+	else:
+		queue_free()

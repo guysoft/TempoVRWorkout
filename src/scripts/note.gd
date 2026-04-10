@@ -31,6 +31,11 @@ var _is_power_ball: bool = false  # PowerBalls require 4x velocity to hit
 var alive = false
 var been_hit = false
 
+# Object pool reference (set by Game.gd when using pooling)
+var _pool: ObjectPool = null
+var _explosion_pool: ObjectPool = null
+var _feedback_pool: ObjectPool = null
+
 #Refs
 @onready var _audio_stream_player = $AudioStreamPlayer3D
 @onready var _animation_player = $AnimationPlayer
@@ -40,6 +45,39 @@ var been_hit = false
 
 func _ready():
 	deactivate(false)
+
+## Reset all state for pool reuse. Called before setup_note() on acquire.
+func reset_for_pool():
+	alive = false
+	been_hit = false
+	_is_power_ball = false
+	speed = 2
+	direction = Vector3(0, 0, 1)
+	_velocity = Vector3.ZERO
+	_bounce_time = 0
+	bounce_freq = 0
+	_y_offset = 0
+	_spawn_timer.stop()
+	_spawn_timer.wait_time = 0.001
+	_collision.set_deferred("disabled", true)
+	set_physics_process(false)
+	# Clear instance shader parameters (PowerBall purple tint)
+	_mesh.set_instance_shader_parameter("albedo_color", null)
+	_mesh.set_instance_shader_parameter("emission_color", null)
+	if _animation_player.is_playing():
+		_animation_player.stop()
+	visible = true  # Will be shown after setup
+
+## Release back to pool instead of queue_free
+func _release_to_pool():
+	visible = false
+	set_physics_process(false)
+	set_process(false)
+	_collision.set_deferred("disabled", true)
+	if _pool:
+		_pool.release(self)
+	else:
+		queue_free()
 
 func setup_note(note, speed, bpm, distance):
 	self.speed = speed
@@ -113,7 +151,7 @@ func deactivate(delete:bool = true, delete_delay:float=1.0):
 	_collision.set_deferred("disabled", true)
 	if delete:
 		await get_tree().create_timer(delete_delay).timeout
-		queue_free()
+		_release_to_pool()
 
 # HitLevel enum values (must match player.gd)
 const HIT_LEVEL_TOOLOW = 0
@@ -198,8 +236,15 @@ func spawn_hit_effect():
 	if hit_effect == null:
 		push_warning("Note: hit_effect is not assigned")
 		return
-	var hit_effect_instance = hit_effect.instantiate()
-	get_tree().current_scene.add_child(hit_effect_instance)
+	
+	var hit_effect_instance
+	if _explosion_pool:
+		hit_effect_instance = _explosion_pool.acquire()
+		if hit_effect_instance:
+			hit_effect_instance.reset_for_pool()
+	if hit_effect_instance == null:
+		hit_effect_instance = hit_effect.instantiate()
+		get_tree().current_scene.add_child(hit_effect_instance)
 
 	var spawn_position = global_transform.origin
 	hit_effect_instance.setup_effect(spawn_position, speed)
@@ -214,8 +259,14 @@ func spawn_feedback(offset, hit_level):
 	if manager == null or manager._player == null or manager._player.game_node == null:
 		return
 	
-	var feedback_instance = feedback_effect.instantiate()
-	get_tree().current_scene.add_child(feedback_instance)
+	var feedback_instance
+	if _feedback_pool:
+		feedback_instance = _feedback_pool.acquire()
+		if feedback_instance:
+			feedback_instance.reset_for_pool()
+	if feedback_instance == null:
+		feedback_instance = feedback_effect.instantiate()
+		get_tree().current_scene.add_child(feedback_instance)
 	
 	var marker_position = manager._player.game_node._hit_marker.global_transform.origin.z
 	var note_transform = global_transform.origin
