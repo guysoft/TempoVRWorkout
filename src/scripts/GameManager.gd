@@ -438,6 +438,16 @@ func initialise_OpenXR() -> bool:
 		# Change our viewport so it is tied to our ARVR interface and renders to our HMD
 		vp.use_xr = true
 
+		if not QualitySettings.is_quest():
+			var render_size = interface.get_render_target_size()
+			print("XR render target size: ", render_size)
+			print("Current viewport size: ", vp.size)
+			var target_height = 1080
+			var aspect = render_size.x / render_size.y
+			var target_width = int(target_height * aspect)
+			get_window().size = Vector2i(target_width, target_height)
+			print("Desktop mirror window resized to: ", target_width, "x", target_height)
+
 		# Our interface will tell us whether we should keep our render buffer in linear color space
 		# If true our preview will be darker.
 		# vp.keep_3d_linear = $Configuration.keep_3d_linear()
