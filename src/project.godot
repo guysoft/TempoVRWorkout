@@ -48,6 +48,10 @@ window/vsync/vsync_mode=0
 
 enabled=PackedStringArray("res://addons/gdai-mcp-plugin-godot/plugin.cfg", "res://addons/godot-xr-tools/plugin.cfg")
 
+[filesystem]
+
+import/blender/enabled=false
+
 [gui]
 
 theme/custom_font="res://fonts/millimetre-font-64.tres"

@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://b3mrx5kj7l8vc" path="res://scenes/Player.tscn" id="2"]
 [ext_resource type="Script" uid="uid://do4wn32gg6rng" path="res://scripts/beat_player.gd" id="3"]
 [ext_resource type="PackedScene" uid="uid://ueybijl2o3qc" path="res://scenes/FPSOverlay.tscn" id="3_2uts2"]
-[ext_resource type="Environment" path="res://effects/menu_environment.tres" id="7"]
+[ext_resource type="Environment" uid="uid://c4hdwm2ookbng" path="res://effects/menu_environment.tres" id="7"]
 [ext_resource type="Script" uid="uid://dytur4u8uamy8" path="res://scripts/EnvironmentManager.gd" id="8"]
 [ext_resource type="PackedScene" uid="uid://ctltchlf2j2r4" path="res://addons/xr-simulator/XRSimulator.tscn" id="9"]
 [ext_resource type="Script" uid="uid://cnmde0srm4xk6" path="res://scripts/DebugController.gd" id="10"]
@@ -12,40 +12,41 @@
 [node name="GameManager" type="Node" unique_id=297511804]
 script = ExtResource("1")
 debug_start_scene = "Menu"
+debug_test_song = ""
 
 [node name="Player" parent="." unique_id=126411633 instance=ExtResource("2")]
 
-[node name="FPSOverlay" parent="Player/XROrigin3D/XRCamera3D" index="3" unique_id=1548264350 instance=ExtResource("3_2uts2")]
+[node name="FPSOverlay" parent="Player/XROrigin3D/XRCamera3D" parent_id_path=PackedInt32Array(126411633, 761277344) index="3" unique_id=1548264350 instance=ExtResource("3_2uts2")]
 
-[node name="LeftHand" parent="Player/XROrigin3D/LeftHand" index="0"]
+[node name="LeftHand" parent="Player/XROrigin3D/LeftHand" parent_id_path=PackedInt32Array(126411633, 1845573142) index="0" unique_id=1831873951]
 script = null
 
-[node name="Position3D2" parent="Player/XROrigin3D/LeftHand" index="1"]
+[node name="Position3D2" parent="Player/XROrigin3D/LeftHand" parent_id_path=PackedInt32Array(126411633, 1845573142) index="1" unique_id=993251412]
 transform = Transform3D(1, 0, 0, 0, 0.81915194, -0.5735769, 0, 0.5735769, 0.81915194, 0, 0, 0)
 
-[node name="Marker3D" parent="Player/XROrigin3D/LeftHand/Position3D2" index="0"]
+[node name="Marker3D" parent="Player/XROrigin3D/LeftHand/Position3D2" index="0" unique_id=378166685]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -0.377)
 
-[node name="Handle" parent="Player/XROrigin3D/LeftHand/Position3D2/Marker3D" index="0"]
+[node name="Handle" parent="Player/XROrigin3D/LeftHand/Position3D2/Marker3D" index="0" unique_id=1420287981]
 transform = Transform3D(1, 0, 0, 0, 0.99999976, 0, 0, 0, 0.99999976, 0, 0.446, 0)
 visible = false
 
-[node name="RightHand" parent="Player/XROrigin3D" index="2"]
+[node name="RightHand" parent="Player/XROrigin3D" parent_id_path=PackedInt32Array(126411633, 164383265) index="2" unique_id=1850382541]
 visible = false
 
-[node name="HandModel" parent="Player/XROrigin3D/RightHand" index="0"]
+[node name="HandModel" parent="Player/XROrigin3D/RightHand" index="0" unique_id=303891437]
 script = null
 
-[node name="Marker3D" parent="Player/XROrigin3D/RightHand/Marker3D" index="0"]
+[node name="Marker3D" parent="Player/XROrigin3D/RightHand/Marker3D" parent_id_path=PackedInt32Array(126411633, 1874028163) index="0" unique_id=330359897]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, -0.377)
 
-[node name="Handle" parent="Player/XROrigin3D/RightHand/Marker3D/Marker3D" index="0"]
+[node name="Handle" parent="Player/XROrigin3D/RightHand/Marker3D/Marker3D" index="0" unique_id=1613009960]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.446, 0)
 
-[node name="CollisionShape3D" parent="Player" index="1"]
+[node name="CollisionShape3D" parent="Player" index="1" unique_id=264514812]
 visible = false
 
-[node name="PlayerCenter" parent="Player" index="3"]
+[node name="PlayerCenter" parent="Player" index="3" unique_id=2105820544]
 visible = false
 
 [node name="BeatPlayer" type="AudioStreamPlayer" parent="." unique_id=1403003101]
