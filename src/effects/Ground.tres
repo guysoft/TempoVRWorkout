@@ -93,18 +93,24 @@ vec4 triplanar_texture(sampler2D p_sampler, vec3 p_weights, vec3 p_triplanar_pos
 	return samp;
 }
 
-// Calculate normal from heightmap using neighboring samples
-vec3 filterNormal(vec2 uv, int texelSize, float terrainSize, float _Displacement) {
+// Calculate normal from heightmap using neighboring samples.
+// texel_step: 1.0 / texture_width (one texel in UV space)
+// terrain_scale: world-space distance corresponding to one full UV span
+// displacement: height multiplier (same scale as vertex displacement)
+vec3 filterNormal(vec2 uv, float texel_step, float terrain_scale, float displacement) {
 	vec4 h;
-	h[0] = textureLod(noise, uv + float(texelSize) * vec2(0, -1), 0).r * _Displacement;
-	h[1] = textureLod(noise, uv + float(texelSize) * vec2(-1, 0), 0).r * _Displacement;
-	h[2] = textureLod(noise, uv + float(texelSize) * vec2(1, 0), 0).r * _Displacement;
-	h[3] = textureLod(noise, uv + float(texelSize) * vec2(0, 1), 0).r * _Displacement;
+	h[0] = textureLod(noise, uv + texel_step * vec2(0, -1), 0).r * displacement;
+	h[1] = textureLod(noise, uv + texel_step * vec2(-1, 0), 0).r * displacement;
+	h[2] = textureLod(noise, uv + texel_step * vec2(1, 0), 0).r * displacement;
+	h[3] = textureLod(noise, uv + texel_step * vec2(0, 1), 0).r * displacement;
+
+	// World-space distance between neighbor samples
+	float world_step = texel_step * terrain_scale;
 
 	vec3 n;
 	n.z = -(h[0] - h[3]);
 	n.x = (h[1] - h[2]);
-	n.y = 2.0 * float(texelSize) * terrainSize;
+	n.y = 2.0 * world_step;
 
 	return normalize(n);
 }
@@ -159,8 +165,12 @@ void vertex() {
 		VERTEX.y -= dist_z * dist_z * curve_strength;
 	}
 	
-	// Calculate normal from heightmap
-	NORMAL = filterNormal(v_scrolled_uv / uv1_scale.x, textureSize(noise, 0).x, 8.0, heightmap);
+	// Calculate normal from heightmap using neighbor height differences.
+	// texel_step = 1/1024 = one texel in UV space
+	// terrain_scale = mesh world size (mesh_size_z * transform scale)
+	// displacement = grad * displace_amount (matches vertex displacement scale)
+	float texel_step = 1.0 / float(textureSize(noise, 0).x);
+	NORMAL = filterNormal(v_scrolled_uv / uv1_scale.x, texel_step, mesh_size_z, grad * displace_amount);
 }
 
 void fragment() {
@@ -226,7 +236,7 @@ shader_parameter/roughness_texture_channel = Vector4(1, 0, 0, 0)
 shader_parameter/texture_normal = ExtResource("2")
 shader_parameter/normal_scale = 1.0
 shader_parameter/uv1_blend_sharpness = 1.0
-shader_parameter/uv1_scale = Vector3(4, 4, 4)
+shader_parameter/uv1_scale = Vector3(2, 2, 2)
 shader_parameter/uv1_offset = Vector3(0, 0, 0)
 shader_parameter/uv2_scale = Vector3(1, 1, 1)
 shader_parameter/uv2_offset = Vector3(0, 0, 0)

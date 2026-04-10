@@ -45,4 +45,3 @@ func set_debug_mode(enabled: bool):
 	## Enable/disable debug height coloring
 	if material:
 		material.set_shader_parameter("debug_height_colors", enabled)
-
