@@ -225,6 +225,60 @@ At the seam between meshes (e.g., z=-32 where Mesh A's front meets Mesh B's back
 | SpaceWarp sees discontinuous motion | SpaceWarp sees smooth +Z motion |
 | Motion vectors flip direction | Motion vectors always +Z |
 
+### SpaceWarp Toggle on Teleport
+
+Even though teleports happen behind the player, Meta's SpaceWarp (Application SpaceWarp / ASW) still detects the sudden geometry change and produces flash artifacts. The fix is to **temporarily disable SpaceWarp** for the frame(s) surrounding a teleport:
+
+1. On the frame a mesh teleports, call `set_space_warp_enabled(false)`
+2. Keep SpaceWarp disabled for `SW_DISABLE_FRAME_COUNT = 3` frames (~75ms at Quest framerate)
+3. After the countdown, re-enable with `set_space_warp_enabled(true)`
+
+**Important notes:**
+- The singleton is accessed via `Engine.get_singleton("OpenXRFbSpaceWarpExtensionWrapper")` (note the `Wrapper` suffix)
+- `skip_space_warp_frame()` alone does NOT fix the artifacts — full disable/enable toggle is required
+- SpaceWarp must remain enabled in project settings (`openxr/extensions/meta/application_space_warp=true`). Disabling it in project settings makes the ground invisible on Quest.
+- The 3-frame disable window is imperceptible to the player
+
+```gdscript
+# In _process(), after a teleport:
+if did_teleport:
+    var sw = _get_space_warp()
+    if sw and sw.is_enabled():
+        sw.set_space_warp_enabled(false)
+        _sw_disable_frames = SW_DISABLE_FRAME_COUNT
+
+# Countdown to re-enable:
+if _sw_disable_frames > 0:
+    _sw_disable_frames -= 1
+    if _sw_disable_frames == 0:
+        var sw = _get_space_warp()
+        if sw:
+            sw.set_space_warp_enabled(true)
+```
+
+### UV Offset Wrapping
+
+UV offsets (`uv_offset_a`, `uv_offset_b`) grow unboundedly during gameplay. After very long play sessions, floating-point precision loss would cause triplanar coordinate degradation.
+
+**Fix:** Wrap both offsets when `uv_offset_a > UV_WRAP` (1000.0):
+
+```gdscript
+const UV_WRAP: float = 1000.0  # Must be a multiple of uv_per_teleport (4.0)
+
+# In _process(), after UV offset increments:
+if uv_offset_a > UV_WRAP:
+    uv_offset_a -= UV_WRAP
+    uv_offset_b -= UV_WRAP
+    mesh_a.set_instance_shader_parameter("uv_offset_z", uv_offset_a)
+    mesh_b.set_instance_shader_parameter("uv_offset_z", uv_offset_b)
+```
+
+**Key constraints:**
+- `UV_WRAP` must be a multiple of `uv_per_teleport` (4.0) to avoid texture discontinuities
+- Both offsets must wrap together to preserve their relative difference
+- The noise texture is seamless, so wrapping is invisible
+- At `UV_WRAP = 1000`, triplanar precision is ~0.002 texels — well within acceptable
+
 ---
 
 ## Debugging
@@ -257,6 +311,8 @@ Colors:
 | Texture slides relative to mountains | Triplanar offset not scaled by `mesh_size_z` | Ensure `material.set_shader_parameter("mesh_size_z", ground_size)` |
 | Visible seam between meshes | Initial UV offset for mesh B incorrect | Verify `uv_offset_b = uv_per_mesh_length` at startup |
 | SpaceWarp still stuttering | Teleport threshold too aggressive | Increase `teleport_threshold` to ensure mesh is fully behind player |
+| SpaceWarp flash on teleport | SpaceWarp predicts geometry that appears suddenly | Use SpaceWarp toggle (disable for 3 frames around teleport) |
+| Ground invisible on Quest | SpaceWarp disabled in project settings | Never disable `application_space_warp` in project.godot — use runtime toggle only |
 | Mountains too small/fast | `grid_scale` or noise frequency too high | Lower `grid_scale` or adjust noise |
 
 ---
@@ -267,7 +323,7 @@ Colors:
 - **Instance uniforms**: Efficient - no material duplication needed
 - **Subdivision count**: 128 is a good balance. Higher = smoother but more vertices
 - **Extra cull margin**: Set on MeshInstance3D to prevent culling when vertices are displaced
-- **UV offset accumulation**: Will eventually overflow (float precision). Consider wrapping at large values (e.g., every 1000.0) since noise texture is seamless
+- **UV offset accumulation**: Wrapped at UV_WRAP=1000.0 to prevent float precision issues (see UV Offset Wrapping section above)
 
 ---
 
@@ -276,5 +332,6 @@ Colors:
 - [ ] Add biome coloring based on height (snow on peaks, grass in valleys)
 - [ ] Multiple noise layers for varied terrain
 - [ ] LOD system for distant terrain
-- [ ] Wrap UV offsets to prevent float precision issues over long play sessions
+- [x] ~~Wrap UV offsets to prevent float precision issues~~ (DONE - UV_WRAP=1000.0)
 - [x] ~~SpaceWarp-compatible scrolling~~ (DONE - dual mesh system)
+- [x] ~~SpaceWarp flash artifacts on teleport~~ (DONE - toggle disable for 3 frames)
