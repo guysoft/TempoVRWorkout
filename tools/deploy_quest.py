@@ -422,8 +422,9 @@ def launch_app() -> bool:
     
     try:
         cmd = [
-            "adb", "shell", "am", "start",
-            "-n", f"{PACKAGE_NAME}/com.godot.game.GodotApp"
+            "adb", "shell", "monkey",
+            "-p", PACKAGE_NAME,
+            "-c", "android.intent.category.LAUNCHER", "1"
         ]
         muted(f"  › {' '.join(cmd)}")
         
@@ -436,7 +437,7 @@ def launch_app() -> bool:
             warning("App may have launched with warnings")
             if result.stderr:
                 muted(f"  {result.stderr}")
-            return True  # Often still works
+            return True
             
     except Exception as e:
         error(f"Launch failed: {e}")
