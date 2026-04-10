@@ -50,6 +50,18 @@ size = Vector2(3, 2)
 subdivide_width = 64
 subdivide_depth = 16
 
+[sub_resource type="SphereMesh" id="33"]
+radius = 60.0
+height = 120.0
+radial_segments = 16
+rings = 8
+is_hemisphere = false
+flip_faces = true
+
+[sub_resource type="StandardMaterial3D" id="34"]
+shading_mode = 0
+albedo_color = Color(0.05, 0.05, 0.08, 1)
+
 [node name="Ground" type="StaticBody3D" unique_id=1115396397]
 collision_layer = 8
 script = ExtResource("2")
@@ -74,5 +86,12 @@ shape = SubResource("9")
 
 [node name="DistantMountains" type="MeshInstance3D" parent="." unique_id=1086310085]
 transform = Transform3D(5, 0, 0, 0, 0.5, 0, 0, 0, 5, 0.654476, -1.97132, -35.252956)
+extra_cull_margin = 16.0
 material_override = SubResource("31")
 mesh = SubResource("32")
+
+[node name="BackgroundSphere" type="MeshInstance3D" parent="."]
+extra_cull_margin = 100.0
+cast_shadow = 0
+mesh = SubResource("33")
+surface_material_override/0 = SubResource("34")
