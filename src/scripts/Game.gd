@@ -151,9 +151,9 @@ func _setup_playlist_mode_ui():
 func _init_pools():
 	"""Pre-allocate all gameplay object pools.
 	
-	Objects are instantiated hidden at y=-100, then made briefly visible for one frame
-	to force Vulkan pipeline compilation. After that they're hidden and parked in pools.
-	This front-loads ALL pipeline compilations to the 4-second start timer window.
+	Vulkan pipeline compilation happens at add_child() time inside ObjectPool._init(),
+	so by the time this function runs all pipeline variants are already compiled.
+	This loop sets cross-pool references (e.g. note -> explosion pool) then releases.
 	"""
 	print("Game: Initializing object pools...")
 	
@@ -173,37 +173,26 @@ func _init_pools():
 		note._pool = _note_pool
 		note._explosion_pool = _explosion_pool
 		note._feedback_pool = _feedback_pool
-		# Briefly show at offscreen position to trigger pipeline compilation
-		note.visible = true
-		note.position = Vector3(0, -100, 0)
 		_note_pool.release(note)
 	
 	for i in range(_obstacle_pool.available()):
 		var obs = _obstacle_pool.acquire()
 		obs._pool = _obstacle_pool
-		obs.visible = true
-		obs.position = Vector3(0, -100, 0)
 		_obstacle_pool.release(obs)
 	
 	for i in range(_explosion_pool.available()):
 		var exp = _explosion_pool.acquire()
 		exp._pool = _explosion_pool
-		exp.visible = true
-		exp.global_position = Vector3(0, -100, 0)
 		_explosion_pool.release(exp)
 	
 	for i in range(_feedback_pool.available()):
 		var fb = _feedback_pool.acquire()
 		fb._pool = _feedback_pool
-		fb.visible = true
-		fb.global_position = Vector3(0, -100, 0)
 		_feedback_pool.release(fb)
 	
 	for i in range(_floating_score_pool.available()):
 		var fs = _floating_score_pool.acquire()
 		fs._pool = _floating_score_pool
-		fs.visible = true
-		fs.global_position = Vector3(0, -100, 0)
 		_floating_score_pool.release(fs)
 	
 	print("Game: Pools initialized (notes=%d, obstacles=%d, explosions=%d, feedback=%d, scores=%d)" % [

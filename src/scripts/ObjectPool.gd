@@ -2,8 +2,9 @@
 ##
 ## Pre-allocates instances at creation, hands them out via acquire(),
 ## and reclaims them via release(). Objects stay in the scene tree
-## (hidden and physics-disabled) so Vulkan pipeline compilations only
-## happen once — eliminating the per-frame compilation storm.
+## (hidden and physics-disabled) — Vulkan pipeline compilation occurs
+## at add_child() time during _init(), eliminating the per-frame
+## compilation storm that happens with runtime instantiation.
 
 class_name ObjectPool
 extends RefCounted
