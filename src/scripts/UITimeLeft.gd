@@ -1,10 +1,12 @@
-extends Label
+extends VBoxContainer
 
-var time = 0
-#TODO format correctly with mm:ss
+var time: float = 0.0
+var song_length: float = 0.0
+
+@onready var _remaining_label: Label = $RemainingLabel
+@onready var _elapsed_label: Label = $ElapsedLabel
 
 func _ready():
-	#move to main
 	format_time()
 	set_process(false)
 	Events.connect("song_begin", Callable(self, "_on_song_begin"))
@@ -12,19 +14,25 @@ func _ready():
 
 func _on_song_begin():
 	set_process(true)
+
 func _on_song_end():
 	set_process(false)
 
 func _process(delta):
-	var ts = Engine.time_scale
-	var d = delta * (1.0/Engine.time_scale)
+	var d = delta * (1.0 / Engine.time_scale)
 	time = time + d
 	format_time()
 
-func format_time():
-	var minutes = int(time / 60)
-	var seconds = time - minutes*60
-	var miliseconds = (seconds - int(seconds))*100
+func _format_mmss(total_seconds: float) -> String:
+	var t = max(0.0, total_seconds)
+	var minutes = int(t / 60.0)
+	var seconds = int(t) % 60
+	return "%02d:%02d" % [minutes, seconds]
 
-	var output_string = "%02d:%02d:%02d"
-	text = output_string % [minutes, seconds, miliseconds]
+func format_time():
+	# Remaining time (countdown)
+	var remaining = max(0.0, song_length - time)
+	_remaining_label.text = "-" + _format_mmss(remaining)
+
+	# Elapsed time
+	_elapsed_label.text = _format_mmss(time)

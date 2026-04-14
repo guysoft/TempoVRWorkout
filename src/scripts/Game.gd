@@ -526,6 +526,7 @@ func _on_music_finished():
 func _on_StartTimer_timeout():
 	var time_left = $ScoreCanvas/SubViewport/ReferenceRect/CenterContainer/VBoxContainer/UITimeLeft
 	time_left.time = (_song_length*start_time_offset)+_beat_player.offset
+	time_left.song_length = _song_length
 	_beat_player.play_music(_song_length*start_time_offset)
 	_beat_player.connect("finished", Callable(self, "_on_music_finished"))
 	Events.emit_signal("song_begin")

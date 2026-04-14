@@ -12,7 +12,6 @@
 [node name="GameManager" type="Node" unique_id=297511804]
 script = ExtResource("1")
 debug_start_scene = "Menu"
-debug_test_song = ""
 
 [node name="Player" parent="." unique_id=126411633 instance=ExtResource("2")]
 
