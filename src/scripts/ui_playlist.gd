@@ -268,6 +268,9 @@ func _on_item_selected(index: int):
 		
 		# Preview the selected song
 		_preview_playlist_song(_selected_playlist, index)
+		
+		# Cross-select in the Custom tab so the user can also play it solo
+		navigate_to_song(index)
 
 
 func _on_item_activated(index: int):
@@ -346,7 +349,9 @@ func get_selected_playlist_songs() -> Array:
 	return _selected_playlist.entries
 
 
-# Navigate to song list and select a specific song
+# Navigate to the Custom tab in the song list and select a specific song.
+# This is called when a user single-clicks a song in the playlist songs view,
+# allowing them to also play the song solo via the normal Start button.
 func navigate_to_song(song_index: int):
 	if _selected_playlist == null:
 		return
@@ -354,34 +359,77 @@ func navigate_to_song(song_index: int):
 		return
 	
 	var song = _selected_playlist.entries[song_index]
+	if song.layout_path == "":
+		return
 	
-	# Set game variables to navigate to this song in the song list
-	if song.layout_path != "":
+	# Set game variables - use music_path for PowerBeatsVR songs (what Custom tab expects)
+	if song.music_path != "":
+		GameVariables.path = song.music_path
+	else:
 		GameVariables.path = song.layout_path
-		GameVariables.difficulty = song.difficulty
+	GameVariables.difficulty = song.difficulty
 	
-	# Find the song list UI and select the song
-	# Look for MainMenu node to access the song list
-	var main_menu = get_tree().root.get_node_or_null("GameManager/ScenesHolder/MainMenu")
+	# Find the song list UI panel.
+	# The playlist is under MainMenu/UICanvasInteract4/SubViewport/UI_Playlist
+	# The song list is under MainMenu/UICanvasInteract2/SubViewport/UI_SongList
+	# Walk up from this node to MainMenu, then down to the song list.
+	var main_menu = _find_main_menu()
 	if main_menu == null:
-		# Alternative path
-		main_menu = get_tree().get_first_node_in_group("main_menu")
+		print("navigate_to_song: Could not find MainMenu node")
+		return
 	
-	if main_menu:
-		# Find the UI_SongList in UICanvasInteract2
-		var song_list_canvas = main_menu.get_node_or_null("UICanvasInteract2")
-		if song_list_canvas:
-			# Get the SubViewport's child (the actual UI_SongList control)
-			var subviewport = song_list_canvas.get_node_or_null("SubViewport")
-			if subviewport and subviewport.get_child_count() > 0:
-				var song_list_ui = subviewport.get_child(0)
-				if song_list_ui and song_list_ui.has_method("select_song_by_path"):
-					song_list_ui.select_song_by_path(song.layout_path)
-				elif song_list_ui:
-					# Fallback: just set game variables and let user see the song list
-					print("Song list found but select_song_by_path not available")
+	# Find UICanvasInteract2 which contains the song list
+	var song_list_canvas = main_menu.get_node_or_null("UICanvasInteract2")
+	if song_list_canvas == null:
+		print("navigate_to_song: Could not find UICanvasInteract2")
+		return
+	
+	# Get the SubViewport's child (the UI_SongList VBoxContainer)
+	var subviewport = song_list_canvas.get_node_or_null("SubViewport")
+	if subviewport == null or subviewport.get_child_count() == 0:
+		print("navigate_to_song: Could not find SubViewport or it has no children")
+		return
+	
+	var song_list_root = subviewport.get_child(0)  # UI_SongList (VBoxContainer)
+	
+	# Find the TabContainer and switch to the Custom tab (index 1)
+	var tab_container = song_list_root.get_node_or_null("TabContainer")
+	if tab_container and tab_container is TabContainer:
+		tab_container.current_tab = 1  # Switch to "Custom" tab
+	
+	# Find the Custom tab instance (second child of TabContainer)
+	var custom_tab = null
+	if tab_container:
+		for i in range(tab_container.get_child_count()):
+			var child = tab_container.get_child(i)
+			if child.has_method("select_song_by_path") and child.get("tab") == "Custom":
+				custom_tab = child
+				break
+	
+	if custom_tab:
+		custom_tab.select_song_by_path(song.layout_path)
+	else:
+		print("navigate_to_song: Could not find Custom tab with select_song_by_path")
 	
 	print("Navigate to song: ", song.name, " at ", song.layout_path)
+
+
+# Find the MainMenu node by walking up the scene tree from this node.
+func _find_main_menu() -> Node:
+	# Walk up through parents to find MainMenu
+	var node = self
+	while node != null:
+		if node.name == "MainMenu":
+			return node
+		node = node.get_parent()
+	
+	# Fallback: try the known runtime path
+	var main_menu = get_tree().root.get_node_or_null("GameManager/ScenesHolder/MainMenu")
+	if main_menu:
+		return main_menu
+	
+	# Second fallback: group-based lookup
+	return get_tree().get_first_node_in_group("main_menu")
 
 
 # Get current view mode

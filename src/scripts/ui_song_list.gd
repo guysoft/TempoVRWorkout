@@ -595,9 +595,59 @@ func _update_scroll_button_visibility():
 		scroll_down_btn.visible = v_scroll.value < max_scroll
 
 
+# Find a music file in subfolders of the music root directory.
+# Returns the relative folder path (relative to music_root) where the file was found,
+# or "" if not found. The song_name should be the basename without extension.
+func _find_music_in_subfolders(music_root: String, song_name: String) -> String:
+	"""Recursively search music_root for a music file matching song_name (basename without ext)."""
+	return _find_music_in_subfolders_recursive(music_root, song_name, "")
+
+
+func _find_music_in_subfolders_recursive(base_path: String, song_name: String, relative_path: String) -> String:
+	"""Recursively walk directories to find a music file matching song_name."""
+	var current_path = base_path
+	if relative_path != "":
+		current_path = base_path + "/" + relative_path
+	
+	if not DirAccess.dir_exists_absolute(current_path):
+		return ""
+	
+	var dir = DirAccess.open(current_path)
+	if not dir:
+		return ""
+	
+	dir.list_dir_begin()
+	var folders: Array[String] = []
+	var item = dir.get_next()
+	while item != "":
+		if not item.begins_with("."):
+			var item_path = current_path + "/" + item
+			if _is_music_file(item):
+				# Check if this music file's basename matches
+				if item.get_basename() == song_name:
+					dir.list_dir_end()
+					return relative_path
+			elif DirAccess.dir_exists_absolute(item_path):
+				# Queue folder for recursive search
+				folders.append(item)
+		item = dir.get_next()
+	dir.list_dir_end()
+	
+	# Search subfolders
+	for folder in folders:
+		var sub_relative = folder if relative_path == "" else relative_path + "/" + folder
+		var result = _find_music_in_subfolders_recursive(base_path, song_name, sub_relative)
+		if result != "":
+			return result
+	
+	return ""
+
+
 # Select a song by its layout path (called from playlist UI)
 func select_song_by_path(layout_path: String):
-	"""Find and select a song by its layout path"""
+	"""Find and select a song by its layout path.
+	If the song is not in the current folder view, recursively searches subfolders
+	and navigates to the correct folder before selecting."""
 	if layout_path == "":
 		return false
 	
@@ -607,8 +657,7 @@ func select_song_by_path(layout_path: String):
 	
 	# If we're in Custom/PowerBeatsVR tab, search for the matching music file
 	if tab in ["Custom", "PowerBeatsVR"]:
-		# The songs_paths array contains full paths to music files
-		# We need to find one whose basename matches the layout name
+		# First try to find the song in the currently displayed folder
 		for i in range(songs_paths.size()):
 			if i < item_types.size() and item_types[i] == ItemType.MUSIC_FILE:
 				var music_filename = songs_list[i]
@@ -617,6 +666,39 @@ func select_song_by_path(layout_path: String):
 					songs_list_ui.select(i)
 					_on_SongList_item_selected(i)
 					return true
+		
+		# Not found in current folder - search subfolders recursively
+		var music_root = GameVariables.pbvr_music_path
+		if music_root != "":
+			var folder_path = _find_music_in_subfolders(music_root, song_name)
+			# folder_path is "" for root, or "subfolder/nested" for subfolders
+			# We need to check if the song was found at all vs not found
+			# _find_music_in_subfolders returns "" both for "found at root" and "not found"
+			# So let's verify the file actually exists at the returned location
+			var check_path = music_root
+			if folder_path != "":
+				check_path = music_root + "/" + folder_path
+			
+			var found_file = false
+			for ext in MUSIC_EXTENSIONS:
+				if FileAccess.file_exists(check_path + "/" + song_name + "." + ext):
+					found_file = true
+					break
+			
+			if found_file:
+				# Navigate to the folder and re-populate
+				current_music_folder = folder_path
+				populate_list()
+				
+				# Now find and select the song in the refreshed list
+				for i in range(songs_paths.size()):
+					if i < item_types.size() and item_types[i] == ItemType.MUSIC_FILE:
+						var music_filename = songs_list[i]
+						var music_base = music_filename.get_basename()
+						if music_base == song_name:
+							songs_list_ui.select(i)
+							_on_SongList_item_selected(i)
+							return true
 	else:
 		# Original tab - search songs_paths for matching path
 		for i in range(songs_paths.size()):
@@ -625,6 +707,6 @@ func select_song_by_path(layout_path: String):
 				_on_SongList_item_selected(i)
 				return true
 	
-	# Song not found in current view - it might be in a different folder
-	print("Song not found in current song list: ", song_name)
+	# Song not found anywhere
+	print("Song not found in any folder: ", song_name)
 	return false
