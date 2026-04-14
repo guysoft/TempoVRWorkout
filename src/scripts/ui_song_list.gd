@@ -429,6 +429,9 @@ func _on_SongList_item_selected(index):
 	if difficulties.size() > 0:
 		GameVariables.difficulty = difficulties[0]
 	
+	# Notify listeners (e.g. Song Info tab) about the selection
+	Events.song_selected.emit(map)
+	
 	var audio_loader = AudioLoader.new()
 	var beatplayer = _get_beatplayer()
 	if beatplayer:
@@ -487,6 +490,9 @@ func _select_powerbeatsvr_song(index: int):
 	var difficulties = map.get_available_difficulties()
 	if difficulties.size() > 0:
 		GameVariables.difficulty = difficulties[0]
+	
+	# Notify listeners (e.g. Song Info tab) about the selection
+	Events.song_selected.emit(map)
 	
 	# Play preview audio
 	var audio_loader = AudioLoader.new()

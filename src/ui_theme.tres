@@ -32,6 +32,11 @@ cache/0/36/0/descent = 0.0
 cache/0/36/0/underline_position = 0.0
 cache/0/36/0/underline_thickness = 0.0
 cache/0/36/0/scale = 1.0
+cache/0/33/0/ascent = 0.0
+cache/0/33/0/descent = 0.0
+cache/0/33/0/underline_position = 0.0
+cache/0/33/0/underline_thickness = 0.0
+cache/0/33/0/scale = 1.0
 
 [sub_resource type="StyleBoxFlat" id="22"]
 bg_color = Color(0, 0, 0, 0.627451)

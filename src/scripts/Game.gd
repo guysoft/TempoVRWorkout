@@ -9,6 +9,7 @@ var obstaclescene = preload("res://scenes/Obstacle.tscn")
 var _explosion_scene = preload("res://scenes/NoteExplosion.tscn")
 var _feedback_scene = preload("res://scenes/NoteFeedback.tscn")
 var _floating_score_scene = preload("res://scenes/FloatingScore.tscn")
+var _fireworks_script = preload("res://scripts/Fireworks.gd")
 
 # Object pools (eliminate per-frame Vulkan pipeline compilations)
 const POOL_NOTES = 24
@@ -569,7 +570,32 @@ func _on_EndTimer_timeout():
 	$BigScore/SubViewport/ReferenceRect/VBoxContainer/UIScore.visible=true
 	_player.score *= time_multiplier
 
-	await get_tree().create_timer(1).timeout
+	# Highscore check
+	var _is_new_highscore = false
+	if _map:
+		var song_id = _map.get_song_id()
+		var diff = _map.get_difficulty()
+		var final_score = int(_player.score)
+		var old_best = HighscoreManager.get_highscore_value(song_id, diff)
+		_is_new_highscore = HighscoreManager.set_highscore(song_id, diff, final_score)
+		var hs_label = $BigScore/SubViewport/ReferenceRect/VBoxContainer/HighscoreLabel
+		if _is_new_highscore:
+			hs_label.text = "[center][color=gold]★ NEW HIGHSCORE! ★[/color][/center]"
+		else:
+			hs_label.text = "[center]Highscore: " + str(old_best) + "[/center]"
+
+	await get_tree().create_timer(0.5).timeout
+	$BigScore/SubViewport/ReferenceRect/VBoxContainer/HighscoreLabel.visible = true
+
+	# Fireworks on new highscore
+	if _is_new_highscore:
+		var fw = Node3D.new()
+		fw.set_script(_fireworks_script)
+		add_child(fw)
+		fw.global_transform.origin = $BigScore.global_transform.origin
+		fw.fire()
+
+	await get_tree().create_timer(0.5).timeout
 	$BigScore/SubViewport/ReferenceRect/VBoxContainer/HSeparator.visible=true
 	$BigScore/SubViewport/ReferenceRect/VBoxContainer/HBoxContainer.visible=true
 	$BigScore/SubViewport/ReferenceRect/VBoxContainer/HBoxContainer/MenuButton.disabled=false

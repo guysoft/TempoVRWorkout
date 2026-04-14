@@ -93,4 +93,3 @@ static func get_format_name(format: MapFormat) -> String:
 			return "PowerBeatsVR"
 		_:
 			return "Unknown"
-

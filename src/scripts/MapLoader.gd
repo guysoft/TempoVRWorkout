@@ -54,6 +54,13 @@ func get_name():
 		return self.bs_info_data["_songName"]
 	return ""
 
+
+## Returns a unique song identifier for highscore storage.
+## Format: "bs:<songName>" — uses _songName from info.dat so the same map
+## in different folders shares the same highscore.
+func get_song_id() -> String:
+	return "bs:" + get_name()
+
 func get_cover_name():
 	if self.bs_info_data != null and "_coverImageFilename" in self.bs_info_data:
 		return self.bs_info_data["_coverImageFilename"]

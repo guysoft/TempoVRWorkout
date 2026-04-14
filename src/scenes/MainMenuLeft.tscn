@@ -3,6 +3,7 @@
 [ext_resource type="Theme" uid="uid://d1fbglwrn3v44" path="res://effects/menu_theme.tres" id="1"]
 [ext_resource type="Theme" uid="uid://dhxx6nyx60wmn" path="res://ui_theme.tres" id="2"]
 [ext_resource type="Script" uid="uid://dtbp8rwbn2jte" path="res://scenes/MainMenuLeft.gd" id="3"]
+[ext_resource type="Script" uid="uid://cjxjafubfg0cv" path="res://scripts/ui_song_info.gd" id="4_rws27"]
 
 [node name="MainMenuLeft" type="VBoxContainer" unique_id=201553181]
 custom_minimum_size = Vector2(996, 568)
@@ -164,6 +165,51 @@ layout_mode = 2
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "Recenter (like B+Y)"
+
+[node name="SongInfo" type="ReferenceRect" parent="TabContainer" unique_id=1744007818]
+visible = false
+layout_mode = 2
+script = ExtResource("4_rws27")
+metadata/_tab_index = 3
+
+[node name="Panel" type="Panel" parent="TabContainer/SongInfo" unique_id=2047114413]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -8.0
+offset_bottom = -36.0
+
+[node name="Content" type="VBoxContainer" parent="TabContainer/SongInfo" unique_id=634776485]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 32.0
+offset_right = 960.0
+offset_bottom = 480.0
+
+[node name="SongNameLabel" type="Label" parent="TabContainer/SongInfo/Content" unique_id=1533631394]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "No song selected"
+
+[node name="Spacer1" type="Control" parent="TabContainer/SongInfo/Content" unique_id=1591973616]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="DifficultyLabel" type="Label" parent="TabContainer/SongInfo/Content" unique_id=510773171]
+layout_mode = 2
+theme_override_font_sizes/font_size = 33
+
+[node name="Spacer2" type="Control" parent="TabContainer/SongInfo/Content" unique_id=100776290]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="HighscoreLabel" type="Label" parent="TabContainer/SongInfo/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+
+[node name="DateLabel" type="Label" parent="TabContainer/SongInfo/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 33
 
 [connection signal="toggled" from="TabContainer/Settings/SettingsContent/OnlyPowerBalls" to="." method="_on_OnlyPowerBalls_toggled"]
 [connection signal="button_down" from="TabContainer/Orientation/OrientationContent/PositionButtons/LeftBtn" to="." method="_on_LeftBtn_pressed"]

@@ -463,3 +463,29 @@ grep "ENABLE_VR" src/scripts/GameVariables.gd
 - **ENABLE_VR = false** causes Quest builds to show a black screen because no XR viewport is rendered
 - These settings are often changed during desktop testing and forgotten before deploy
 - CI builds will inherit whatever value is committed, breaking releases
+
+## 17. UI Text Sizing Rules
+
+When adding new text elements (Labels, RichTextLabels, Buttons) to any scene, **always match the font sizes of existing sibling elements in the same parent container**. Never use arbitrary font sizes.
+
+### Reference Sizes by Scene
+
+| Scene / Panel | Element Type | Font Size |
+|---------------|-------------|-----------|
+| **BigScore results** (Game.tscn) | Title ("SONG FINISHED") | 53 |
+| **BigScore results** (Game.tscn) | Labels & values ("final score", time bonus) | 64 |
+| **BigScore results** (Game.tscn) | Buttons (restart/menu/next) | 64 |
+| **MainMenuLeft tabs** (MainMenuLeft.tscn) | Tab headers | 41 |
+| **MainMenuLeft tabs** (MainMenuLeft.tscn) | Section labels ("-- Position --") | 36 |
+| **MainMenuLeft tabs** (MainMenuLeft.tscn) | Body text / instructions | 33 |
+| **MainMenuLeft tabs** (MainMenuLeft.tscn) | Buttons | 36 |
+| **In-game HUD** (ScoreCanvas in Game.tscn) | Score display | 60 |
+| **In-game HUD** (ScoreCanvas in Game.tscn) | Combo display | 48 |
+| **Song list / playlist panels** | Default (via ui_theme.tres) | 64 |
+
+### Rule
+Before adding any new UI text element:
+1. Check existing elements in the same parent container
+2. Use the same `theme_override_font_sizes/font_size` value
+3. If the element serves a special emphasis purpose (e.g., celebration text), it may use the title size (53) but never exceed it
+4. Test in VR to verify readability -- text on 3D panels must be legible from the player's standing position

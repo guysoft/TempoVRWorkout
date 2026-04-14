@@ -139,6 +139,13 @@ func get_name() -> String:
 	return json_data.get("name", "")
 
 
+## Returns a unique song identifier for highscore storage.
+## Format: "pbvr:<layout_basename>" — uses the JSON layout filename so the
+## same layout always maps to the same highscore regardless of music folder.
+func get_song_id() -> String:
+	return "pbvr:" + path.get_file().get_basename()
+
+
 func get_bpm() -> float:
 	return float(json_data.get("bpm", 120))
 

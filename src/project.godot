@@ -37,6 +37,7 @@ PlaylistManager="*res://scripts/PlaylistManager.gd"
 GameplayLogger="*res://scripts/GameplayLogger.gd"
 GDAIMCPRuntime="*res://addons/gdai-mcp-plugin-godot/gdai_mcp_runtime.gd"
 Version="*res://scripts/Version.gd"
+HighscoreManager="*res://scripts/HighscoreManager.gd"
 
 [display]
 
