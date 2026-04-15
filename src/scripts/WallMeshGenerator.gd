@@ -157,7 +157,7 @@ static func _collision_shapes_archway(x_offset: float) -> Array:
 	"""
 	var shapes = []
 	var arch_width = 1.0
-	var arch_height = 1.2
+	var arch_height = 1.5  # Raised from 1.2 to match mesh
 	
 	# Left wall: X: -1.7 to (x_offset - arch_width/2)
 	var left_width = (x_offset - arch_width / 2.0) - (-HALF_WIDTH)
@@ -291,7 +291,7 @@ static func _generate_archway_mesh(x_offset: float) -> ArrayMesh:
 	surface_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	
 	var arch_width = 1.0  # Width of the archway opening
-	var arch_height = 1.2  # Height player can duck under
+	var arch_height = 1.5  # Height player can duck under (raised from 1.2 for comfort)
 	
 	# Left wall
 	_add_box_to_surface(surface_tool,
