@@ -69,6 +69,48 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 47
 text = "Only power balls"
 
+[node name="HeightSpacer" type="Control" parent="TabContainer/Settings/SettingsContent" unique_id=1739358446]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="HeightLabel" type="Label" parent="TabContainer/Settings/SettingsContent" unique_id=295034416]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "— Player Height —"
+horizontal_alignment = 1
+
+[node name="HeightButtons" type="HBoxContainer" parent="TabContainer/Settings/SettingsContent" unique_id=272465813]
+layout_mode = 2
+alignment = 1
+
+[node name="HeightDownBtn" type="Button" parent="TabContainer/Settings/SettingsContent/HeightButtons" unique_id=1255770939]
+custom_minimum_size = Vector2(120, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "  -  "
+
+[node name="HeightValueLabel" type="Label" parent="TabContainer/Settings/SettingsContent/HeightButtons" unique_id=1279823429]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 47
+text = "173 cm"
+horizontal_alignment = 1
+
+[node name="HeightUpBtn" type="Button" parent="TabContainer/Settings/SettingsContent/HeightButtons" unique_id=40624341]
+custom_minimum_size = Vector2(120, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "  +  "
+
+[node name="HeightSpacer2" type="Control" parent="TabContainer/Settings/SettingsContent" unique_id=1262737636]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="MeasureHeightBtn" type="Button" parent="TabContainer/Settings/SettingsContent" unique_id=938374023]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Measure Height (Stand Straight)"
+
 [node name="Orientation" type="ReferenceRect" parent="TabContainer" unique_id=2008908738]
 visible = false
 layout_mode = 2
@@ -203,11 +245,11 @@ theme_override_font_sizes/font_size = 33
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
-[node name="HighscoreLabel" type="Label" parent="TabContainer/SongInfo/Content"]
+[node name="HighscoreLabel" type="Label" parent="TabContainer/SongInfo/Content" unique_id=599218249]
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 
-[node name="DateLabel" type="Label" parent="TabContainer/SongInfo/Content"]
+[node name="DateLabel" type="Label" parent="TabContainer/SongInfo/Content" unique_id=1483320922]
 layout_mode = 2
 theme_override_font_sizes/font_size = 33
 

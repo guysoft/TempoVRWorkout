@@ -18,8 +18,9 @@ const ES_LEVEL_WIDTH = 0.8       # Map.LEVEL_WIDTH
 const ES_LEVEL_LOW = 0.6         # Map.LEVEL_LOW
 const ES_LEVEL_HIGH = 1.05       # Map.LEVEL_HIGH (actual max Y = 2.1)
 
-# Player height for scaling (future: make this configurable)
-const PLAYER_HEIGHT = 1.73
+# Player height for scaling - read from Settings at runtime
+# Default 1.73m, configurable via Settings menu
+const DEFAULT_PLAYER_HEIGHT = 1.73
 
 # Ball sizes (matched to PBVR)
 # PBVR uses 0.225m radius = 0.45m diameter
@@ -384,10 +385,11 @@ func _pbvr_to_es_position(position: Array) -> Vector2:
 	x = clamp(x, -PBVR_X_MAX, PBVR_X_MAX)
 	y = clamp(y, PBVR_Y_MIN, PBVR_Y_MAX)
 	
-	# Step 3: Apply PBVR height scaling (what the player sees in PBVR at 1.73m height)
-	var height_scale = PLAYER_HEIGHT / PBVR_REFERENCE_HEIGHT  # 0.91
-	var pbvr_scaled_y_min = PBVR_Y_MIN * height_scale  # 0.55
-	var pbvr_scaled_y_max = PBVR_Y_MAX * height_scale  # 1.82
+	# Step 3: Apply PBVR height scaling (what the player sees in PBVR at their height)
+	var player_height = _get_player_height_setting()
+	var height_scale = player_height / PBVR_REFERENCE_HEIGHT
+	var pbvr_scaled_y_min = PBVR_Y_MIN * height_scale
+	var pbvr_scaled_y_max = PBVR_Y_MAX * height_scale
 	y *= height_scale  # Scale Y to what player actually sees
 	
 	# Step 4: Map X from PBVR range to ES range
@@ -447,3 +449,15 @@ static func _get_only_power_balls_setting() -> bool:
 		return bool(settings_node.get_setting("game", "only_power_balls"))
 	return false
 
+
+# Helper to safely get the "player_height" setting
+# Returns DEFAULT_PLAYER_HEIGHT if Settings autoload is not available
+static func _get_player_height_setting() -> float:
+	var main_loop = Engine.get_main_loop()
+	var tree := main_loop as SceneTree
+	if tree == null:
+		return DEFAULT_PLAYER_HEIGHT
+	var settings_node = tree.root.get_node_or_null("Settings")
+	if settings_node and settings_node.has_method("get_setting"):
+		return float(settings_node.get_setting("game", "player_height", DEFAULT_PLAYER_HEIGHT))
+	return DEFAULT_PLAYER_HEIGHT

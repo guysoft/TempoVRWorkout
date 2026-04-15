@@ -5,7 +5,8 @@ const SAVE_PATH = "user://settings.ini"
 var _config_file = ConfigFile.new()
 var _settings = {
 	"game": {
-		"only_power_balls": false
+		"only_power_balls": false,
+		"player_height": 1.73
 		},
 	"vr": {
 		"recenter_offset_position": Vector3.ZERO,

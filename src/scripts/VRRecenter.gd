@@ -197,6 +197,14 @@ func get_position_offset() -> Vector3:
 func get_rotation_offset_degrees() -> float:
 	return rad_to_deg(_offset_rotation)
 
+func get_camera_height() -> float:
+	"""Return the XR camera's current Y position in tracking space (head height in meters).
+	Returns -1.0 if camera is not available (e.g., desktop mode without VR)."""
+	if _xr_camera == null:
+		return -1.0
+	# Use LOCAL transform to get raw tracking height (not affected by offset)
+	return _xr_camera.transform.origin.y
+
 # Static helper functions for offset calculations (useful for testing)
 static func calculate_rotation_offset(camera_forward: Vector3) -> float:
 	"""Calculate the Y rotation offset given a camera forward direction."""
@@ -213,4 +221,3 @@ static func calculate_position_offset(camera_position: Vector3, rotation_offset:
 	"""Calculate the position offset given camera position and rotation offset."""
 	var offset = Vector3(-camera_position.x, 0, -camera_position.z)
 	return offset.rotated(Vector3.UP, rotation_offset)
-
