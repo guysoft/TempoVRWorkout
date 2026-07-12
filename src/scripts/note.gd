@@ -68,6 +68,7 @@ func reset_for_pool():
 	# Clear instance shader parameters (PowerBall purple tint)
 	_mesh.set_instance_shader_parameter("albedo_color", null)
 	_mesh.set_instance_shader_parameter("emission_color", null)
+	_mesh.position = Vector3.ZERO
 	if _animation_player.is_playing():
 		_animation_player.stop()
 	visible = false  # Hidden until activate() plays the spawn animation

@@ -47,19 +47,21 @@ func _ready():
 			v_scroll.connect("value_changed", _on_scroll_changed)
 	
 	# Start in playlists view
-	_show_playlists_view()
+	# Do not overwrite the saved view before restoration reads it.
+	_show_playlists_view(false)
 
 	# Restore saved playlist state after initial view
 	_restore_playlist_state()
 
 
-func _show_playlists_view():
+func _show_playlists_view(persist_state: bool = true):
 	"""Switch to showing list of playlists"""
 	_current_view_mode = ViewMode.PLAYLISTS
 	_selected_playlist = null
 	_selected_song_index = -1
 	
-	Settings.set_setting("ui", "playlist_view_mode", 0)
+	if persist_state:
+		Settings.set_setting("ui", "playlist_view_mode", 0)
 
 	# Update UI
 	if playlist_label:

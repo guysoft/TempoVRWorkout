@@ -38,7 +38,7 @@ func _run_tests():
 	else:
 		print("✗ SOME TESTS FAILED")
 
-	quit()
+	quit(0 if _tests_failed == 0 else 1)
 
 
 func _pass(name: String):

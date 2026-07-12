@@ -49,7 +49,7 @@ func _refresh_difficulty_display():
 	if not _current_map:
 		return
 	var diff = GameVariables.difficulty
-	_difficulty_label.text = "Difficulty: " + diff
+	_difficulty_label.text = "Difficulty: " + str(diff)
 	
 	# Enable buttons for available difficulties, disable others
 	var available = _current_map.get_available_difficulties()
