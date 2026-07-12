@@ -49,6 +49,9 @@ func _ready():
 	# Start in playlists view
 	_show_playlists_view()
 
+	# Restore saved playlist state after initial view
+	_restore_playlist_state()
+
 
 func _show_playlists_view():
 	"""Switch to showing list of playlists"""
@@ -56,6 +59,8 @@ func _show_playlists_view():
 	_selected_playlist = null
 	_selected_song_index = -1
 	
+	Settings.set_setting("ui", "playlist_view_mode", 0)
+
 	# Update UI
 	if playlist_label:
 		playlist_label.text = "PLAYLISTS"
@@ -75,6 +80,8 @@ func _show_songs_view(playlist):
 	_selected_playlist = playlist
 	_selected_song_index = -1
 	
+	Settings.set_setting("ui", "playlist_view_mode", 1)
+
 	# Update UI
 	if playlist_label:
 		playlist_label.text = playlist.name
@@ -245,6 +252,7 @@ func _on_item_selected(index: int):
 			return
 		
 		_selected_playlist_index = index
+		Settings.set_setting("ui", "playlist_selected_index", index)
 		_update_play_button()
 		
 		# Preview first song in playlist
@@ -264,6 +272,7 @@ func _on_item_selected(index: int):
 			return
 		
 		_selected_song_index = index
+		Settings.set_setting("ui", "playlist_selected_song_index", index)
 		_update_play_button()
 		
 		# Preview the selected song
@@ -435,3 +444,47 @@ func _find_main_menu() -> Node:
 # Get current view mode
 func get_view_mode() -> ViewMode:
 	return _current_view_mode
+
+
+# Restore saved playlist state (view mode, selected playlist, selected song)
+func _restore_playlist_state():
+	var saved_view_mode = Settings.get_setting("ui", "playlist_view_mode", 0)
+	var saved_playlist_index = Settings.get_setting("ui", "playlist_selected_index", 0)
+	var saved_song_index = Settings.get_setting("ui", "playlist_selected_song_index", 0)
+
+	if saved_view_mode == 1 and saved_playlist_index is int and saved_playlist_index >= 0:
+		# Was in songs view — navigate to the saved playlist
+		if saved_playlist_index < PlaylistManager.get_playlist_count():
+			var playlist = PlaylistManager.get_playlist(saved_playlist_index)
+			if playlist and playlist.entries.size() > 0:
+				_show_songs_view(playlist)
+				# Select the saved song if valid
+				if saved_song_index is int and saved_song_index >= 0 and saved_song_index < playlist.entries.size():
+					var song = playlist.entries[saved_song_index]
+					if song.layout_path != "":
+						playlist_items.select(saved_song_index)
+						_on_item_selected(saved_song_index)
+					else:
+						# Saved song no longer available, select first valid
+						_select_first_valid_song()
+				else:
+					_select_first_valid_song()
+				return
+		# Playlist no longer exists, stay in playlists view
+	elif saved_playlist_index is int and saved_playlist_index >= 0:
+		# Was in playlists view — select the saved playlist
+		if saved_playlist_index < PlaylistManager.get_playlist_count():
+			playlist_items.select(saved_playlist_index)
+			_on_item_selected(saved_playlist_index)
+
+
+func _select_first_valid_song():
+	"""Select the first non-disabled song in the current playlist"""
+	if _selected_playlist == null:
+		return
+	for i in range(_selected_playlist.entries.size()):
+		var song = _selected_playlist.entries[i]
+		if song.layout_path != "":
+			playlist_items.select(i)
+			_on_item_selected(i)
+			return

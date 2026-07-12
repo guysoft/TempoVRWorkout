@@ -33,6 +33,14 @@ var path = ""
 # Folder navigation state for PowerBeatsVR music browser
 var current_music_folder: String = ""  # Relative to pbvr_music_path
 
+# Cached TabContainer parent (null when not inside one, e.g. standalone test).
+# Used to determine whether this tab is the currently visible one, so inactive
+# tabs don't clobber GameVariables.path during their _ready restore.
+var _tab_container: TabContainer = null
+# True after this tab has performed its initial auto-restore once. Prevents
+# re-running the restore every time the user switches back to an already-restored tab.
+var _initial_restore_done: bool = false
+
 # Music file extensions
 const MUSIC_EXTENSIONS = ["ogg", "mp3", "wav"]
 
@@ -45,6 +53,10 @@ func _ready():
 	if tab == "Original":
 		_setup_tab_persistence()
 	
+	# Restore folder navigation for Custom/PowerBeatsVR tabs
+	if tab in ["Custom", "PowerBeatsVR"]:
+		current_music_folder = Settings.get_setting("ui", "custom_music_folder", "")
+
 	populate_list()
 
 
@@ -65,8 +77,35 @@ func _setup_tab_persistence():
 
 
 func _on_tab_container_tab_changed(tab_index: int):
-	"""Save the selected tab when user changes it"""
+	"""Save the selected tab and trigger selection restore on the newly visible tab"""
 	Settings.set_setting("ui", "song_list_tab", tab_index)
+	# Ask the tab that just became visible to restore its selection. Inactive tabs
+	# skipped auto-restore in their _ready (to avoid clobbering GameVariables.path),
+	# so when the user switches to one we run the restore now that it owns the UI.
+	if _tab_container != null:
+		var shown = _tab_container.get_tab_control(tab_index)
+		if shown and shown.has_method("_restore_selection_on_show"):
+			shown._restore_selection_on_show()
+
+
+# Called by the TabContainer's tab_changed signal (via the sibling tab that has the
+# signal connected) when this tab becomes visible. Runs the auto-restore that was
+# skipped during _ready because this tab wasn't the visible one.
+func _restore_selection_on_show():
+	if _initial_restore_done:
+		return
+	if not _is_active_tab():
+		return
+	if songs_list_ui == null or songs_list_ui.get_item_count() == 0:
+		return
+	if tab in ["Custom", "PowerBeatsVR"]:
+		_restore_custom_selection()
+	else:
+		# Original tab
+		if GameVariables.song_selected != null and GameVariables.song_selected < songs_list_ui.get_item_count():
+			songs_list_ui.select(GameVariables.song_selected)
+			_on_SongList_item_selected(GameVariables.song_selected)
+		_initial_restore_done = true
 
 
 func populate_list():
@@ -97,6 +136,13 @@ func populate_list():
 
 func _setup_ui_nodes():
 	"""Setup UI node references based on tab type"""
+	# Cache the TabContainer parent so we can tell whether this tab is visible.
+	# Only the Original tab calls _setup_tab_persistence (which also looks this up),
+	# but every tab runs _setup_ui_nodes, so this is a reliable place to cache it.
+	var parent = get_parent()
+	if parent is TabContainer:
+		_tab_container = parent
+
 	if tab == "Custom":
 		# Custom tab has VBoxContainer structure with PathLabel
 		songs_list_ui = $VBoxContainer/ListContainer/SongList
@@ -127,6 +173,15 @@ func _setup_ui_nodes():
 		var v_scroll = songs_list_ui.get_v_scroll_bar()
 		if v_scroll and not v_scroll.is_connected("value_changed", _on_scroll_changed):
 			v_scroll.connect("value_changed", _on_scroll_changed)
+
+
+# Is this tab the currently visible tab in the TabContainer?
+# Inactive tabs still run _ready and populate their lists, but they must not fire
+# selection callbacks that would overwrite GameVariables.path (used by the Start button).
+func _is_active_tab() -> bool:
+	if _tab_container == null:
+		return true  # No TabContainer (e.g. standalone scene) — behave as before
+	return _tab_container.current_tab == get_index()
 
 
 func _populate_beatsaber_ui():
@@ -263,28 +318,53 @@ func _finalize_list_ui():
 	# Use call_deferred to ensure UI has been laid out
 	call_deferred("_update_scroll_button_visibility")
 	
-	# For PowerBeatsVR browser, don't auto-select
+	# For PowerBeatsVR browser, restore previously selected song if any
 	if tab in ["Custom", "PowerBeatsVR"]:
-		# Find first selectable item
-		for i in range(songs_list_ui.get_item_count()):
-			if i < disabled_items.size() and not disabled_items[i]:
-				if i < item_types.size() and item_types[i] == ItemType.MUSIC_FILE:
-					songs_list_ui.select(i)
-					_on_SongList_item_selected(i)
-					return
+		# Only fire the selection (which sets GameVariables.path) when this tab
+		# is the currently visible one. Inactive tabs still populate their list
+		# here so they display correctly when switched to; their restore is
+		# deferred until the user actually views the tab (see _on_tab_container_tab_changed).
+		if _is_active_tab():
+			_restore_custom_selection()
 		return
 	
 	# Original Beat Saber behavior
-	if GameVariables.song_selected == null:
-		songs_list_ui.select(0)
-		GameVariables.song_selected = 0
-	else:
-		# Make sure selected index is valid
-		if GameVariables.song_selected >= songs_list_ui.get_item_count():
+	if _is_active_tab():
+		if GameVariables.song_selected == null:
+			songs_list_ui.select(0)
 			GameVariables.song_selected = 0
-		songs_list_ui.select(GameVariables.song_selected)
-	
-	_on_SongList_item_selected(GameVariables.song_selected)
+		else:
+			# Make sure selected index is valid
+			if GameVariables.song_selected >= songs_list_ui.get_item_count():
+				GameVariables.song_selected = 0
+			songs_list_ui.select(GameVariables.song_selected)
+		_on_SongList_item_selected(GameVariables.song_selected)
+		_initial_restore_done = true
+
+
+# Restore saved Custom/PowerBeatsVR selection by filename, falling back to first
+# selectable song. Only call this when the tab is the currently visible one — it
+# sets GameVariables.path via _on_SongList_item_selected → _select_powerbeatsvr_song.
+func _restore_custom_selection():
+	var saved_song = Settings.get_setting("ui", "custom_selected_song", "")
+	if saved_song != "":
+		# Find the saved song by filename in the current list
+		for i in range(songs_list.size()):
+			if i < item_types.size() and item_types[i] == ItemType.MUSIC_FILE:
+				if songs_list[i] == saved_song:
+					if i < disabled_items.size() and not disabled_items[i]:
+						songs_list_ui.select(i)
+						_on_SongList_item_selected(i)
+						_initial_restore_done = true
+						return
+	# Fall back to first selectable item
+	for i in range(songs_list_ui.get_item_count()):
+		if i < disabled_items.size() and not disabled_items[i]:
+			if i < item_types.size() and item_types[i] == ItemType.MUSIC_FILE:
+				songs_list_ui.select(i)
+				_on_SongList_item_selected(i)
+				_initial_restore_done = true
+				return
 
 
 func _add_beatsaber_songs(search_path: String):
@@ -460,6 +540,9 @@ func _navigate_up():
 	parts.remove_at(parts.size() - 1)
 	current_music_folder = "/".join(parts)
 	
+	# Save folder navigation state
+	Settings.set_setting("ui", "custom_music_folder", current_music_folder)
+
 	populate_list()
 
 
@@ -470,6 +553,9 @@ func _navigate_into(folder_name: String):
 	else:
 		current_music_folder = current_music_folder + "/" + folder_name
 	
+	# Save folder navigation state
+	Settings.set_setting("ui", "custom_music_folder", current_music_folder)
+
 	populate_list()
 
 
@@ -477,6 +563,9 @@ func _select_powerbeatsvr_song(index: int):
 	"""Select a PowerBeatsVR song from the music browser"""
 	var music_path = songs_paths[index]
 	
+	# Save selection state for menu restoration
+	Settings.set_setting("ui", "custom_selected_song", songs_list[index])
+
 	# Set game variables to use the music path (MapFactory derives layout from it)
 	GameVariables.song_selected = index
 	GameVariables.path = music_path
@@ -690,6 +779,7 @@ func select_song_by_path(layout_path: String):
 			if found_file:
 				# Navigate to the folder and re-populate
 				current_music_folder = folder_path
+				Settings.set_setting("ui", "custom_music_folder", current_music_folder)
 				populate_list()
 				
 				# Now find and select the song in the refreshed list

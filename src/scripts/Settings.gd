@@ -13,7 +13,14 @@ var _settings = {
 		"recenter_offset_rotation": 0.0  # Y-axis rotation in radians
 		},
 	"ui": {
-		"song_list_tab": 0  # Default to Original tab (index 0)
+		"song_list_tab": 0,  # Default to Original tab (index 0)
+		"custom_music_folder": "",  # Last browsed folder in Custom tab
+		"custom_selected_song": "",  # Last selected song filename in Custom tab
+		"playlist_view_mode": 0,  # 0 = playlists list, 1 = songs view
+		"playlist_selected_index": 0,  # Selected playlist index
+		"playlist_selected_song_index": 0,  # Selected song index within playlist
+		"last_played_path": "",  # GameVariables.path at the moment Start was last pressed (solo play only)
+		"last_played_difficulty": "",  # Difficulty paired with last_played_path
 		}
 	}
 
