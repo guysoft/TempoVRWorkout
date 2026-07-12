@@ -27,6 +27,8 @@ var _type:int
 var _cut_direction:int
 var _custom_data = {}
 var _is_power_ball: bool = false  # PowerBalls require 4x velocity to hit
+var _beat_player: BeatPlayer = null
+var _visual_spawn_time: float = 0.0
 
 var alive = false
 var been_hit = false
@@ -57,6 +59,8 @@ func reset_for_pool():
 	_bounce_time = 0
 	bounce_freq = 0
 	_y_offset = 0
+	_beat_player = null
+	_visual_spawn_time = 0.0
 	_spawn_timer.stop()
 	_spawn_timer.wait_time = 0.001
 	_collision.set_deferred("disabled", true)
@@ -66,7 +70,7 @@ func reset_for_pool():
 	_mesh.set_instance_shader_parameter("emission_color", null)
 	if _animation_player.is_playing():
 		_animation_player.stop()
-	visible = true  # Will be shown after setup
+	visible = false  # Hidden until activate() plays the spawn animation
 
 ## Release back to pool instead of queue_free
 func _release_to_pool():
@@ -79,8 +83,9 @@ func _release_to_pool():
 	else:
 		queue_free()
 
-func setup_note(note, speed, bpm, distance):
+func setup_note(note, speed, bpm, distance, beat_player: BeatPlayer = null):
 	self.speed = speed
+	_beat_player = beat_player
 	if not note:
 		return
 	
@@ -96,6 +101,9 @@ func setup_note(note, speed, bpm, distance):
 	
 	_time = note["_time"]
 	_type = note["_type"]
+	# Keep collision physics-driven while the child mesh follows the audio clock.
+	if speed > 0.0:
+		_visual_spawn_time = _time * 60.0 / bpm - distance / speed
 	
 	#if the note has an offset, set up the timer to match
 	if not is_equal_approx(note["offset"],0.0):
@@ -143,11 +151,24 @@ func activate():
 		await _spawn_timer.timeout
 	
 	set_physics_process(true)
+	set_process(true)
 	_collision.set_deferred("disabled", false)
 	_animation_player.play("spawn")
+	visible = true  # Show only when the spawn animation starts
+
+func _process(_delta):
+	if not alive or _beat_player == null:
+		set_process(false)
+		return
+
+	# Render-frame visual motion removes physics/render cadence jitter while the
+	# Area3D remains physics-driven for hammer collision detection.
+	var desired_z = speed * (_beat_player.song_position - _visual_spawn_time)
+	_mesh.position = Vector3(0, 0, desired_z - position.z)
 
 func deactivate(delete:bool = true, delete_delay:float=1.0):
 	set_physics_process(false)
+	set_process(false)
 	_collision.set_deferred("disabled", true)
 	if delete:
 		await get_tree().create_timer(delete_delay).timeout

@@ -434,7 +434,7 @@ func _on_beat_detected(beat):
 		
 		var note_speed = calc_object_speed()
 		#print(note_speed)
-		note_instance.setup_note(note, note_speed, _map.get_bpm(), travel_distance)
+		note_instance.setup_note(note, note_speed, _map.get_bpm(), travel_distance, _beat_player)
 	
 		note_instance.activate()
 		

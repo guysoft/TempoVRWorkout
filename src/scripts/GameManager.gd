@@ -3,6 +3,7 @@ extends Node
 # DEVELOPMENT CONSTS
 @export var debug_start_scene: String # (String, "GGJ2Splash", "Menu","Game", "GameTest", "CustomSongTest")
 @export var debug_test_song: String = "" # Filename only (e.g., "My Song.mp3"), used with CustomSongTest mode
+@export_range(72.0, 120.0, 1.0) var target_refresh_rate: float = 120.0
 var splash_path = "res://scenes/GameOffSplash.tscn"
 var menu_path = "res://scenes/MainMenu.tscn"
 var game_path = "res://scenes/Game.tscn"
@@ -452,14 +453,13 @@ func initialise_OpenXR() -> bool:
 		# If true our preview will be darker.
 		# vp.keep_3d_linear = $Configuration.keep_3d_linear()
 
-		# Set display refresh rate for Quest (90Hz for Space Warp at 45fps target)
+		# Set display refresh rate for Quest. SpaceWarp synthesizes presentation
+		# frames between app frames; 90 Hz remains selectable for thermal fallback.
 		# Quest 2/3 supports: 72, 80, 90, 120 Hz
 		if QualitySettings.is_quest():
 			var available_rates = interface.get_available_display_refresh_rates()
 			print("Available display refresh rates: " + str(available_rates))
 			
-			# Request 90Hz for Space Warp (renders at 45fps, reprojects to 90Hz)
-			var target_refresh_rate = 90.0
 			if available_rates.size() > 0 and target_refresh_rate in available_rates:
 				interface.set_display_refresh_rate(target_refresh_rate)
 				print("Requested display refresh rate: " + str(target_refresh_rate) + "Hz")
