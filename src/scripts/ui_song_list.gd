@@ -424,10 +424,11 @@ func _on_SongList_item_selected(index):
 		push_error("Failed to load map: " + selected_path)
 		return
 	
-	# Set the first available difficulty for this map
+	# Preserve existing difficulty if valid for this map, otherwise pick first available
 	var difficulties = map.get_available_difficulties()
 	if difficulties.size() > 0:
-		GameVariables.difficulty = difficulties[0]
+		if not (GameVariables.difficulty in difficulties):
+			GameVariables.difficulty = difficulties[0]
 	
 	# Notify listeners (e.g. Song Info tab) about the selection
 	Events.song_selected.emit(map)
@@ -486,10 +487,11 @@ func _select_powerbeatsvr_song(index: int):
 		push_error("Failed to load map for music: " + music_path)
 		return
 	
-	# Set the first available difficulty for this map
+	# Preserve existing difficulty if valid for this map, otherwise pick first available
 	var difficulties = map.get_available_difficulties()
 	if difficulties.size() > 0:
-		GameVariables.difficulty = difficulties[0]
+		if not (GameVariables.difficulty in difficulties):
+			GameVariables.difficulty = difficulties[0]
 	
 	# Notify listeners (e.g. Song Info tab) about the selection
 	Events.song_selected.emit(map)

@@ -245,6 +245,35 @@ theme_override_font_sizes/font_size = 33
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 
+[node name="DifficultyButtons" type="HBoxContainer" parent="TabContainer/SongInfo/Content" unique_id=1787955915]
+layout_mode = 2
+alignment = 1
+
+[node name="BeginnerBtn" type="Button" parent="TabContainer/SongInfo/Content/DifficultyButtons" unique_id=946289521]
+custom_minimum_size = Vector2(160, 70)
+layout_mode = 2
+mouse_filter = 0
+theme_override_font_sizes/font_size = 36
+text = "Beginner"
+
+[node name="AdvancedBtn" type="Button" parent="TabContainer/SongInfo/Content/DifficultyButtons" unique_id=178428301]
+custom_minimum_size = Vector2(160, 70)
+layout_mode = 2
+mouse_filter = 0
+theme_override_font_sizes/font_size = 36
+text = "Advanced"
+
+[node name="ExpertBtn" type="Button" parent="TabContainer/SongInfo/Content/DifficultyButtons" unique_id=2027538247]
+custom_minimum_size = Vector2(160, 70)
+layout_mode = 2
+mouse_filter = 0
+theme_override_font_sizes/font_size = 36
+text = "Expert"
+
+[node name="Spacer3" type="Control" parent="TabContainer/SongInfo/Content" unique_id=1944968272]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
 [node name="HighscoreLabel" type="Label" parent="TabContainer/SongInfo/Content" unique_id=599218249]
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
