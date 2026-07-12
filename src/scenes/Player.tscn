@@ -110,7 +110,7 @@ transform = Transform3D(1, 0, 0, 0, 1, -2.98023e-08, 0, 2.98023e-08, 1, 0, 0, -0
 [node name="Area3D" type="Area3D" parent="XROrigin3D/LeftHand/Position3D2/Marker3D" unique_id=1666319702]
 transform = Transform3D(0.9974904, -0.056038313, 0.043272354, -0.040609844, 0.047810316, 0.9980298, -0.057996813, -0.9972824, 0.045414835, 0.00042785704, 0.25550413, -0.033929378)
 collision_layer = 2
-collision_mask = 28
+collision_mask = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="XROrigin3D/LeftHand/Position3D2/Marker3D/Area3D" unique_id=1623225385]
 transform = Transform3D(0.9996111, -0.015502961, -0.023179665, -0.022843488, 0.021573037, -0.999506, 0.015995182, 0.9996464, 0.02121067, -0.0144622065, -0.017327636, 0.3287332)
@@ -165,7 +165,7 @@ transform = Transform3D(1, 0, 0, 0, 1, -2.98023e-08, 0, 2.98023e-08, 1, 0, 5.960
 [node name="Area3D" type="Area3D" parent="XROrigin3D/RightHand/Marker3D/Marker3D" unique_id=708909277]
 transform = Transform3D(0.9974616, -0.056526102, 0.043301523, -0.04061225, 0.047888283, 0.99802595, -0.058488216, -0.9972511, 0.04547108, -0.00042785704, 0.25550413, 0.033929378)
 collision_layer = 2
-collision_mask = 28
+collision_mask = 4
 
 [node name="CollisionShape3D3-handle" type="CollisionShape3D" parent="XROrigin3D/RightHand/Marker3D/Marker3D/Area3D" unique_id=2125923365]
 transform = Transform3D(0.9985084, -0.054320876, 0.0054309852, 0.0067422558, 0.023985088, -0.99968946, 0.05417376, 0.99823403, 0.024315596, -0.016522711, 0.060434937, 0.32962227)

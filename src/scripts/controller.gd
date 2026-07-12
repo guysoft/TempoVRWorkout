@@ -38,11 +38,11 @@ func _ready():
 
 func _apply_controller_model() -> void:
 	# Apply platform-specific material settings to hammer controller models.
-	# Quest: Simplify materials (disable metallic, normal maps) for performance
-	# PC: Add subtle emission glow for visibility in dark environments
-	var model_root := find_child("hammer_smaller_hand_left", true, false)
+	# Quest: Strip metallic (no sky to reflect) for visibility under dim ambient.
+	# PC: Add subtle emission glow for visibility in dark environments.
+	var model_root := find_child("hammer_low_poly_left", true, false)
 	if model_root == null:
-		model_root = find_child("hammer_smaller_hand_right", true, false)
+		model_root = find_child("hammer_low_poly_right", true, false)
 	if model_root == null:
 		return
 
@@ -55,11 +55,10 @@ func _apply_controller_model() -> void:
 		if QualitySettings.is_quest():
 			_simplify_mesh_for_quest(mi)
 		else:
-			# Subtle glow: enough to read details, not enough to blow out textures.
 			_make_mesh_emissive(mi, 0.15)
 
 func _simplify_mesh_for_quest(mi: MeshInstance3D) -> void:
-	# Disable expensive PBR features for Quest performance
+	# Strip all expensive PBR features for Quest performance
 	var surface_count := mi.mesh.get_surface_count()
 	for surface_i in range(surface_count):
 		var mat: Material = mi.get_active_material(surface_i)
@@ -68,7 +67,6 @@ func _simplify_mesh_for_quest(mi: MeshInstance3D) -> void:
 		var dup: Material = mat.duplicate()
 		if dup is StandardMaterial3D:
 			var sm := dup as StandardMaterial3D
-			# Disable expensive PBR features
 			sm.metallic = 0.0
 			sm.metallic_texture = null
 			sm.roughness = 1.0
