@@ -52,6 +52,9 @@ func _init():
 	# Test 15: Song list scroll buttons
 	all_passed = test_song_list_scroll_buttons() and all_passed
 	
+	# Test 16: Controller hammer models have no negative scale (normal inversion check)
+	all_passed = test_hammer_models_no_negative_scale() and all_passed
+	
 	print("\n=== Test Summary ===")
 	if all_passed:
 		print("✓ ALL TESTS PASSED")
@@ -1043,4 +1046,37 @@ func test_song_list_scroll_buttons() -> bool:
 			passed = false
 	
 	instance.queue_free()
+	return passed
+
+func test_hammer_models_no_negative_scale() -> bool:
+	print("--- Testing Hammer Models Have No Negative Scale ---")
+	var passed = true
+	var glb_paths = [
+		"res://models/contoller/hammer_low_poly_left.glb",
+		"res://models/contoller/hammer_low_poly_right.glb",
+	]
+	for glb_path in glb_paths:
+		var scene = load(glb_path)
+		if scene == null:
+			print("  ✗ Failed to load: ", glb_path)
+			passed = false
+			continue
+		var instance = scene.instantiate()
+		if instance == null:
+			print("  ✗ Failed to instantiate: ", glb_path)
+			passed = false
+			continue
+		var all_nodes = instance.find_children("*", "", true, false)
+		all_nodes.append(instance)
+		var found_negative = false
+		for n in all_nodes:
+			if n is Node3D:
+				var s = n.scale
+				if s.x < 0 or s.y < 0 or s.z < 0:
+					print("  ✗ ", glb_path, " node '", n.name, "' has negative scale: ", s)
+					found_negative = true
+					passed = false
+		if not found_negative:
+			print("  ✓ ", glb_path, " — no negative scale on any node")
+		instance.queue_free()
 	return passed
