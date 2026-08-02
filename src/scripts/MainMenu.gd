@@ -136,9 +136,9 @@ func _warmup_game_shaders():
 	var obstaclescene = preload("res://scenes/Obstacle.tscn")
 	
 	# Also preload the materials directly to ensure they're in GPU memory
-	var _mat0 = preload("res://effects/note_0_material.tres")
-	var _mat1 = preload("res://effects/note_1_material.tres")
-	var _mat3 = preload("res://effects/note_3_material.tres")
+	var _mat0 = preload("res://effects/note_main_0_material.tres")
+	var _mat1 = preload("res://effects/note_main_1_material.tres")
+	var _mat3 = preload("res://effects/note_main_3_material.tres")
 	var _wall_mat = preload("res://effects/wall_material.tres")
 	
 	var warmup_objects = []

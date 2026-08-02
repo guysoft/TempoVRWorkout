@@ -14,10 +14,8 @@
 [ext_resource type="FontFile" uid="uid://byemkjra3kgch" path="res://fonts/millimetre-font-128.tres" id="12"]
 [ext_resource type="PackedScene" uid="uid://dm6ln1wr7hmcs" path="res://scenes/ui_combo.tscn" id="13"]
 [ext_resource type="Material" uid="uid://bhuo1ttshnp37" path="res://effects/wall_material.tres" id="14"]
-[ext_resource type="Material" uid="uid://fm84yumfchuq" path="res://effects/note_3_material.tres" id="15"]
 [ext_resource type="PackedScene" uid="uid://bqmjf2xl6vp1h" path="res://scenes/ui_score.tscn" id="16"]
-[ext_resource type="Material" uid="uid://dr8t6pa5tb8a4" path="res://effects/note_1_material.tres" id="18"]
-[ext_resource type="Material" uid="uid://0l3q4ycp43lc" path="res://effects/note_0_material.tres" id="19"]
+
 [ext_resource type="PackedScene" uid="uid://dp6qkljlk5y1r" path="res://scenes/ui_time_left.tscn" id="20"]
 [ext_resource type="FontFile" uid="uid://dyway4ixu5nvl" path="res://fonts/millimetre-font-256.tres" id="21"]
 [ext_resource type="Material" uid="uid://ceh5k72kyhean" path="res://effects/Ground.tres" id="22"]
@@ -48,7 +46,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)
 
 [node name="BeatResponder" type="Node" parent="." unique_id=119369707]
 script = ExtResource("5")
-materials = [ExtResource("19"), ExtResource("18"), ExtResource("15"), ExtResource("14")]
+materials = [ExtResource("14")]
 params = {
 "min_displace": 2.5
 }

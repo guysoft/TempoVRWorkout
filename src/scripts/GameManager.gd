@@ -138,9 +138,9 @@ func _warmup_game_shaders():
 	# 2. Preload game object scenes and materials
 	var notescene = preload("res://scenes/Note.tscn")
 	var obstaclescene = preload("res://scenes/Obstacle.tscn")
-	var _mat0 = preload("res://effects/note_0_material.tres")
-	var _mat1 = preload("res://effects/note_1_material.tres")
-	var _mat3 = preload("res://effects/note_3_material.tres")
+	var _mat0 = preload("res://effects/note_main_0_material.tres")
+	var _mat1 = preload("res://effects/note_main_1_material.tres")
+	var _mat3 = preload("res://effects/note_main_3_material.tres")
 	var _wall_mat = preload("res://effects/wall_material.tres")
 	
 	# 3. Preload other commonly used resources

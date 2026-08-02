@@ -106,9 +106,9 @@ func test_note_materials() -> bool:
 	var passed = true
 	
 	var note_files = [
-		"res://effects/note_0_material.tres",
-		"res://effects/note_1_material.tres",
-		"res://effects/note_3_material.tres"
+		"res://effects/note_main_0_material.tres",
+		"res://effects/note_main_1_material.tres",
+		"res://effects/note_main_3_material.tres"
 	]
 	
 	for path in note_files:
@@ -251,10 +251,11 @@ func test_all_effect_files() -> bool:
 		"res://effects/menu_environment.tres",
 		"res://effects/menu_logo_material.tres",
 		"res://effects/menu_theme.tres",
-		"res://effects/note_0_material.tres",
-		"res://effects/note_1_material.tres",
-		"res://effects/note_3_material.tres",
+		"res://effects/note_main_0_material.tres",
+		"res://effects/note_main_1_material.tres",
+		"res://effects/note_main_3_material.tres",
 		"res://effects/note_displace_shader.tres",
+		"res://effects/note_displace_shader_textured.tres",
 		"res://effects/obstacle_material.tres",
 		"res://effects/right_laser_material.tres",
 		"res://effects/ring_material.tres",
