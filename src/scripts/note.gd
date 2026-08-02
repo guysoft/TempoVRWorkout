@@ -32,6 +32,8 @@ var _visual_spawn_time: float = 0.0
 
 var alive = false
 var been_hit = false
+var _random_rotation := Vector3.ZERO
+var _rotation_pending := false
 
 # Object pool reference (set by Game.gd when using pooling)
 var _pool: ObjectPool = null
@@ -69,6 +71,9 @@ func reset_for_pool():
 	_mesh.set_instance_shader_parameter("albedo_color", null)
 	_mesh.set_instance_shader_parameter("emission_color", null)
 	_mesh.position = Vector3.ZERO
+	_mesh.rotation_degrees = Vector3.ZERO
+	_random_rotation = Vector3.ZERO
+	_rotation_pending = false
 	if _animation_player.is_playing():
 		_animation_player.stop()
 	visible = false  # Hidden until activate() plays the spawn animation
@@ -138,6 +143,22 @@ func setup_note(note, speed, bpm, distance, beat_player: BeatPlayer = null):
 	# Apply purple tint for PowerBalls (must be after material is set)
 	if _is_power_ball:
 		_set_ball_purple()
+	
+	# Register note materials with BeatResponder so beat-driven shader params
+	# (like min_displace) pulse on the actual rendered materials.
+	_register_with_beat_responder()
+	
+	var angle = fmod(note["_time"] * 137.035 + note["x"] * 271.0 + note["y"] * 401.0, 360.0)
+	_random_rotation = Vector3(angle, fmod(angle * 0.7, 360.0), fmod(angle * 1.3, 360.0))
+	_rotation_pending = true
+
+func _register_with_beat_responder() -> void:
+	var manager = Global.manager()
+	if manager == null or manager._player == null or manager._player.game_node == null:
+		return
+	var beat_responder = manager._player.game_node.get_node_or_null("BeatResponder")
+	if beat_responder and beat_responder.has_method("register_note_materials"):
+		beat_responder.register_note_materials(materials)
 
 func activate():
 	#if the spawn timer has been setup with an offset
@@ -166,6 +187,10 @@ func _process(_delta):
 	# Area3D remains physics-driven for hammer collision detection.
 	var desired_z = speed * (_beat_player.song_position - _visual_spawn_time)
 	_mesh.position = Vector3(0, 0, desired_z - position.z)
+	
+	if _rotation_pending and not _animation_player.is_playing():
+		_mesh.rotation_degrees = _random_rotation
+		_rotation_pending = false
 
 func deactivate(delete:bool = true, delete_delay:float=1.0):
 	set_physics_process(false)
