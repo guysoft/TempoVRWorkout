@@ -1,0 +1,30 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://c1yki0xoyc7pj"]
+
+[ext_resource type="Shader" path="res://effects/note_displace_shader_textured.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://4n6evexo53zz" path="res://models/note/note_main_textures/texture_0.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://4k3pkzqkao3f" path="res://models/note/note_main_textures/texture_2.png" id="3"]
+
+[sub_resource type="FastNoiseLite" id="9"]
+
+[sub_resource type="NoiseTexture2D" id="10"]
+noise = SubResource("9")
+
+[resource]
+render_priority = 0
+shader = ExtResource("1")
+shader_parameter/emission_color = Color(0.913725, 0.219608, 0.219608, 1)
+shader_parameter/albedo_color = Color(0.913725, 0.219608, 0.219608, 1)
+shader_parameter/displace_scale = 0.148
+shader_parameter/mid_level = 0.5
+shader_parameter/scale = 0.0
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/noise = SubResource("10")
+shader_parameter/scroll = Vector2(0.1, 0.25)
+shader_parameter/object_position = Vector3(1.35, 0.963, 0.6)
+shader_parameter/max_distance_clamp = 0.5
+shader_parameter/min_displace = 0.564
+shader_parameter/base_texture = ExtResource("2")
+shader_parameter/normal_texture = ExtResource("3")
+shader_parameter/texture_uv_scale = Vector2(15.18, 16)
+shader_parameter/texture_uv_offset = Vector2(0.0003, 4e-06)
+shader_parameter/normal_map_depth = 0.5

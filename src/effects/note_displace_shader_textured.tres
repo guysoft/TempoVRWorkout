@@ -1,0 +1,65 @@
+[gd_resource type="Shader" format=3]
+
+[resource]
+code = "shader_type spatial;
+render_mode depth_draw_opaque, cull_disabled, world_vertex_coords;
+
+uniform vec4 emission_color : source_color = vec4(1.0,1.0,1.0,1.0);
+uniform vec4 albedo_color : source_color = vec4(1.0,1.0,1.0,1.0);
+
+uniform float displace_scale;
+uniform float mid_level : hint_range(0, 1);
+
+uniform float scale;
+uniform vec2 offset;
+uniform sampler2D noise : source_color;
+
+uniform vec2 scroll;
+
+uniform vec3 object_position;
+uniform float max_distance_clamp;
+uniform float min_displace;
+
+uniform sampler2D base_texture : repeat_enable, filter_linear_mipmap;
+uniform sampler2D normal_texture : repeat_enable, filter_linear_mipmap;
+uniform vec2 texture_uv_scale = vec2(16.0, 16.0);
+uniform vec2 texture_uv_offset = vec2(0.0, 0.0);
+uniform float normal_map_depth = 0.5;
+
+varying vec3 vert_out;
+
+void vertex() {
+	vec4 world_vertex = vec4(VERTEX,1.0);
+
+	vec2 uv = UV + offset + (scroll*TIME);
+
+	vec3 norm = NORMAL;
+
+	vec4 tex= texture(noise,uv);
+
+	float dist = distance(object_position,world_vertex.xyz);
+
+	if (dist>max_distance_clamp){
+		dist=max_distance_clamp;
+	}
+
+	float new_distance = max_distance_clamp + min_displace - dist;
+
+	vec4 tex_adjusted = (tex - mid_level) * new_distance;
+	vert_out.x = VERTEX.x + (((tex_adjusted.r)*norm.x)*displace_scale);
+	vert_out.y = VERTEX.y + (((tex_adjusted.r)*norm.y)*displace_scale);
+	vert_out.z = VERTEX.z + (((tex_adjusted.r)*norm.z)*displace_scale);
+
+	VERTEX = vert_out;
+
+}
+
+void fragment() {
+	vec2 tex_uv = UV * texture_uv_scale + texture_uv_offset;
+	vec4 tex_color = texture(base_texture, tex_uv);
+	ALBEDO = albedo_color.rgb * tex_color.rgb;
+	EMISSION = emission_color.rgb / 2.0 * tex_color.rgb;
+	ALPHA = albedo_color.a * tex_color.a;
+	NORMAL_MAP = texture(normal_texture, tex_uv).rgb;
+	NORMAL_MAP_DEPTH = normal_map_depth;
+}"
