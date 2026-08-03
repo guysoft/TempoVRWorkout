@@ -2,17 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ag4lsgza8tos"
-path.s3tc="res://.godot/imported/texture_3.png-576125fd37ceae76813e858a73d57652.s3tc.ctex"
-path.etc2="res://.godot/imported/texture_3.png-576125fd37ceae76813e858a73d57652.etc2.ctex"
+uid="uid://g4lsg0a8tos"
+path.s3tc="res://.godot/imported/texture_3.png-2d3301549e57290fb6feca182d7e7017.s3tc.ctex"
+path.etc2="res://.godot/imported/texture_3.png-2d3301549e57290fb6feca182d7e7017.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
+
 [deps]
+
 source_file="res://models/note/note_main_textures/texture_3.png"
-dest_files=["res://.godot/imported/texture_3.png-576125fd37ceae76813e858a73d57652.s3tc.ctex", "res://.godot/imported/texture_3.png-576125fd37ceae76813e858a73d57652.etc2.ctex"]
+dest_files=["res://.godot/imported/texture_3.png-2d3301549e57290fb6feca182d7e7017.s3tc.ctex", "res://.godot/imported/texture_3.png-2d3301549e57290fb6feca182d7e7017.etc2.ctex"]
+
 [params]
+
 compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7

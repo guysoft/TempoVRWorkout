@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" uid="uid://k6disfe0h3yj" path="res://scripts/note.gd" id="1"]
 [ext_resource type="AudioStream" uid="uid://bhq1oe6e46uko" path="res://sfx/beep_01.wav" id="2"]
-[ext_resource type="Material" path="res://effects/note_main_1_material.tres" id="4"]
-[ext_resource type="Material" path="res://effects/note_main_0_material.tres" id="5"]
-[ext_resource type="Material" path="res://effects/note_main_3_material.tres" id="6"]
+[ext_resource type="Material" uid="uid://dhp11ur41gqm5" path="res://effects/note_main_1_material.tres" id="4"]
+[ext_resource type="Material" uid="uid://c88d3xmingtq5" path="res://effects/note_main_0_material.tres" id="5"]
+[ext_resource type="Material" uid="uid://c1yki0xoyc7pj" path="res://effects/note_main_3_material.tres" id="6"]
 [ext_resource type="PackedScene" uid="uid://docpre3d6j6du" path="res://scenes/NoteExplosion.tscn" id="7"]
 [ext_resource type="PackedScene" uid="uid://c0ru1eq1i3uer" path="res://scenes/NoteFeedback.tscn" id="8"]
-[ext_resource type="ArrayMesh" uid="uid://no0b8g9e1f5y" path="res://models/note/note_main_mesh.obj" id="8_333ir"]
+[ext_resource type="ArrayMesh" uid="uid://no0b8hae1f5y" path="res://models/note/note_main_mesh.obj" id="8_333ir"]
 
 [sub_resource type="SphereShape3D" id="7"]
 margin = 0.01

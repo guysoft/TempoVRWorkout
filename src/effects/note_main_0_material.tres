@@ -1,8 +1,8 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://c88d3xmingtq5"]
 
 [ext_resource type="Shader" path="res://effects/note_displace_shader_textured.tres" id="1"]
-[ext_resource type="Texture2D" uid="uid://4n6evexo53zz" path="res://models/note/note_main_textures/texture_0.png" id="2"]
-[ext_resource type="Texture2D" uid="uid://4k3pkzqkao3f" path="res://models/note/note_main_textures/texture_2.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://4n6evexo5300" path="res://models/note/note_main_textures/texture_0.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://4k3pk0qkao3f" path="res://models/note/note_main_textures/texture_2.png" id="3"]
 
 [sub_resource type="FastNoiseLite" id="9"]
 
