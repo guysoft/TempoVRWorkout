@@ -1,13 +1,9 @@
 extends CharacterBody3D
 
-# PowerBeatsVR velocity mechanics (Expert difficulty)
-# These are SQUARED velocity thresholds for performance
-# From PowerBeatsVR GameManager.cs:
-#   HIT_SPEED_SQUARED_EXPERT_LOWER = 1.0f  (minimum for any hit)
-#   HIT_SPEED_SQUARED_EXPERT_UPPER = 3.0f  (for full impact)
-# PowerBalls: velocity is divided by 4 before checking thresholds
-const HIT_SPEED_SQUARED_MIN = 1.0       # Minimum for semi-hit
-const HIT_SPEED_SQUARED_FULL = 3.0      # For full impact hit
+# PowerBeatsVR velocity mechanics - thresholds live in HitRules (ported from
+# PowerBeatsVR GameManager.GetHitLevel; SQUARED velocities, PowerBall v2/4,
+# TOOLOW only on Expert). Enum kept here for existing references.
+enum HitLevel { TOOLOW, MINIMUMIMPACT, FULLIMPACT }
 
 # PowerBeatsVR scoring constants
 const SCORE_SEMI = 10       # Partial/semi hit
@@ -16,10 +12,7 @@ const SCORE_COMPLETE = 20   # Full impact hit
 # Combo system
 const MIN_COMBO_FOR_MULTIPLIER = 5  # Need 5+ combo for score multiplier
 
-# Hit level enum (from PowerBeatsVR)
-enum HitLevel { TOOLOW, MINIMUMIMPACT, FULLIMPACT }
-
-const BOMB_SCORE_VALUE = 100 
+const BOMB_SCORE_VALUE = 100
 const MAX_COMBO = 99  # Increased max combo for PowerBeatsVR style
 
 # Floating score text scene
@@ -200,7 +193,12 @@ func handle_hit(body, hand):
 			else:
 				body.queue_free()
 		else:
-			velocity = controller.get("velocity")
+			# Peak velocity over a ~70ms window (PBVR-style contact-moment speed),
+			# not the diluted 30-frame average
+			if controller and controller.has_method("get_hit_velocity"):
+				velocity = controller.get_hit_velocity()
+			else:
+				velocity = controller.get("velocity")
 			var linear_velocity = velocity.length()
 			
 			var velocity_squared = linear_velocity * linear_velocity
@@ -240,26 +238,10 @@ func handle_hit(body, hand):
 					body.queue_free()
 
 
-# Calculate hit level based on velocity squared (PowerBeatsVR Expert difficulty)
-# PowerBalls require 4x velocity - this is checked per-ball, not globally
-# From PowerBeatsVR GameManager.cs: if (isPowerBall) { velocity /= 4f; }
+# Calculate hit level based on velocity squared (PowerBeatsVR GetHitLevel parity)
+# Rules live in HitRules so they stay testable without autoloads.
 func _calculate_hit_level(velocity_squared: float, is_power_ball: bool = false) -> int:
-	var effective_velocity = velocity_squared
-	
-	# PowerBalls: divide velocity by 4 (same as multiplying threshold by 4)
-	# This matches PowerBeatsVR exactly
-	if is_power_ball:
-		effective_velocity = velocity_squared / 4.0
-	
-	# Use normal thresholds for all balls after adjustment
-	# Min: 1.0 (1.0 m/s for normal, 2.0 m/s for power)
-	# Full: 3.0 (1.73 m/s for normal, 3.46 m/s for power)
-	if effective_velocity >= HIT_SPEED_SQUARED_FULL:
-		return HitLevel.FULLIMPACT
-	elif effective_velocity >= HIT_SPEED_SQUARED_MIN:
-		return HitLevel.MINIMUMIMPACT
-	else:
-		return HitLevel.TOOLOW
+	return HitRules.calculate_hit_level(velocity_squared, GameVariables.difficulty, is_power_ball)
 		
 #			if controller.get_rumble() == 0.0:
 #				print("rumble")
