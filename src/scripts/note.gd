@@ -199,11 +199,14 @@ func _process(_delta):
 		set_process(false)
 		return
 
-	# Render-frame visual motion removes physics/render cadence jitter while the
-	# Area3D remains physics-driven for hammer collision detection.
-	var desired_z = speed * (_beat_player.song_position - _visual_spawn_time)
-	_mesh.position = Vector3(0, 0, desired_z - position.z)
-	
+	if not been_hit:
+		# Drive the whole note (collider + mesh) from the audio clock so the
+		# hitbox is exactly where the ball is rendered. Area3D transform changes
+		# are picked up by the next physics step, so hammer overlap checks use
+		# this same position.
+		position.z = speed * (_beat_player.song_position - _visual_spawn_time)
+		_mesh.position = Vector3.ZERO
+
 	if _rotation_pending and not _animation_player.is_playing():
 		_mesh.rotation_degrees = _random_rotation
 		_rotation_pending = false
@@ -368,11 +371,12 @@ func despawn(type):
 	#_bounce_time+=delta
 
 func _physics_process(delta):
-	_velocity = direction * speed * delta #consider moving to setup if it doesn't change
-	
-	#bounce_note()
-	
-	translate(_velocity)
-	
+	# Pre-hit flight is driven from the audio clock in _process (collider and
+	# mesh share one position). Physics translate remains for the post-hit
+	# fling and as a fallback when no beat player is available.
+	if been_hit or _beat_player == null:
+		_velocity = direction * speed * delta
+		translate(_velocity)
+
 	if self.transform.origin.z > despawn_z+(speed*0.25):
 		self.despawn(MISS)
