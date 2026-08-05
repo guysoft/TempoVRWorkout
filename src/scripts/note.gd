@@ -27,8 +27,18 @@ var _type:int
 var _cut_direction:int
 var _custom_data = {}
 var _is_power_ball: bool = false  # PowerBalls require 4x velocity to hit
+var _swing_role: String = ""  # "start"/"mid"/"end" when part of a swing series
 var _beat_player: BeatPlayer = null
 var _visual_spawn_time: float = 0.0
+
+# Swing series collider scaling (from PowerBeatsVR GameManager.cs:2605-2673):
+# every swing ball x1.03, mid ball x1.1111 more, end ball x1.1765 more.
+# Applied to the CollisionShape3D node (per-instance, pooling-safe).
+const SWING_COLLIDER_SCALE = {
+	"start": 1.03,
+	"mid": 1.03 * 1.1111112,
+	"end": 1.03 * 1.1764705,
+}
 
 var alive = false
 var been_hit = false
@@ -55,6 +65,7 @@ func reset_for_pool():
 	alive = false
 	been_hit = false
 	_is_power_ball = false
+	_swing_role = ""
 	speed = 2
 	direction = Vector3(0, 0, 1)
 	_velocity = Vector3.ZERO
@@ -66,6 +77,7 @@ func reset_for_pool():
 	_spawn_timer.stop()
 	_spawn_timer.wait_time = 0.001
 	_collision.set_deferred("disabled", true)
+	_collision.scale = Vector3.ONE
 	set_physics_process(false)
 	# Clear instance shader parameters (PowerBall purple tint)
 	_mesh.set_instance_shader_parameter("albedo_color", null)
@@ -121,6 +133,10 @@ func setup_note(note, speed, bpm, distance, beat_player: BeatPlayer = null):
 		
 	# Check if this is a PowerBall (requires 4x velocity to hit)
 	_is_power_ball = note.get("_is_power_ball", false)
+
+	# Swing series balls get enlarged colliders (PBVR parity)
+	_swing_role = note.get("_swing_role", "")
+	_collision.scale = Vector3.ONE * SWING_COLLIDER_SCALE.get(_swing_role, 1.0)
 	
 	#set the material based on the note type
 	#var mat = _mesh.get_active_material(0) as ShaderMaterial
