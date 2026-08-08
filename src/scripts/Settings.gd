@@ -6,7 +6,8 @@ var _config_file = ConfigFile.new()
 var _settings = {
 	"game": {
 		"only_power_balls": false,
-		"player_height": 1.73
+		"player_height": 1.73,
+		"difficulty": "Expert"  # Beginner / Advanced / Expert (PBVR hit rules)
 		},
 	"vr": {
 		"recenter_offset_position": Vector3.ZERO,

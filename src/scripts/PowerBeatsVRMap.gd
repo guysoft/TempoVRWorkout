@@ -162,16 +162,10 @@ func get_offset() -> float:
 
 
 func get_ball_flight_duration() -> int:
-	# Ball flight duration in beats - how long balls take to fly from spawn to player
-	# From PowerBeatsVR GameManager.cs - Expert difficulty timing
-	# BPM < 100  (Low):  2 beats
-	# BPM 100-145 (Mid): 2 beats
-	# BPM >= 145 (High): 3 beats
-	var bpm = get_bpm()
-	if bpm >= BPM_HIGH_THRESHOLD:
-		return 3  # High BPM songs need more time
-	else:
-		return 2  # Low and Mid BPM songs
+	# Ball flight duration in beats - how long balls take to fly from spawn to player.
+	# From PowerBeatsVR GameManager.SetBallFlightDuration (GameManager.cs:1288-1342).
+	# Higher difficulties fly balls faster (fewer beats = less time to react).
+	return HitRules.get_ball_flight_duration(get_bpm(), _get_difficulty_setting())
 
 
 func get_song() -> String:
@@ -552,6 +546,19 @@ static func _get_only_power_balls_setting() -> bool:
 	if settings_node and settings_node.has_method("get_setting"):
 		return bool(settings_node.get_setting("game", "only_power_balls"))
 	return false
+
+
+# Helper to safely get the current difficulty
+# Returns "Expert" if GameVariables autoload is not available (e.g., headless testing)
+static func _get_difficulty_setting() -> String:
+	var main_loop = Engine.get_main_loop()
+	var tree := main_loop as SceneTree
+	if tree == null:
+		return "Expert"
+	var gv_node = tree.root.get_node_or_null("GameVariables")
+	if gv_node and "difficulty" in gv_node:
+		return str(gv_node.difficulty)
+	return "Expert"
 
 
 # Helper to safely get the "player_height" setting
