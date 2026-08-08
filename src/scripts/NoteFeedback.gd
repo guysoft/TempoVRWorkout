@@ -1,7 +1,8 @@
 extends Node3D
 
 @export var miss_texture: Texture2D
-@export var semi_texture: Texture2D    # Used for MINIMUMIMPACT (semi-hit)
+@export var weak_texture: Texture2D    # Used for TOOLOW (punched too weak)
+@export var semi_texture: Texture2D    # Legacy (EARLY); MINIMUMIMPACT shows no popup
 @export var perfect_texture: Texture2D # Used for FULLIMPACT (full hit)
 @export var late_texture: Texture2D    # Legacy, kept for compatibility
 @export var bomb_texture: Texture2D
@@ -13,6 +14,8 @@ var _pool: ObjectPool = null
 const HIT_LEVEL_TOOLOW = 0
 const HIT_LEVEL_MINIMUMIMPACT = 1
 const HIT_LEVEL_FULLIMPACT = 2
+# Pseudo-level for fly-past misses (never punched); matches note.gd
+const HIT_LEVEL_MISS = -1
 
 ## Reset all state for pool reuse.
 func reset_for_pool():
@@ -21,11 +24,9 @@ func reset_for_pool():
 		$AnimationPlayer.stop()
 
 func show_feedback(position, hit_level):
-	
-	print ("hit_level: ", hit_level)
 	global_transform.origin = position
 	visible = true
-	
+
 	var mat = $MeshInstance3D.get_surface_override_material(0)
 	if mat == null:
 		mat = $MeshInstance3D.get_active_material(0)
@@ -33,20 +34,20 @@ func show_feedback(position, hit_level):
 		push_warning("NoteFeedback: No material found on MeshInstance3D")
 		_release_to_pool()
 		return
-	
+
 	# PowerBeatsVR style feedback based on hit level
 	match hit_level:
 		HIT_LEVEL_TOOLOW:
-			# Too weak / miss
+			# Punched too weak to register
+			mat.albedo_texture = weak_texture if weak_texture else miss_texture
+		HIT_LEVEL_MISS:
+			# Flew past unhit
 			mat.albedo_texture = miss_texture
-		HIT_LEVEL_MINIMUMIMPACT:
-			# Semi-hit (minimum impact)
-			mat.albedo_texture = semi_texture if semi_texture else miss_texture
 		HIT_LEVEL_FULLIMPACT:
 			# Full impact (perfect!)
 			mat.albedo_texture = perfect_texture
 		_:
-			# Unknown - show miss
+			# MINIMUMIMPACT shows no word popup; unknown levels show miss
 			mat.albedo_texture = miss_texture
 	
 	$AnimationPlayer.play("show")

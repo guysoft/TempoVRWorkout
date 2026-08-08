@@ -219,6 +219,7 @@ func test_all_external_textures() -> bool:
 		"res://effects/ui_late.png",
 		"res://effects/ui_miss.png",
 		"res://effects/ui_perfect.png",
+		"res://effects/ui_weak.png",
 	]
 	
 	for path in texture_paths:
