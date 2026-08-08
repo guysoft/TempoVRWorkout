@@ -28,6 +28,7 @@ func _init():
 	all_passed = test_hit_levels_expert() and all_passed
 	all_passed = test_hit_levels_casual_never_toolow() and all_passed
 	all_passed = test_hit_levels_power_ball() and all_passed
+	all_passed = test_hit_levels_pbvr_exact_boundaries() and all_passed
 	all_passed = test_hit_velocity_peak_and_window() and all_passed
 
 	print("\n=== Test Summary ===")
@@ -177,6 +178,36 @@ func test_hit_levels_power_ball() -> bool:
 		and HitRulesScript.calculate_hit_level(4.0, "Expert", true) == HL.MINIMUMIMPACT \
 		and HitRulesScript.calculate_hit_level(12.0, "Expert", true) == HL.FULLIMPACT
 	_assert(ok, "PowerBall thresholds wrong")
+	return ok
+
+
+func test_hit_levels_pbvr_exact_boundaries() -> bool:
+	print("--- Hit levels: exact PBVR boundaries (GameManager.cs:79-85, 3079-3107) ---")
+	var HL = HitRulesScript.HitLevel
+	var cases = [
+		# Beginner/Advanced: 1.5 is the only threshold, TOOLOW impossible
+		[1.49, "Beginner", false, HL.MINIMUMIMPACT],
+		[1.5, "Beginner", false, HL.FULLIMPACT],
+		[1.49, "Advanced", false, HL.MINIMUMIMPACT],
+		[1.5, "Advanced", false, HL.FULLIMPACT],
+		# Expert: TOOLOW < 1.0 <= MIN < 3.0 <= FULL
+		[0.99, "Expert", false, HL.TOOLOW],
+		[1.0, "Expert", false, HL.MINIMUMIMPACT],
+		[2.99, "Expert", false, HL.MINIMUMIMPACT],
+		[3.0, "Expert", false, HL.FULLIMPACT],
+		# Expert + PowerBall: v2/4 first (4.0 -> 1.0 -> MIN, 12.0 -> 3.0 -> FULL)
+		[3.99, "Expert", true, HL.TOOLOW],
+		[4.0, "Expert", true, HL.MINIMUMIMPACT],
+		[11.99, "Expert", true, HL.MINIMUMIMPACT],
+		[12.0, "Expert", true, HL.FULLIMPACT],
+	]
+	var ok = true
+	for c in cases:
+		var got = HitRulesScript.calculate_hit_level(c[0], c[1], c[2])
+		if got != c[3]:
+			ok = false
+			print("  ✗ v2=%s diff=%s power=%s: expected %s, got %s" % [c[0], c[1], c[2], c[3], got])
+	_assert(ok, "PBVR boundary mismatch (see above)")
 	return ok
 
 

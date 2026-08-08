@@ -17,12 +17,21 @@ exports in `/home/guy/workspace/vibe/PunchBeatVR` (read-only reference; original
    (`CollidableHandObject.GetSpeed()` -> `poseAction.velocity`), evaluated as
    `speed.sqrMagnitude`. No averaging/smoothing in game code.
    (`Controller.SPHERE_HIT_THRESHOLD_VELOCITY_SQUARED` exists but is dead code.)
-3. **Thresholds** (`GameManager.GetHitLevel`, `GameManager.cs:3079-3107`):
-   - Expert: v2 < 1.0 -> TOOLOW (ball bounces off, combo reset);
-     1.0 <= v2 < 3.0 -> MINIMUMIMPACT; v2 >= 3.0 -> FULLIMPACT.
-   - Beginner/Advanced: v2 < 1.5 -> MINIMUMIMPACT (ball still breaks, scores);
-     v2 >= 1.5 -> FULLIMPACT. **TOOLOW is impossible below Expert.**
-   - PowerBall: `v2 /= 4` before the check (i.e. needs 2x linear speed).
+3. **Thresholds** (`GameManager.GetHitLevel`, `GameManager.cs:3079-3107`; constants at
+   `GameManager.cs:79-85`):
+   - Expert: v2 < `HIT_SPEED_SQUARED_EXPERT_LOWER` (1.0) -> TOOLOW (ball bounces off,
+     combo reset, `hitSpeedTooSlow` sound, no text popup);
+     1.0 <= v2 < `HIT_SPEED_SQUARED_EXPERT_UPPER` (3.0) -> MINIMUMIMPACT;
+     v2 >= 3.0 -> FULLIMPACT.
+   - Beginner: v2 < `HIT_SPEED_SQUARED_BEGINNER_MINIMUM` (1.5) -> MINIMUMIMPACT;
+     v2 >= 1.5 -> FULLIMPACT. **TOOLOW is impossible.**
+   - Advanced: v2 < `HIT_SPEED_SQUARED_ADVANCED_MINIMUM` (1.5) -> MINIMUMIMPACT;
+     v2 >= 1.5 -> FULLIMPACT. **TOOLOW is impossible.**
+   - PowerBall: `v2 /= 4` before the check (i.e. needs 2x linear speed)
+     (`GameManager.cs:2916-2918`).
+   - MINIMUMIMPACT score scales with strength: `min + percentage * (max - min)`
+     where percentage is v2/1.5 (casual) or (v2-1)/2 (Expert)
+     (`GameManager.cs:2948-2952`). Our game uses fixed +10/+20 instead.
 4. **Swing series** ("3 balls with an arrow"):
    - Detection (`BeatSequence.FindSwing`, `BeatSequence.cs:1000`): balls at beats
      **N, N+1/16 (0.0625), N+1/8 (0.125)** (float tolerance 0.001). Purely timing-based.
