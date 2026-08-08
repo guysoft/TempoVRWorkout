@@ -223,6 +223,9 @@ func deactivate(delete:bool = true, delete_delay:float=1.0):
 const HIT_LEVEL_TOOLOW = 0
 const HIT_LEVEL_MINIMUMIMPACT = 1
 const HIT_LEVEL_FULLIMPACT = 2
+# Pseudo-level for fly-past misses (never punched) so they keep the MISS popup
+# while TOOLOW (punched too weak) shows WEAK. Matches NoteFeedback.gd.
+const HIT_LEVEL_MISS = -1
 
 #TODO: Take into account the controller position of the hit?
 func on_hit(velocity, linear_velocity, hit_level):
@@ -238,7 +241,9 @@ func on_hit(velocity, linear_velocity, hit_level):
 	if linear_velocity:
 		speed = linear_velocity
 	
-	spawn_feedback(0, hit_level)
+	# A hit is a hit - no word popup for MINIMUMIMPACT (floating score still shows)
+	if hit_level != HIT_LEVEL_MINIMUMIMPACT:
+		spawn_feedback(0, hit_level)
 	
 	# Visual feedback based on hit level
 	if hit_level == HIT_LEVEL_TOOLOW:
@@ -356,7 +361,7 @@ func despawn(type):
 		
 	elif type==MISS and not been_hit and _type!=3:
 		GameplayLogger.log_miss(global_position, speed)
-		spawn_feedback(-speed*0.25, HIT_LEVEL_TOOLOW)
+		spawn_feedback(-speed*0.25, HIT_LEVEL_MISS)
 		var manager = Global.manager()
 		if manager and manager._player:
 			manager._player.combo = 0
