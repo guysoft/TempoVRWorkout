@@ -28,3 +28,6 @@ assets
 android
 out
 tools
+
+# Local distribution/test bundles (large binaries, not for version control)
+dist
