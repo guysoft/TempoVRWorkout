@@ -34,6 +34,18 @@ Official builds are published to [GitHub Releases](https://github.com/guysoft/Te
 2. Extract the APK
 3. Sideload via ADB: `adb install -r TempoVR.apk` (or use Quest's file manager)
 
+### Steam Frame (Linux ARM64)
+
+Native Linux ARM64 builds for [Steam Frame](https://partner.steamgames.com/doc/steamhardware/steamframe) are produced by the `Steam Frame ARM64` CI job (see `Linux-ARM64.zip`).
+
+1. Download `Linux-ARM64.zip` from the latest release
+2. Extract and run `TempoVR.arm64`
+
+The build ships the OpenXR Vendors plugin (`libgodotopenxrvendors.so`, arm64) for
+foveated rendering, and the OpenXR action map includes the Valve Steam Frame
+controller profile (with the Oculus Touch profile as a fallback).
+
+
 ## Pre-shipped Songs
 
 Official builds include the following songs (ExpertPlus difficulty):
