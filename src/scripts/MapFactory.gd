@@ -67,7 +67,7 @@ static func create_map(path: String):
 			if ext in ["ogg", "mp3", "wav"]:
 				music_path = path
 				var song_name = path.get_file().get_basename()
-				layout_path = GameVariables.pbvr_layouts_path + "/" + song_name + ".json"
+				layout_path = _get_pbvr_layouts_path() + "/" + song_name + ".json"
 				print("MapFactory: Creating PowerBeatsVR map from music file: " + path)
 				print("MapFactory: Derived layout path: " + layout_path)
 				var layout_exists = FileAccess.file_exists(layout_path)
@@ -93,3 +93,16 @@ static func get_format_name(format: MapFormat) -> String:
 			return "PowerBeatsVR"
 		_:
 			return "Unknown"
+
+
+# Helper to safely get the PowerBeatsVR layouts path
+# Returns "" if GameVariables autoload is not available (e.g., headless testing)
+static func _get_pbvr_layouts_path() -> String:
+	var main_loop = Engine.get_main_loop()
+	var tree := main_loop as SceneTree
+	if tree == null:
+		return ""
+	var gv_node = tree.root.get_node_or_null("GameVariables")
+	if gv_node and "pbvr_layouts_path" in gv_node:
+		return str(gv_node.pbvr_layouts_path)
+	return ""

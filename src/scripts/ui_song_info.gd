@@ -59,11 +59,13 @@ func _refresh_difficulty_display():
 		if btn:
 			var is_available = diff_name in available
 			btn.disabled = not is_available
-			# Highlight active difficulty, dim others
+			# Highlight active difficulty with bright text + border, dim others
 			if diff_name == diff and is_available:
-				btn.modulate = Color(1.3, 1.3, 1.3)
+				btn.modulate = Color(1, 1, 1)
+				_set_button_selected(btn, true)
 			else:
 				btn.modulate = Color(0.7, 0.7, 0.7) if is_available else Color(0.4, 0.4, 0.4)
+				_set_button_selected(btn, false)
 
 	# Refresh highscore for current difficulty
 	var song_id = _current_map.get_song_id()
@@ -75,6 +77,23 @@ func _refresh_difficulty_display():
 		_highscore_label.text = "Highscore: —"
 		_date_label.text = ""
 
+func _set_button_selected(btn: Button, selected: bool):
+	if selected:
+		btn.add_theme_color_override("font_color", Color(1, 1, 1))
+		var style = StyleBoxFlat.new()
+		style.bg_color = Color(0.254902, 0.603922, 0.882353, 0.35)
+		style.border_color = Color(0.254902, 0.603922, 0.882353, 1)
+		style.set_border_width_all(3)
+		style.set_corner_radius_all(8)
+		btn.add_theme_stylebox_override("normal", style)
+		btn.add_theme_stylebox_override("hover", style)
+		btn.add_theme_stylebox_override("pressed", style)
+	else:
+		btn.remove_theme_color_override("font_color")
+		btn.remove_theme_stylebox_override("normal")
+		btn.remove_theme_stylebox_override("hover")
+		btn.remove_theme_stylebox_override("pressed")
+
 func _on_difficulty_selected(diff_name):
 	if not _current_map:
 		return
@@ -82,6 +101,7 @@ func _on_difficulty_selected(diff_name):
 	if diff_name not in available:
 		return
 	GameVariables.difficulty = diff_name
+	Settings.set_setting("game", "difficulty", diff_name)
 	_refresh_difficulty_display()
 
 func _on_beginner_pressed():
