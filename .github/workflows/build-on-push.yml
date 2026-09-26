@@ -7,7 +7,7 @@ name: Build TempoVR
 # Trigger rules
 on:
   push:
-    branches: [main, develop, ci-workflow, workout, mac-ci]
+    branches: [main, develop, ci-workflow, workout, mac-ci, ci/steam-frame-arm64]
     tags: ['v*']
   pull_request:
     branches: [main, workout]
@@ -18,7 +18,10 @@ env:
   # Configure Godot version (must match project.godot config/features)
   GODOT_VERSION: 4.6.0
   # OpenXR Vendors version (for VR builds)
-  OPENXR_VENDORS_VERSION: 4.2.2-stable
+  # 5.1.0 is built for Godot 4.6 and ships a Linux arm64 binary, required for
+  # the Steam Frame ARM64 export (foveated rendering etc.). Earlier 4.x releases
+  # only ship linux x86_64.
+  OPENXR_VENDORS_VERSION: 5.1.0-stable
 
 # CI jobs
 jobs:
@@ -49,6 +52,15 @@ jobs:
             export-type: release
             export-folder: build/linux
             archive: Linux
+
+          # Export for Steam Frame (Linux ARM64 standalone VR)
+          - name: Steam Frame ARM64
+            os: ubuntu-22.04
+            platform: linux-arm64
+            export-preset: Steam Frame Arm64
+            export-type: release
+            export-folder: build/linux-arm64
+            archive: Linux-ARM64
 
           # Export for macOS
           - name: macOS
@@ -183,6 +195,21 @@ jobs:
           cd src
           godot --headless ${{ matrix.export-args }} --export-${{ matrix.export-type }} "${{ matrix.export-preset }}"
 
+      # Verify the Steam Frame build is actually an ARM64 (aarch64) executable
+      - name: Verify Steam Frame ARM64 Binary
+        if: matrix.platform == 'linux-arm64'
+        shell: bash
+        run: |
+          set -e
+          BIN="src/${{ matrix.export-folder }}/TempoVR.arm64"
+          file "$BIN"
+          if file "$BIN" | grep -q 'ARM aarch64'; then
+            echo "✓ Executable is ARM aarch64"
+          else
+            echo "✗ Executable is NOT ARM aarch64"
+            exit 1
+          fi
+
       # macOS: Godot exports a .zip containing the .app bundle. Unzip it so the
       # artifact isn't double-zipped and we can place Levels inside the .app.
       - name: Unzip macOS App Bundle
@@ -263,4 +290,4 @@ jobs:
           omitNameDuringUpdate: true
           omitBodyDuringUpdate: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: 'Windows-Artifacts/Windows.zip,Linux-Artifacts/Linux.zip,macOS-Artifacts/macOS.zip,Android-Quest-Artifacts/TempoVR-CI.apk'
+          artifacts: 'Windows-Artifacts/Windows.zip,Linux-Artifacts/Linux.zip,Linux-ARM64-Artifacts/Linux-ARM64.zip,macOS-Artifacts/macOS.zip,Android-Quest-Artifacts/TempoVR-CI.apk'
