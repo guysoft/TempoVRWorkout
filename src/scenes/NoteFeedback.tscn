@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://c47puisq3guvc" path="res://effects/ui_miss.png" id="4"]
 [ext_resource type="Texture2D" uid="uid://bjfkbbfjmatrq" path="res://effects/ui_perfect.png" id="5"]
 [ext_resource type="Texture2D" uid="uid://bfl7ks4b8ejfy" path="res://effects/ui_bomb.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://c6w1gq0o6mwfk" path="res://effects/ui_weak.png" id="7"]
 
 [sub_resource type="Animation" id="1"]
 length = 0.001
@@ -119,6 +120,7 @@ albedo_texture = ExtResource("5")
 [node name="NoteFeedback" type="Node3D" unique_id=2075860235]
 script = ExtResource("3")
 miss_texture = ExtResource("4")
+weak_texture = ExtResource("7")
 semi_texture = ExtResource("1")
 perfect_texture = ExtResource("5")
 late_texture = ExtResource("2")
