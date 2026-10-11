@@ -8,17 +8,22 @@ const HEIGHT_STEP = 0.01 # 1 cm
 @onready var _height_down_btn = $TabContainer/Settings/SettingsContent/HeightButtons/HeightDownBtn
 @onready var _height_up_btn = $TabContainer/Settings/SettingsContent/HeightButtons/HeightUpBtn
 @onready var _measure_height_btn = $TabContainer/Settings/SettingsContent/MeasureHeightBtn
+@onready var _diff_buttons = {
+	"Beginner": $TabContainer/Settings/SettingsContent/DifficultyButtons/DiffBeginnerBtn,
+	"Advanced": $TabContainer/Settings/SettingsContent/DifficultyButtons/DiffAdvancedBtn,
+	"Expert": $TabContainer/Settings/SettingsContent/DifficultyButtons/DiffExpertBtn,
+}
 
 var _current_height: float = 1.73
 
 
 func _ready():
 	$TabContainer/Settings/SettingsContent/OnlyPowerBalls.button_pressed = Settings.get_setting("game", "only_power_balls")
-	
+
 	# Load saved height
 	_current_height = float(Settings.get_setting("game", "player_height", 1.73))
 	_update_height_display()
-	
+
 	# Connect height button signals (button_down for VR raycast compatibility)
 	if _height_down_btn and not _height_down_btn.button_down.is_connected(_on_HeightDown_pressed):
 		_height_down_btn.button_down.connect(_on_HeightDown_pressed)
@@ -26,6 +31,45 @@ func _ready():
 		_height_up_btn.button_down.connect(_on_HeightUp_pressed)
 	if _measure_height_btn and not _measure_height_btn.button_down.is_connected(_on_MeasureHeight_pressed):
 		_measure_height_btn.button_down.connect(_on_MeasureHeight_pressed)
+
+	# Difficulty buttons (button_down for VR raycast compatibility)
+	for diff in _diff_buttons:
+		var btn = _diff_buttons[diff]
+		if btn and not btn.button_down.is_connected(_on_difficulty_button.bind(diff)):
+			btn.button_down.connect(_on_difficulty_button.bind(diff))
+	_update_difficulty_display(GameVariables.difficulty)
+
+
+func _on_difficulty_button(diff: String):
+	Settings.set_setting("game", "difficulty", diff)
+	GameVariables.difficulty = diff
+	_update_difficulty_display(diff)
+
+
+func _update_difficulty_display(selected: String):
+	for diff in _diff_buttons:
+		var btn = _diff_buttons[diff]
+		if btn:
+			btn.set_pressed_no_signal(diff == selected)
+			_set_button_selected(btn, diff == selected)
+
+
+func _set_button_selected(btn: Button, selected: bool):
+	if selected:
+		btn.add_theme_color_override("font_color", Color(1, 1, 1))
+		var style = StyleBoxFlat.new()
+		style.bg_color = Color(0.254902, 0.603922, 0.882353, 0.35)
+		style.border_color = Color(0.254902, 0.603922, 0.882353, 1)
+		style.set_border_width_all(3)
+		style.set_corner_radius_all(8)
+		btn.add_theme_stylebox_override("normal", style)
+		btn.add_theme_stylebox_override("hover", style)
+		btn.add_theme_stylebox_override("pressed", style)
+	else:
+		btn.remove_theme_color_override("font_color")
+		btn.remove_theme_stylebox_override("normal")
+		btn.remove_theme_stylebox_override("hover")
+		btn.remove_theme_stylebox_override("pressed")
 
 
 func _on_OnlyPowerBalls_toggled(button_pressed):

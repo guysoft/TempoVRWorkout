@@ -69,6 +69,41 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 47
 text = "Only power balls"
 
+[node name="DifficultySpacer" type="Control" parent="TabContainer/Settings/SettingsContent"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="DifficultyLabel" type="Label" parent="TabContainer/Settings/SettingsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "— Difficulty —"
+horizontal_alignment = 1
+
+[node name="DifficultyButtons" type="HBoxContainer" parent="TabContainer/Settings/SettingsContent"]
+layout_mode = 2
+alignment = 1
+
+[node name="DiffBeginnerBtn" type="Button" parent="TabContainer/Settings/SettingsContent/DifficultyButtons"]
+custom_minimum_size = Vector2(220, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+toggle_mode = true
+text = "Beginner"
+
+[node name="DiffAdvancedBtn" type="Button" parent="TabContainer/Settings/SettingsContent/DifficultyButtons"]
+custom_minimum_size = Vector2(220, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+toggle_mode = true
+text = "Advanced"
+
+[node name="DiffExpertBtn" type="Button" parent="TabContainer/Settings/SettingsContent/DifficultyButtons"]
+custom_minimum_size = Vector2(220, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+toggle_mode = true
+text = "Expert"
+
 [node name="HeightSpacer" type="Control" parent="TabContainer/Settings/SettingsContent" unique_id=1739358446]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2

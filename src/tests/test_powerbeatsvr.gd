@@ -26,6 +26,33 @@ class FakeSettings extends Node:
 		return null
 
 
+# Minimal fake GameVariables autoload for headless tests.
+class FakeGameVariables extends Node:
+	var difficulty := "Expert"
+
+	func _init(diff: String = "Expert"):
+		difficulty = diff
+
+
+func _install_fake_game_variables(diff: String = "Expert") -> void:
+	var root := get_root()
+	var existing := root.get_node_or_null("GameVariables")
+	if existing != null:
+		return
+	var gv := FakeGameVariables.new(diff)
+	gv.name = "GameVariables"
+	gv.set_meta("__fake_game_variables", true)
+	root.add_child(gv)
+
+
+func _remove_fake_game_variables() -> void:
+	var root := get_root()
+	var existing := root.get_node_or_null("GameVariables")
+	if existing != null and existing.has_meta("__fake_game_variables"):
+		root.remove_child(existing)
+		existing.free()
+
+
 func _install_fake_settings(only_power_balls_enabled: bool) -> void:
 	# Avoid clobbering a real autoload if tests are ever run inside the editor.
 	var root := get_root()
@@ -506,52 +533,66 @@ func test_wall_type_mapping() -> bool:
 func test_ball_flight_duration() -> bool:
 	print("--- Testing Ball Flight Duration ---")
 	var passed = true
-	
-	# Test Wellerman (96 BPM = Low BPM range)
-	# Expert difficulty should have 2 beats flight duration
+
+	# Difficulty-based flight duration matrix (PBVR GameManager.SetBallFlightDuration):
+	#   Low (<100):  Beginner 3, Advanced 2, Expert 2
+	#   Mid (100-145): Beginner 4, Advanced 3, Expert 2
+	#   High (>=145): Beginner 5, Advanced 3, Expert 3
+	var matrix = {
+		"Low": {"Beginner": 3, "Advanced": 2, "Expert": 2},
+		"Mid": {"Beginner": 4, "Advanced": 3, "Expert": 2},
+		"High": {"Beginner": 5, "Advanced": 3, "Expert": 3},
+	}
+
+	# Test the shared HitRules logic directly (works headless, no JSON file needed)
+	var HitRulesScript = preload("res://scripts/HitRules.gd")
+	for bpm_range in ["Low", "Mid", "High"]:
+		var bpm = {"Low": 90.0, "Mid": 120.0, "High": 160.0}[bpm_range]
+		for diff in ["Beginner", "Advanced", "Expert"]:
+			var duration = HitRulesScript.get_ball_flight_duration(bpm, diff)
+			var expected = matrix[bpm_range][diff]
+			if duration == expected:
+				print("  ✓ " + bpm_range + " BPM (" + str(int(bpm)) + ") " + diff + " returns " + str(expected) + " beats")
+			else:
+				print("  ✗ " + bpm_range + " BPM (" + str(int(bpm)) + ") " + diff + " should return " + str(expected) + " beats, got: " + str(duration))
+				passed = false
+
+	# Test a PowerBeatsVR map instance (Wellerman if available headless, else skip silently)
 	var global_path = ProjectSettings.globalize_path(WELLERMAN_PATH)
-	var wellerman_map = PowerBeatsVRMapScript.new(global_path)
-	
-	var wellerman_duration = wellerman_map.get_ball_flight_duration()
-	var wellerman_bpm = wellerman_map.get_bpm()
-	
-	print("  Wellerman BPM: " + str(wellerman_bpm))
-	print("  Ball flight duration: " + str(wellerman_duration) + " beats")
-	
-	# Wellerman is 96 BPM which is Low range (< 100)
-	# Expert difficulty should be 2 beats
-	if wellerman_duration == 2:
-		print("  ✓ Low BPM (96) correctly returns 2 beats")
-	else:
-		print("  ✗ Low BPM (96) should return 2 beats, got: " + str(wellerman_duration))
-		passed = false
-	
-	# Test BPM threshold logic by creating mock maps with different BPMs
-	# We can't easily create maps with different BPMs, so we test the thresholds directly
-	
+	if FileAccess.file_exists(global_path):
+		var wellerman_map = PowerBeatsVRMapScript.new(global_path)
+		var wellerman_bpm = wellerman_map.get_bpm()
+		print("  Wellerman BPM: " + str(wellerman_bpm))
+		_install_fake_game_variables()
+		for diff in ["Beginner", "Advanced", "Expert"]:
+			get_root().get_node("GameVariables").difficulty = diff
+			var duration = wellerman_map.get_ball_flight_duration()
+			var bpm_range = "Low"
+			if wellerman_bpm >= 145:
+				bpm_range = "High"
+			elif wellerman_bpm >= 100:
+				bpm_range = "Mid"
+			var expected = matrix[bpm_range][diff]
+			if duration == expected:
+				print("  ✓ Wellerman map " + diff + " returns " + str(expected) + " beats")
+			else:
+				print("  ✗ Wellerman map " + diff + " should return " + str(expected) + " beats, got: " + str(duration))
+				passed = false
+		_remove_fake_game_variables()
+
 	# Verify threshold constants exist
 	if PowerBeatsVRMapScript.BPM_HIGH_THRESHOLD == 145:
 		print("  ✓ BPM_HIGH_THRESHOLD is 145")
 	else:
 		print("  ✗ BPM_HIGH_THRESHOLD should be 145")
 		passed = false
-	
+
 	if PowerBeatsVRMapScript.BPM_MID_THRESHOLD == 100:
 		print("  ✓ BPM_MID_THRESHOLD is 100")
 	else:
 		print("  ✗ BPM_MID_THRESHOLD should be 100")
 		passed = false
-	
-	# Calculate expected flight time for Wellerman
-	var flight_time = 60.0 / wellerman_bpm * wellerman_duration
-	print("  Expected flight time: " + str(snapped(flight_time, 0.01)) + " seconds")
-	
-	if flight_time < 1.5:  # Should be about 1.25 seconds for 96 BPM with 2 beats
-		print("  ✓ Flight time is reasonable (~1.25s for 96 BPM)")
-	else:
-		print("  ✗ Flight time seems too long: " + str(flight_time))
-		passed = false
-	
+
 	return passed
 
 

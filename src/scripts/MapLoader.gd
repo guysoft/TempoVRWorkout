@@ -12,6 +12,7 @@ const NOTE_TYPE = {"BOMB": 3}
 const OBSTACLE_TYPE = {"FULL_HEIGHT": 0, "CROUCH": 1}
 
 # BPM threshold for ball flight duration (from PowerBeatsVR)
+const BPM_MID_THRESHOLD = 100
 const BPM_HIGH_THRESHOLD = 145
 
 # The width from each side in the center (the total width is twice this number)
@@ -85,14 +86,9 @@ func get_note_count(difficulty):
 	return self.bs_level_data[difficulty]["_notes"].size()
 
 func get_ball_flight_duration() -> int:
-	# Ball flight duration in beats - matches PowerBeatsVR timing
-	# High BPM (>= 145): 3 beats for more reaction time
-	# Low/Mid BPM (< 145): 2 beats
-	var bpm = get_bpm()
-	if bpm >= BPM_HIGH_THRESHOLD:
-		return 3
-	else:
-		return 2
+	# Ball flight duration in beats - matches PowerBeatsVR timing.
+	# From PowerBeatsVR GameManager.SetBallFlightDuration (GameManager.cs:1288-1342).
+	return HitRules.get_ball_flight_duration(get_bpm(), _get_difficulty_setting())
 
 func get_song():
 	if self.bs_info_data != null and "_songFilename" in self.bs_info_data:
@@ -291,3 +287,16 @@ static func _get_only_power_balls_setting() -> bool:
 	if settings_node and settings_node.has_method("get_setting"):
 		return bool(settings_node.get_setting("game", "only_power_balls"))
 	return false
+
+
+# Helper to safely get the current difficulty
+# Returns "Expert" if GameVariables autoload is not available (e.g., headless testing)
+static func _get_difficulty_setting() -> String:
+	var main_loop = Engine.get_main_loop()
+	var tree := main_loop as SceneTree
+	if tree == null:
+		return "Expert"
+	var gv_node = tree.root.get_node_or_null("GameVariables")
+	if gv_node and "difficulty" in gv_node:
+		return str(gv_node.difficulty)
+	return "Expert"

@@ -15,6 +15,8 @@ const TIME_CIRCLE = 500000
 
 const TRACK_LENGTH = 30
 
+var _hit_tracker = HitVelocityTracker.new()
+
 var _rumble_intensity = 0.0;
 var _rumble_duration = -128.0; #-1 means deactivated so applications can also set their own rumble
 
@@ -232,6 +234,7 @@ func calc_velocity(delta):
 	prior_controller_position = tracker_node.global_transform.origin
 
 	points.append(current_vel)
+	_hit_tracker.add_sample(current_vel)
 	if points.size() > TRACK_LENGTH:
 		points.remove_at(0)
 
@@ -239,6 +242,12 @@ func calc_velocity(delta):
 	for vel in points:
 		velocity += vel
 	velocity = velocity / points.size()
+
+
+## Peak per-frame tip velocity over the last ~70ms (PBVR contact-moment speed),
+## used for hit strength instead of the diluted 30-frame mean.
+func get_hit_velocity() -> Vector3:
+	return _hit_tracker.get_hit_velocity(velocity)
 
 
 func calc_velocity_old():

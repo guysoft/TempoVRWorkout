@@ -27,8 +27,18 @@ var _type:int
 var _cut_direction:int
 var _custom_data = {}
 var _is_power_ball: bool = false  # PowerBalls require 4x velocity to hit
+var _swing_role: String = ""  # "start"/"mid"/"end" when part of a swing series
 var _beat_player: BeatPlayer = null
 var _visual_spawn_time: float = 0.0
+
+# Swing series collider scaling (from PowerBeatsVR GameManager.cs:2605-2673):
+# every swing ball x1.03, mid ball x1.1111 more, end ball x1.1765 more.
+# Applied to the CollisionShape3D node (per-instance, pooling-safe).
+const SWING_COLLIDER_SCALE = {
+	"start": 1.03,
+	"mid": 1.03 * 1.1111112,
+	"end": 1.03 * 1.1764705,
+}
 
 var alive = false
 var been_hit = false
@@ -55,6 +65,7 @@ func reset_for_pool():
 	alive = false
 	been_hit = false
 	_is_power_ball = false
+	_swing_role = ""
 	speed = 2
 	direction = Vector3(0, 0, 1)
 	_velocity = Vector3.ZERO
@@ -66,6 +77,7 @@ func reset_for_pool():
 	_spawn_timer.stop()
 	_spawn_timer.wait_time = 0.001
 	_collision.set_deferred("disabled", true)
+	_collision.scale = Vector3.ONE
 	set_physics_process(false)
 	# Clear instance shader parameters (PowerBall purple tint)
 	_mesh.set_instance_shader_parameter("albedo_color", null)
@@ -121,6 +133,10 @@ func setup_note(note, speed, bpm, distance, beat_player: BeatPlayer = null):
 		
 	# Check if this is a PowerBall (requires 4x velocity to hit)
 	_is_power_ball = note.get("_is_power_ball", false)
+
+	# Swing series balls get enlarged colliders (PBVR parity)
+	_swing_role = note.get("_swing_role", "")
+	_collision.scale = Vector3.ONE * SWING_COLLIDER_SCALE.get(_swing_role, 1.0)
 	
 	#set the material based on the note type
 	#var mat = _mesh.get_active_material(0) as ShaderMaterial
@@ -183,11 +199,14 @@ func _process(_delta):
 		set_process(false)
 		return
 
-	# Render-frame visual motion removes physics/render cadence jitter while the
-	# Area3D remains physics-driven for hammer collision detection.
-	var desired_z = speed * (_beat_player.song_position - _visual_spawn_time)
-	_mesh.position = Vector3(0, 0, desired_z - position.z)
-	
+	if not been_hit:
+		# Drive the whole note (collider + mesh) from the audio clock so the
+		# hitbox is exactly where the ball is rendered. Area3D transform changes
+		# are picked up by the next physics step, so hammer overlap checks use
+		# this same position.
+		position.z = speed * (_beat_player.song_position - _visual_spawn_time)
+		_mesh.position = Vector3.ZERO
+
 	if _rotation_pending and not _animation_player.is_playing():
 		_mesh.rotation_degrees = _random_rotation
 		_rotation_pending = false
@@ -204,6 +223,9 @@ func deactivate(delete:bool = true, delete_delay:float=1.0):
 const HIT_LEVEL_TOOLOW = 0
 const HIT_LEVEL_MINIMUMIMPACT = 1
 const HIT_LEVEL_FULLIMPACT = 2
+# Pseudo-level for fly-past misses (never punched) so they keep the MISS popup
+# while TOOLOW (punched too weak) shows WEAK. Matches NoteFeedback.gd.
+const HIT_LEVEL_MISS = -1
 
 #TODO: Take into account the controller position of the hit?
 func on_hit(velocity, linear_velocity, hit_level):
@@ -219,7 +241,9 @@ func on_hit(velocity, linear_velocity, hit_level):
 	if linear_velocity:
 		speed = linear_velocity
 	
-	spawn_feedback(0, hit_level)
+	# A hit is a hit - no word popup for MINIMUMIMPACT (floating score still shows)
+	if hit_level != HIT_LEVEL_MINIMUMIMPACT:
+		spawn_feedback(0, hit_level)
 	
 	# Visual feedback based on hit level
 	if hit_level == HIT_LEVEL_TOOLOW:
@@ -337,7 +361,7 @@ func despawn(type):
 		
 	elif type==MISS and not been_hit and _type!=3:
 		GameplayLogger.log_miss(global_position, speed)
-		spawn_feedback(-speed*0.25, HIT_LEVEL_TOOLOW)
+		spawn_feedback(-speed*0.25, HIT_LEVEL_MISS)
 		var manager = Global.manager()
 		if manager and manager._player:
 			manager._player.combo = 0
@@ -352,11 +376,12 @@ func despawn(type):
 	#_bounce_time+=delta
 
 func _physics_process(delta):
-	_velocity = direction * speed * delta #consider moving to setup if it doesn't change
-	
-	#bounce_note()
-	
-	translate(_velocity)
-	
+	# Pre-hit flight is driven from the audio clock in _process (collider and
+	# mesh share one position). Physics translate remains for the post-hit
+	# fling and as a fallback when no beat player is available.
+	if been_hit or _beat_player == null:
+		_velocity = direction * speed * delta
+		translate(_velocity)
+
 	if self.transform.origin.z > despawn_z+(speed*0.25):
 		self.despawn(MISS)

@@ -23,9 +23,15 @@ const ES_LEVEL_HIGH = 1.05       # Map.LEVEL_HIGH (actual max Y = 2.1)
 const DEFAULT_PLAYER_HEIGHT = 1.73
 
 # Ball sizes (matched to PBVR)
-# PBVR uses 0.225m radius = 0.45m diameter
+# PBVR uses a 0.307m trigger radius (visual ball ~0.25m)
 # ES Note.tscn collision sphere updated to match
-const BALL_RADIUS = 0.225
+const BALL_RADIUS = 0.307
+
+# Swing series detection (ported from PowerBeatsVR BeatSequence.FindSwing)
+# A swing is 3 balls at beats T, T+1/16 and T+1/8. PBVR enlarges swing ball
+# colliders; roles are tagged here and applied in note.gd.
+const SWING_OFFSET_MID = 0.0625   # 1/16 beat
+const SWING_OFFSET_END = 0.125    # 1/8 beat
 
 # BPM Range thresholds (from PowerBeatsVR GameManager.cs)
 # Used to determine ball flight duration
@@ -156,16 +162,10 @@ func get_offset() -> float:
 
 
 func get_ball_flight_duration() -> int:
-	# Ball flight duration in beats - how long balls take to fly from spawn to player
-	# From PowerBeatsVR GameManager.cs - Expert difficulty timing
-	# BPM < 100  (Low):  2 beats
-	# BPM 100-145 (Mid): 2 beats
-	# BPM >= 145 (High): 3 beats
-	var bpm = get_bpm()
-	if bpm >= BPM_HIGH_THRESHOLD:
-		return 3  # High BPM songs need more time
-	else:
-		return 2  # Low and Mid BPM songs
+	# Ball flight duration in beats - how long balls take to fly from spawn to player.
+	# From PowerBeatsVR GameManager.SetBallFlightDuration (GameManager.cs:1288-1342).
+	# Higher difficulties fly balls faster (fewer beats = less time to react).
+	return HitRules.get_ball_flight_duration(get_bpm(), _get_difficulty_setting())
 
 
 func get_song() -> String:
@@ -236,9 +236,11 @@ func get_level(select_difficulty: String):
 	var beats = diff_data["beats"]
 	for beat in beats:
 		_parse_beat(select_difficulty, beat)
-	
-	print("PowerBeatsVRMap: Loaded ", select_difficulty, " - ", 
-		  get_note_count(select_difficulty), " notes")
+
+	var swing_count = _run_swing_detection(select_difficulty)
+
+	print("PowerBeatsVRMap: Loaded ", select_difficulty, " - ",
+		  get_note_count(select_difficulty), " notes, ", swing_count, " swing series")
 
 
 func _parse_beat(diff: String, beat: Dictionary):
@@ -305,6 +307,102 @@ func _add_note(diff: String, beat_no: int, offset: float, position: Array, actio
 	}
 	
 	notes[diff][beat_no].append(note)
+
+
+# --- Swing series detection (ported from PowerBeatsVR BeatSequence.FindSwing) ---
+# A swing is 3 hittables at beats T, T+1/16 (0.0625) and T+1/8 (0.125), matched
+# with 0.001 beat tolerance. Only NormalBall/PowerBall count (PBVR's
+# GetHittablesOnBeat filters HittableAction; bombs/walls are ObstacleAction).
+# Tags each ball's note dict with "_swing_role": "start"/"mid"/"end" ("" = not
+# part of a swing). note.gd applies PBVR's enlarged colliders from these roles.
+
+static func _swing_time_key(t: float) -> int:
+	# Millisecond keys; lookups check +-1 key to reproduce PBVR's 0.001 tolerance
+	return int(round(t * 1000.0))
+
+
+static func _swing_hittables_at(time_map: Dictionary, t: float) -> Array:
+	var k = _swing_time_key(t)
+	var result = []
+	for dk in [-1, 0, 1]:
+		if time_map.has(k + dk):
+			result.append_array(time_map[k + dk])
+	return result
+
+
+func _run_swing_detection(diff: String) -> int:
+	if not notes.has(diff):
+		return 0
+
+	# Time-indexed view of hittable notes (parse order preserved within each time)
+	var time_map = {}
+	for beat_no in notes[diff]:
+		for note in notes[diff][beat_no]:
+			if note.get("_type", -1) == NOTE_TYPE_BOMB:
+				continue
+			note["_swing_role"] = ""
+			var key = _swing_time_key(note["_time"])
+			if not time_map.has(key):
+				time_map[key] = []
+			time_map[key].append(note)
+
+	var swing_count = 0
+	var times = time_map.keys()
+	times.sort()
+	for t_key in times:
+		var first_balls = time_map[t_key]
+		for first in first_balls:
+			# PBVR: FindSwing only runs from balls not already part of a swing
+			if first["_swing_role"] != "":
+				continue
+			swing_count += _find_swing(time_map, first, first_balls)
+	return swing_count
+
+
+func _find_swing(time_map: Dictionary, first: Dictionary, first_balls: Array) -> int:
+	var t = first["_time"]
+	var mid_balls = _swing_hittables_at(time_map, t + SWING_OFFSET_MID)
+	var end_balls = _swing_hittables_at(time_map, t + SWING_OFFSET_END)
+	if mid_balls.is_empty() or end_balls.is_empty():
+		return 0
+
+	# The "other" ball on the first beat (double swing candidate).
+	# PBVR keeps the last hittable on the beat that isn't the first ball.
+	var other_first = null
+	for n in first_balls:
+		if n != first:
+			other_first = n
+
+	if other_first == null:
+		# Single swing: pair with the first hittable of each following beat
+		first["_swing_role"] = "start"
+		mid_balls[0]["_swing_role"] = "mid"
+		end_balls[0]["_swing_role"] = "end"
+		return 1
+
+	# Double swing requires exactly 2 balls on each following beat (PBVR rule)
+	if mid_balls.size() != 2 or end_balls.size() != 2:
+		return 0
+
+	# Pair by X position: left hand follows leftmost balls, right hand rightmost
+	var mid_left = mid_balls[0] if mid_balls[0]["x"] < mid_balls[1]["x"] else mid_balls[1]
+	var mid_right = mid_balls[1] if mid_balls[0]["x"] < mid_balls[1]["x"] else mid_balls[0]
+	var end_left = end_balls[0] if end_balls[0]["x"] < end_balls[1]["x"] else end_balls[1]
+	var end_right = end_balls[1] if end_balls[0]["x"] < end_balls[1]["x"] else end_balls[0]
+
+	first["_swing_role"] = "start"
+	other_first["_swing_role"] = "start"
+	if first["x"] < other_first["x"]:
+		mid_left["_swing_role"] = "mid"
+		end_left["_swing_role"] = "end"
+		mid_right["_swing_role"] = "mid"
+		end_right["_swing_role"] = "end"
+	else:
+		mid_right["_swing_role"] = "mid"
+		end_right["_swing_role"] = "end"
+		mid_left["_swing_role"] = "mid"
+		end_left["_swing_role"] = "end"
+	return 2
 
 
 func _add_bomb(diff: String, beat_no: int, offset: float, position: Array):
@@ -448,6 +546,19 @@ static func _get_only_power_balls_setting() -> bool:
 	if settings_node and settings_node.has_method("get_setting"):
 		return bool(settings_node.get_setting("game", "only_power_balls"))
 	return false
+
+
+# Helper to safely get the current difficulty
+# Returns "Expert" if GameVariables autoload is not available (e.g., headless testing)
+static func _get_difficulty_setting() -> String:
+	var main_loop = Engine.get_main_loop()
+	var tree := main_loop as SceneTree
+	if tree == null:
+		return "Expert"
+	var gv_node = tree.root.get_node_or_null("GameVariables")
+	if gv_node and "difficulty" in gv_node:
+		return str(gv_node.difficulty)
+	return "Expert"
 
 
 # Helper to safely get the "player_height" setting

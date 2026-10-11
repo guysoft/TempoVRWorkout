@@ -87,7 +87,11 @@ func _ready():
 	# DISABLED: Warmup was causing GPU crashes on Quest
 	# if QualitySettings.is_quest():
 	#	await _warmup_game_shaders()
-	
+
+	# Restore the player's saved difficulty (Beginner/Advanced/Expert hit rules).
+	# Debug start modes below override this with Expert for deterministic testing.
+	GameVariables.difficulty = Settings.get_setting("game", "difficulty", "Expert")
+
 	match (debug_start_scene):
 		"GGJ2Splash":
 			load_scene(splash_path, "splash")
